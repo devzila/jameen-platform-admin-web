@@ -74,7 +74,7 @@ function Sidebar({ color, image, routes }) {
               onClick={handleLogout}
             >
               <i className="nc-icon nc-alien-33" />
-              <p>Logout123</p>
+              <p>Logout</p>
             </NavLink>
           </li>
 
