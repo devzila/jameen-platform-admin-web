@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { useLocation, Route, Switch } from "react-router-dom";
+import { Provider } from 'use-http'
 
 import Sidebar from "components/Sidebar/Sidebar";
 import Login from "../views/Login"
@@ -8,6 +9,7 @@ import routes from "routes.js";
 
 import sidebarImage from "assets/img/sidebar-4.jpg";
 import { AuthContext, initialAuthState, reducer } from '../contexts/AuthContext'
+import options from './Options'
 
 
 function Admin() {
@@ -16,7 +18,9 @@ function Admin() {
   const [hasImage, setHasImage] = React.useState(true);
   const location = useLocation();
   const mainPanel = React.useRef(null);
-  const [state, dispatch] = React.useReducer(reducer, initialAuthState)
+  const [state, dispatch] = React.useReducer(reducer, initialAuthState);
+
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
@@ -53,12 +57,14 @@ function Admin() {
         <Login />
       ) : (
         <div className="wrapper">
-          <Sidebar color={color} image={hasImage ? image : ""} routes={routes} />
-          <div className="main-panel" ref={mainPanel}>
-            <div className="content">
-              <Switch>{getRoutes(routes)}</Switch>
+          <Provider url={process.env.REACT_APP_API_URL} options={options}>
+            <Sidebar color={color} image={hasImage ? image : ""} routes={routes} />
+            <div className="main-panel" ref={mainPanel}>
+              <div className="content">
+                <Switch>{getRoutes(routes)}</Switch>
+              </div>
             </div>
-          </div>
+          </Provider>
         </div>
       )} 
     </AuthContext.Provider>   

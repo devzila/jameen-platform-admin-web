@@ -73,7 +73,7 @@ const Login = () => {
         <div className="Auth-form-content">
           <h3 className="Auth-form-title">Sign In</h3>
           <div className="form-group mt-3">
-            <label>Email address</label>
+            <label>Username</label>
             <input
               name="email"
               className="form-control mt-1"
