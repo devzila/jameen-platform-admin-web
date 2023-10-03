@@ -1,5 +1,6 @@
-import Company from "views/Company.js";
-import UserProfile from "views/UserProfile.js";
+import CompanyIndex from "views/company/Index.js";
+import CompanyEdit from "views/company/Edit.js";
+import UserEdit from "views/user/Edit.js";
 import TableList from "views/TableList.js";
 
 const dashboardRoutes = [
@@ -7,14 +8,22 @@ const dashboardRoutes = [
     path: "/company",
     name: "Comapnies",
     icon: "nc-icon nc-chart-pie-35",
-    component: Company,
+    component: CompanyIndex,
     layout: "/admin"
+  },
+  {
+    path: "/company/edit",
+    name: "ComapnyEdit",
+    icon: "nc-icon nc-chart-pie-35",
+    component: CompanyEdit,
+    layout: "/admin",
+    redirect: true
   },
   {
     path: "/user",
     name: "Users",
     icon: "nc-icon nc-circle-09",
-    component: UserProfile,
+    component: UserEdit,
     layout: "/admin"
   },
   {

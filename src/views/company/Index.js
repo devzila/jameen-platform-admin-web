@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react"
 import useFetch from 'use-http'
-import ReactPaginate from 'react-paginate'
+import Paginate from '../../components/Paginate'
+import { useHistory } from "react-router-dom"
 
 // react-bootstrap components
 import {
@@ -15,12 +16,16 @@ import {
   Col,
 } from "react-bootstrap";
 
-function Company() {
+function Index() {
   const [companies, setCompanies] = useState([])
   const [pagination, setPagination] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const { get, post, response, loading, error } = useFetch()
   useEffect(() => { loadInitialCompanies() }, [currentPage]) 
+  const history = useHistory();
+  const addCompany = () => {
+      history.push("/admin/company/edit");
+  } 
 
   async function loadInitialCompanies() {
     const initialCompanies = await get(`/v1/platform_admin/companies?page=${currentPage}`)
@@ -47,9 +52,7 @@ function Company() {
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
                 <Card.Title as="h4">Companies</Card.Title>
-                <p className="card-category">
-                  Company list
-                </p>
+                <Button onClick={addCompany}>Add Company</Button>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
@@ -68,7 +71,7 @@ function Company() {
                       <td>{company.name}</td>
                       <td>{company.slug}</td>
                       <td>{company.max_compound}</td>
-                      <td>{company.created_at}</td>
+                      <td>{company.created_at.substring(0, 10)}</td>
                       <td>Oud-Turnhout</td>
                     </tr>
                     )}
@@ -81,24 +84,10 @@ function Company() {
         <Row>
           <Col md="12">
             { pagination ? 
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel="next >"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              containerClassName="pagination justify-content-center"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-              activeClassName="active"
+            <Paginate
               onPageChange={handlePageClick}
               pageRangeDisplayed={pagination.per_page}
               pageCount={pagination.total_pages}
-              previousLabel="< previous"
-              renderOnZeroPageCount={null}
               forcePage={currentPage - 1}
             />
             : <br/> }
@@ -109,4 +98,4 @@ function Company() {
   );
 }
 
-export default Company;
+export default Index;
