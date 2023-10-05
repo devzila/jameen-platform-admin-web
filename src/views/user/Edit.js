@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 // react-bootstrap components
 import {
@@ -8,12 +8,16 @@ import {
   Form,
   Navbar,
   Nav,
+  Table,
   Container,
   Row,
   Col
 } from "react-bootstrap";
 
 function Edit() {
+  useEffect(()=>{
+
+  }, [])
   return (
     <>
       <Container fluid>
