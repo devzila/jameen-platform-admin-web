@@ -1,6 +1,6 @@
 import CompanyIndex from "views/company/Index.js";
 import CompanyEdit from "views/company/Edit.js";
-import UserEdit from "views/user/Edit.js";
+import UserIndex from "views/user/Index.js";
 import TableList from "views/TableList.js";
 
 const dashboardRoutes = [
@@ -23,7 +23,7 @@ const dashboardRoutes = [
     path: "/user",
     name: "Users",
     icon: "nc-icon nc-circle-09",
-    component: UserEdit,
+    component: UserIndex,
     layout: "/admin"
   },
   {
