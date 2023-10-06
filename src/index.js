@@ -19,8 +19,8 @@ root.render(
   <>
     <BrowserRouter>
       <Switch>
-        <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-        <Redirect from="/" to="/admin/company" />
+        <Route path="/" render={(props) => <AdminLayout {...props} />} />
+        <Redirect from="/" to="/companies" />
       </Switch>
     </BrowserRouter>
     <ToastContainer />

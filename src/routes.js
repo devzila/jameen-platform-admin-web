@@ -1,40 +1,33 @@
 import CompanyIndex from "views/company/Index.js";
+import CompanyShow from "views/company/Show.js";
 import CompanyEdit from "views/company/Edit.js";
+import CompanyAdd from "views/company/Add.js";
 import UserIndex from "views/user/Index.js";
 import UserEdit from "views/user/Edit.js";
+import UserAdd from "views/user/Add.js";
+import UserShow from "views/user/Show.js";
 import TableList from "views/TableList.js";
 
 const dashboardRoutes = [
   {
-    path: "/company",
+    path: "/companies",
     name: "Comapnies",
     icon: "nc-icon nc-chart-pie-35",
-    component: CompanyIndex,
-    layout: "/admin"
+    component: CompanyIndex
   },
-  {
-    path: "/company/edit",
-    name: "ComapnyEdit",
-    icon: "nc-icon nc-chart-pie-35",
-    component: CompanyEdit,
-    layout: "/admin",
-    redirect: true
-  },
-  {
-    path: "/user",
-    name: "Users",
-    icon: "nc-icon nc-circle-09",
-    component: UserIndex,
-    layout: "/admin"
-  },
- 
   {
     path: "/table",
     name: "Table List",
     icon: "nc-icon nc-notes",
-    component: TableList,
-    layout: "/admin"
-  }
+    component: TableList
+  },
+  { path: "/companies/add", component: CompanyAdd, redirect: true },
+  { path: "/companies/:id", component: CompanyShow, redirect: true },
+  { path: "/companies/:id/edit", component: CompanyEdit, redirect: true },
+  { path: "/companies/:id/users", component: UserIndex, redirect: true },
+  { path: "/companies/:id/users/add", component: UserAdd, redirect: true },
+  { path: "/companies/:id/users/:id", component: UserShow, redirect: true },
+  { path: "/companies/:id/users/:id/edit", component: UserEdit, redirect: true }
 ];
 
 export default dashboardRoutes;

@@ -5,11 +5,8 @@ import { useHistory } from "react-router-dom"
 
 // react-bootstrap components
 import {
-  Badge,
   Button,
   Card,
-  Navbar,
-  Nav,
   Table,
   Container,
   Row,
@@ -24,7 +21,7 @@ function Index() {
   useEffect(() => { loadInitialCompanies() }, [currentPage]) 
   const history = useHistory();
   const addCompany = () => {
-      history.push("/admin/company/edit");
+      history.push("/companies/add");
   } 
 
   async function loadInitialCompanies() {

@@ -23,17 +23,13 @@ function Admin() {
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route
-            exact path={prop.layout + prop.path}
-            render={(props) => <prop.component {...props} />}
-            key={key}
-          />
-        );
-      } else {
-        return null;
-      }
+      return (
+        <Route
+          exact path={prop.path}
+          render={(props) => <prop.component {...props} />}
+          key={key}
+        />
+      );
     });
   };
   React.useEffect(() => {
