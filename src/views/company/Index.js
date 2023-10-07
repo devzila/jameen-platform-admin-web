@@ -4,7 +4,7 @@ import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
-import CustomDivToggle from "./CustomDivToggle";
+import CustomDivToggle from "../../components/CustomDivToggle";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 
@@ -82,9 +82,9 @@ function Index() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                               <Dropdown.Item><Link to={`/companies/${company.id}/edit`}>Edit</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to="/companies/:id/users">User</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to="/companies/:id/">Show</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to="/companies/:id/users/:id">User Show</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${company.id}/users`}>User</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${company.id}/Show`}>Show</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${company.id}/users/:id`}>User Show</Link></Dropdown.Item>
 
                             </Dropdown.Menu>
                           </Dropdown>
