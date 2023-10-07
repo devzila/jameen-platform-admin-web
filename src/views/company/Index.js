@@ -1,7 +1,13 @@
-import React, {useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import useFetch from 'use-http'
 import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
+import { BsThreeDots } from "react-icons/bs";
+import { Dropdown } from "react-bootstrap";
+import CustomDivToggle from "./CustomDivToggle";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
+
+
 
 // react-bootstrap components
 import {
@@ -18,11 +24,11 @@ function Index() {
   const [pagination, setPagination] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const { get, post, response, loading, error } = useFetch()
-  useEffect(() => { loadInitialCompanies() }, [currentPage]) 
+  useEffect(() => { loadInitialCompanies() }, [currentPage])
   const history = useHistory();
   const addCompany = () => {
-      history.push("/companies/add");
-  } 
+    history.push("/companies/add");
+  }
 
   async function loadInitialCompanies() {
     const initialCompanies = await get(`/v1/platform_admin/companies?page=${currentPage}`)
@@ -32,7 +38,7 @@ function Index() {
     }
   }
 
-  function handlePageClick(e){
+  function handlePageClick(e) {
     setCurrentPage(e.selected + 1)
   }
 
@@ -42,7 +48,7 @@ function Index() {
     <>
       {error && error.Error}
       {loading && "Loading..."}
-      
+
       <Container fluid>
         <Row>
           <Col md="12">
@@ -63,14 +69,27 @@ function Index() {
                     </tr>
                   </thead>
                   <tbody>
-                  {companies.map(company => 
-                    <tr id={company.id}>
-                      <td>{company.name}</td>
-                      <td>{company.slug}</td>
-                      <td>{company.max_compound}</td>
-                      <td>{company.created_at.substring(0, 10)}</td>
-                      <td>Oud-Turnhout</td>
-                    </tr>
+                    {companies.map(company =>
+                      <tr id={company.id}>
+                        <td>{company.name}</td>
+                        <td>{company.slug}</td>
+                        <td>{company.max_compound}</td>
+                        <td>{company.created_at.substring(0, 10)}</td>
+                        <td>
+                          <Dropdown key={company.id}>
+                            <Dropdown.Toggle as={CustomDivToggle} style={{ cursor: "pointer" }}>
+                              <BsThreeDots />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item><Link to="/companies/:id/edit">Edit</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to="/companies/:id/users">User</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to="/companies/:id/">Show</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to="/companies/:id/users/:id">User Show</Link></Dropdown.Item>
+
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </Table>
@@ -80,14 +99,14 @@ function Index() {
         </Row>
         <Row>
           <Col md="12">
-            { pagination ? 
-            <Paginate
-              onPageChange={handlePageClick}
-              pageRangeDisplayed={pagination.per_page}
-              pageCount={pagination.total_pages}
-              forcePage={currentPage - 1}
-            />
-            : <br/> }
+            {pagination ?
+              <Paginate
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={pagination.per_page}
+                pageCount={pagination.total_pages}
+                forcePage={currentPage - 1}
+              />
+              : <br />}
           </Col>
         </Row>
       </Container>
