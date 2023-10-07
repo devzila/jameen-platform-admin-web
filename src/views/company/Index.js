@@ -81,7 +81,7 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item><Link to="/companies/:id/edit">Edit</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${company.id}/edit`}>Edit</Link></Dropdown.Item>
                               <Dropdown.Item><Link to="/companies/:id/users">User</Link></Dropdown.Item>
                               <Dropdown.Item><Link to="/companies/:id/">Show</Link></Dropdown.Item>
                               <Dropdown.Item><Link to="/companies/:id/users/:id">User Show</Link></Dropdown.Item>
