@@ -44,14 +44,17 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>Identifier: </label>
+                        <label>Slug: </label>
+                        <span>{company.slug}</span>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Scheme:</label>
+                        <label>Created_at:</label>
+                        <span>{company.created_at}</span>
+
                       </Form.Group>
                     </Col>
                   </Row>
