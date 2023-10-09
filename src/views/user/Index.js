@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react"
 import useFetch from 'use-http'
 import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
+import CustomDivToggle from "components/CustomDivToggle"
+import { Link } from "react-router-dom/cjs/react-router-dom.min"
 
 // react-bootstrap components
 import {
@@ -76,8 +78,20 @@ function Index() {
                       <td>{user.email}</td>
                       <td>{user.mobile_number}</td>
                       <td>{user.created_at.substring(0, 10)}</td>
-                      <td>{user.updated_at.substring(0, 10)}</td>
+                      <td>
+                          <Dropdown key={user.id}>
+                            <Dropdown.Toggle as={CustomDivToggle} style={{ cursor: "pointer" }}>
+                              <BsThreeDots />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item><Link to={`/companies/${user.id}/edit`}>Edit</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${user.id}/users`}>User</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${user.id}/Show`}>Show</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${user.id}/users/:id`}>User Show</Link></Dropdown.Item>
 
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
                     </tr>
                     )}
                   </tbody>
