@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-
+import { useForm } from 'react-hook-form';
 // react-bootstrap components
 import {
   Button,
@@ -10,73 +10,49 @@ import {
   Col
 } from "react-bootstrap";
 
-function Add() {
+function Add() { 
+    const {register, handleSubmit} = useForm();
+  
+    const onSubmit = (data) => {
+       console.log(data);
+    };
 
-  useEffect(()=>{
-
-  }, [])
   return (
     <>
-      <Container fluid>
-        <Row>
-          <Col md="12">
-            <Card>
-              <Card.Header>
-                <Card.Title as="h4">Add User</Card.Title>
-              </Card.Header>
-              <Card.Body>
-                <Form>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Name</label>
-                        <Form.Control
-                          defaultValue=""
-                          placeholder="User Name"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                    <Form.Group>
-                        <label>Email</label>
-                        <Form.Control
-                          defaultValue=""
-                          placeholder="Identifier"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Ph No</label>
-                        <Form.Control
-                          defaultValue=""
-                          placeholder="Subscription Scheme"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Button
-                    className="btn-fill pull-right"
-                    type="submit"
-                    variant="info"
-                  >
-                    Update Profile
-                  </Button>
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+       <div>
+      <div className="card text-bg-dark mb-3" styles="max-width: 18rem;">
+  <div className="card-body">
+  <form onSubmit={handleSubmit(onSubmit)}>
+  <div className="mb-3">
+    <label htmlFor="exampleInputName1" className="form-label"> First Name</label>
+    <input type="name"  name="name" className="form-control" id="exampleInputName1" {...register('name', { required: true })} aria-describedby="emailHelp"/>
+  </div>
+  <div className="mb-3">
+  <label htmlFor="exampleInputName1" className="form-label">Last Name</label>
+    <input type="name"  name="name" className="form-control" id="exampleInputName1" {...register('name', { required: true })} aria-describedby="emailHelp"/>
+  </div>
+  <label htmlFor="exampleInputName1" className="form-label">User Name</label>
+    <input type="name"  name="name" className="form-control" id="exampleInputName1" {...register('name', { required: true })} aria-describedby="emailHelp"/>
+  <div className="mb-3">
+    <label htmlFor="exampleInputEmail1" className="form-label">Enter Your Email</label>
+    <input type="email"  name="email" className="form-control" id="exampleInputEmail1" {...register('email', { required: true })} aria-describedby="emailHelp"/>
+  </div>
+  <div className="mb-3">
+    <label htmlFor="exampleInputDetail1" className="form-label">Enter your Adress</label>
+    <input type="detail"  name="detail" className="form-control" id="exampleInputdetail1" {...register('detail', { required: true })} />
+  </div>
+  <div className="mb-3">
+    <label htmlFor="typeNumber" className="form-label">Number input</label>
+    <input type="number" name="number" id="typeNumber" className="form-control" {...register('phone_number', { required: true })} />
+
+  </div>
+  
+  <button type="submit" className="btn btn-primary">Submit Form</button>
+</form>
+  </div>
+</div>
+    </div>
+     </>
   );
 }
 
