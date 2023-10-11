@@ -14,7 +14,7 @@ import {
   Col
 } from "react-bootstrap";
 
-function Edit() {
+function SampleForm() {
   useEffect(()=>{
 
   }, [])

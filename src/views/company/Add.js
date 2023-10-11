@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"
+import useFetch from 'use-http'
 
 // react-bootstrap components
 import {
@@ -7,14 +8,25 @@ import {
   Form,
   Container,
   Row,
-  Col
+  Col,
+  FormSelect
 } from "react-bootstrap";
 
 function Add() {
+  const { get, post, response, loading, error } = useFetch()
+  const [subscriptionPlans, setSubscriptionPlans] = useState({})
 
   useEffect(()=>{
-
+    loadSubscriptionPlans()
   }, [])
+
+  async function loadSubscriptionPlans() {
+    const api = await get(`/v1/platform_admin/options`)
+    if (response.ok) {
+      setSubscriptionPlans(api.subscription_plans)
+    }
+  }
+
   return (
     <>
       <Container fluid>
@@ -54,11 +66,11 @@ function Add() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Scheme</label>
-                        <Form.Control
-                          defaultValue=""
-                          placeholder="Subscription Scheme"
-                          type="text"
-                        ></Form.Control>
+                        <Form.Select>
+                        {subscriptionPlans.map(plan => 
+                          <option id={plan.id}>{plan.name}</option>
+                        )}
+                        </Form.Select>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -67,7 +79,7 @@ function Add() {
                     type="submit"
                     variant="info"
                   >
-                    Update Profile
+                    Submit
                   </Button>
                   <div className="clearfix"></div>
                 </Form>

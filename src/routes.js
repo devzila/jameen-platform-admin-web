@@ -24,10 +24,10 @@ const dashboardRoutes = [
   { path: "/companies/add", component: CompanyAdd, redirect: true },
   { path: "/companies/:id", component: CompanyShow, redirect: true },
   { path: "/companies/:id/edit", component: CompanyEdit, redirect: true },
-  { path: "/companies/:id/users", component: UserIndex, redirect: true },
-  { path: "/companies/:id/users/add", component: UserAdd, redirect: true },
-  { path: "/companies/:id/users/:id", component: UserShow, redirect: true },
-  { path: "/companies/:id/users/:id/edit", component: UserEdit, redirect: true }
+  { path: "/companies/:companyId/users", component: UserIndex, redirect: true },
+  { path: "/companies/:companyId/users/add", component: UserAdd, redirect: true },
+  { path: "/companies/:companyId/users/:userId", component: UserShow, redirect: true },
+  { path: "/companies/:companyId/users/:userId/edit", component: UserEdit, redirect: true }
 ];
 
 export default dashboardRoutes;

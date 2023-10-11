@@ -4,6 +4,9 @@ import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
 import CustomDivToggle from "components/CustomDivToggle"
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
+import { Dropdown } from "react-bootstrap"
+import { BsThreeDots } from "react-icons/bs"
+import { useParams } from 'react-router-dom'
 
 // react-bootstrap components
 import {
@@ -19,6 +22,7 @@ import {
 } from "react-bootstrap";
 
 function Index() {
+  const { companyId } = useParams()
   const [users, setusers] = useState([])
   const [pagination, setPagination] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -30,7 +34,7 @@ function Index() {
   } 
 
   async function loadInitialusers() {
-    const initialusers = await get(`/v1/platform_admin/companies/1/users?page=${currentPage}`)
+    const initialusers = await get(`/v1/platform_admin/companies/${companyId}/users?page=${currentPage}`)
     if (response.ok) {
       setusers(initialusers.data.users)
       setPagination(initialusers.data.pagination)
@@ -57,6 +61,7 @@ function Index() {
                 <Button onClick={addUser}>Add User</Button>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
+                { users.length > 0 ? 
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
@@ -96,6 +101,7 @@ function Index() {
                     )}
                   </tbody>
                 </Table>
+                : <div>No data found </div> }
               </Card.Body>
             </Card>
           </Col>

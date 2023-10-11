@@ -82,9 +82,8 @@ function Index() {
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                               <Dropdown.Item><Link to={`/companies/${company.id}/edit`}>Edit</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/users`}>User</Link></Dropdown.Item>
+                              <Dropdown.Item><Link to={`/companies/${company.id}/users`}>Users</Link></Dropdown.Item>
                               <Dropdown.Item><Link to={`/companies/${company.id}/Show`}>Show</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/users/:id`}>User Show</Link></Dropdown.Item>
 
                             </Dropdown.Menu>
                           </Dropdown>
