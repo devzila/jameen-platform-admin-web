@@ -19,7 +19,7 @@ function Show() {
   useEffect(()=>{ loadUser() }, [])
 
   async function loadUser() {
-    const api = await get(`/v1/platform_admin/companies/1/users/${id}`)
+    const api = await get(`/v1/platform_admin/companies/${id}/users/${id}`)
     if (response.ok) {
       setUser(api.data.user)
     }

@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react"
 import useFetch from 'use-http'
 import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
+import { BsThreeDots } from "react-icons/bs";
+import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "components/CustomDivToggle"
 import { Link } from "react-router-dom/cjs/react-router-dom.min"
 
@@ -26,7 +28,7 @@ function Index() {
   useEffect(() => { loadInitialusers() }, [currentPage]) 
   const history = useHistory();
   const addUser = () => {
-      history.push("/admin/user/edit");
+      history.push("/companies/:id/users/add");
   } 
 
   async function loadInitialusers() {
@@ -61,39 +63,42 @@ function Index() {
                   <thead>
                     <tr>
                       <th className="border-0">Name</th>
-                      <th className="border-0"></th>
                       <th className="border-0">Email Adress</th>
                       <th className="border-0">Ph_Number</th>
                       <th className="border-0">Crated At</th>
                       <th className="border-0">Updated At</th>
-                      <th className="border-0"></th>
-
                     </tr>
                   </thead>
                   <tbody>
-                  {users.map(user => 
-                    <tr id={user.id}>
-                      <td>{user.name}</td>
-                      <td>{user.slug}</td>
-                      <td>{user.email}</td>
-                      <td>{user.mobile_number}</td>
-                      <td>{user.created_at.substring(0, 10)}</td>
-                      <td>
+                  {users.map(user => (
+                      <tr key={user.id}>
+                        <td>{user.name}</td>
+                        <td>{user.slug}</td>
+                        <td>{user.max_compound}</td>
+                        <td>{user.created_at.substring(0, 10)}</td>
+                        <td>
                           <Dropdown key={user.id}>
                             <Dropdown.Toggle as={CustomDivToggle} style={{ cursor: "pointer" }}>
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item><Link to={`/companies/${user.id}/edit`}>Edit</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${user.id}/users`}>User</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${user.id}/Show`}>Show</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${user.id}/users/:id`}>User Show</Link></Dropdown.Item>
-
+                              <Dropdown.Item key={`edit-${user.id}`} as={Link} to={`/companies/${user.id}/edit`}>
+                                Edit
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`users-${user.id}`} as={Link} to={`/companies/${user.id}/users`}>
+                                User
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`show-${user.id}`} as={Link} to={`/companies/${user.id}/Show`}>
+                                Show
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`user-show-${user.id}`} as={Link} to={`/companies/${user.id}/users/:id`}>
+                                User Show
+                              </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>
                         </td>
-                    </tr>
-                    )}
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

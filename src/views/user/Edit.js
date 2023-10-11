@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
-
+import { useParams } from 'react-router-dom'
+import { useForm } from "react-hook-form"
+import useFetch from 'use-http'
 // react-bootstrap components
 import {
   Badge,
@@ -15,9 +17,34 @@ import {
 } from "react-bootstrap";
 
 function Edit() {
-  useEffect(()=>{
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm()
 
-  }, [])
+  const { id } = useParams()
+  const { get, put, response, loading, error } = useFetch()
+  const [userData, setUserData] = useState({})
+  useEffect(()=>{
+    loadUser()
+  }, [id])
+
+  async function loadUser() {
+    const api = await get(`/v1/platform_admin/companies/${id}users/${id}`)
+    if (response.ok) {
+      setUserData(api.data.user)
+    }
+  }
+  async function onSubmit(data) { 
+    console.log(data)
+    const api = await put(`/v1/platform_admin/companies/${id}/users/${id}`, {user: data})
+    if (response.ok) {
+      
+    }
+  }
+
   return (
     <>
       <Container fluid>
@@ -28,16 +55,17 @@ function Edit() {
                 <Card.Title as="h4">Edit Profile</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                   <Row>
                     <Col className="pr-1" md="5">
                       <Form.Group>
                         <label>Company (disabled)</label>
                         <Form.Control
-                          defaultValue="Creative Code Inc."
+                          defaultValue={userData.name}
                           disabled
                           placeholder="Company"
                           type="text"
+                          {...register("name")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -45,9 +73,11 @@ function Edit() {
                       <Form.Group>
                         <label>Username</label>
                         <Form.Control
-                          defaultValue="michael23"
+                          defaultValue={userData.username}
                           placeholder="Username"
                           type="text"
+                          {...register("username")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -57,8 +87,11 @@ function Edit() {
                           Email address
                         </label>
                         <Form.Control
+                        defaultValue={userData.email}
                           placeholder="Email"
                           type="email"
+                          {...register("email")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -68,9 +101,11 @@ function Edit() {
                       <Form.Group>
                         <label>First Name</label>
                         <Form.Control
-                          defaultValue="Mike"
+                          defaultValue={userData.firstname}
                           placeholder="Company"
                           type="text"
+                          {...register("firstname")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -78,9 +113,11 @@ function Edit() {
                       <Form.Group>
                         <label>Last Name</label>
                         <Form.Control
-                          defaultValue="Andrew"
+                          defaultValue={userData.lastname}
                           placeholder="Last Name"
                           type="text"
+                          {...register("lastname")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -90,9 +127,10 @@ function Edit() {
                       <Form.Group>
                         <label>Address</label>
                         <Form.Control
-                          defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                          defaultValue={userData.adress}
                           placeholder="Home Address"
                           type="text"
+                          {...register("address")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -102,9 +140,11 @@ function Edit() {
                       <Form.Group>
                         <label>City</label>
                         <Form.Control
-                          defaultValue="Mike"
+                          defaultValue={city}
                           placeholder="City"
                           type="text"
+                          {...register("city")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -112,9 +152,11 @@ function Edit() {
                       <Form.Group>
                         <label>Country</label>
                         <Form.Control
-                          defaultValue="Andrew"
+                          defaultValue={country}
                           placeholder="Country"
                           type="text"
+                          {...register("country")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -122,8 +164,11 @@ function Edit() {
                       <Form.Group>
                         <label>Postal Code</label>
                         <Form.Control
+                          defaultValue={userData.postalcode}
                           placeholder="ZIP Code"
                           type="number"
+                          {...register("postalcode")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>

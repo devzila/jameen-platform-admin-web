@@ -8,7 +8,6 @@ import CustomDivToggle from "../../components/CustomDivToggle";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 
-
 // react-bootstrap components
 import {
   Button,
@@ -69,8 +68,8 @@ function Index() {
                     </tr>
                   </thead>
                   <tbody>
-                    {companies.map(company =>
-                      <tr id={company.id}>
+                    {companies.map(company => (
+                      <tr key={company.id}>
                         <td>{company.name}</td>
                         <td>{company.slug}</td>
                         <td>{company.max_compound}</td>
@@ -81,16 +80,23 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/edit`}>Edit</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/users`}>User</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/Show`}>Show</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/users/:id`}>User Show</Link></Dropdown.Item>
-
+                              <Dropdown.Item key={`edit-${company.id}`} as={Link} to={`/companies/${company.id}/edit`}>
+                                Edit
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`users-${company.id}`} as={Link} to={`/companies/${company.id}/users`}>
+                                User
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`show-${company.id}`} as={Link} to={`/companies/${company.id}/Show`}>
+                                Show
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`user-show-${company.id}`} as={Link} to={`/companies/${company.id}/users/:id`}>
+                                User Show
+                              </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>
                         </td>
                       </tr>
-                    )}
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>
