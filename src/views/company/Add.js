@@ -90,7 +90,7 @@ function Add() {
                         <label>Scheme</label>
 
                         <Form.Select
-                          defaultValue={companyData.subscription_id}
+                          defaultValue={companyData.subscription}
                           {...register("scheme", { required: true })}
                         >
                           {Array.isArray(subscriptionPlans) &&

@@ -75,13 +75,52 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
+                    <Form.Group>
+                        <label>username</label>
+                        <Form.Control
+                          defaultValue={userData.username}
+                          placeholder="Identifier"
+                          type="text"
+                          {...register("username")}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="12">
+                    <Form.Group>
+                        <label>Password</label>
+                        <Form.Control
+                          defaultValue={userData.password}
+                          placeholder="Identifier"
+                          type="text"
+                          {...register("password")}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="12">
+                    <Form.Group>
+                        <label>Role</label>
+                        <Form.Control
+                          defaultValue={userData.role_id}
+                          placeholder="Identifier"
+                          type="text"
+                          {...register("role_id")}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Ph No</label>
                         <Form.Control
-                          defaultValue={userData.phone_number}
+                          defaultValue={userData.mobile_number}
                           placeholder="Subscription Scheme"
                           type="text"
-                          {...register("phone_number")}
+                          {...register("mobile_number")}
 
                         ></Form.Control>
                       </Form.Group>

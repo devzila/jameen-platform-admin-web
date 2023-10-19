@@ -29,7 +29,7 @@ function Index() {
   useEffect(() => { loadInitialusers() }, [currentPage]) 
   const history = useHistory();
   const addUser = () => {
-      history.push("/companies/companyId/users/add");
+      history.push(`/companies/${companyId}/users/add`);
   } 
 
 
