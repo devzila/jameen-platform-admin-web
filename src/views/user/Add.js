@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState } from "react";
+import useFetch from 'use-http';
+import { useForm } from "react-hook-form"
+import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 // react-bootstrap components
 import {
   Button,
@@ -9,12 +11,31 @@ import {
   Row,
   Col
 } from "react-bootstrap";
+import { post } from "jquery";
+
 
 function Add() {
+    const {
+      register,
+      handleSubmit,
+      watch,
+      formState: { errors },
+    } = useForm()
 
-  useEffect(()=>{
+    const {companyId} = useParams()
+    const { get, post, response } = useFetch();
+    const [userData, setUserData] = useState({})
+    
+    useEffect(()=>{
 
-  }, [])
+    }, [])
+
+    async function onSubmit(data) {
+      console.log(data)
+      const api = await post(`/v1/platform_admin/companies/${companyId}/users`, { user: data })
+      if (response.ok) {
+      }
+    }
   return (
     <>
       <Container fluid>
@@ -25,15 +46,16 @@ function Add() {
                 <Card.Title as="h4">Add User</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue=""
+                          defaultValue={userData.name}
                           placeholder="User Name"
                           type="text"
+                          {...register("name")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -43,9 +65,10 @@ function Add() {
                     <Form.Group>
                         <label>Email</label>
                         <Form.Control
-                          defaultValue=""
+                          defaultValue={userData.email}
                           placeholder="Identifier"
                           type="text"
+                          {...register("email")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -55,9 +78,11 @@ function Add() {
                       <Form.Group>
                         <label>Ph No</label>
                         <Form.Control
-                          defaultValue=""
+                          defaultValue={userData.phone_number}
                           placeholder="Subscription Scheme"
                           type="text"
+                          {...register("phone_number")}
+
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -78,6 +103,7 @@ function Add() {
       </Container>
     </>
   );
-}
+  }
+
 
 export default Add;

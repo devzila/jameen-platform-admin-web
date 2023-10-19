@@ -69,8 +69,8 @@ function Index() {
                     </tr>
                   </thead>
                   <tbody>
-                    {companies.map(company =>
-                      <tr id={company.id}>
+                  {companies.map(company => (
+                      <tr key={company.id}>
                         <td>{company.name}</td>
                         <td>{company.slug}</td>
                         <td>{company.max_compound}</td>
@@ -81,15 +81,21 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/edit`}>Edit</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/users`}>Users</Link></Dropdown.Item>
-                              <Dropdown.Item><Link to={`/companies/${company.id}/Show`}>Show</Link></Dropdown.Item>
-
+                              <Dropdown.Item key={`edit-${company.id}`} as={Link} to={`/companies/${company.id}/edit`}>
+                                Edit
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`companys-${company.id}`} as={Link} to={`/companies/${company.id}/users`}>
+                                 Users
+                              </Dropdown.Item>
+                              <Dropdown.Item key={`show-${company.id}`} as={Link} to={`/companies/${company.id}`}>
+                                Show
+                              </Dropdown.Item>
+                
                             </Dropdown.Menu>
                           </Dropdown>
                         </td>
                       </tr>
-                    )}
+                    ))}
                   </tbody>
                 </Table>
               </Card.Body>

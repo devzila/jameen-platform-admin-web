@@ -43,7 +43,6 @@ function Edit() {
     console.log(data)
     const api = await put(`/v1/platform_admin/companies/${id}`, {company: data})
     if (response.ok) {
-      
     }
   }
 
@@ -92,7 +91,7 @@ function Edit() {
                           defaultValue={companyData.subscription?.name}
                           placeholder="Subscription Scheme"
                           type="text"
-                          {...register("subscription_id")}
+                          {...register("subscription_name")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>

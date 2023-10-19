@@ -13,13 +13,13 @@ import {
 } from "react-bootstrap";
 
 function Show() {
-  const { id } = useParams()
+  const {companyId, userId} = useParams()
   const [user, setUser] = useState({})
   const { get, response, loading, error } = useFetch()
   useEffect(()=>{ loadUser() }, [])
 
   async function loadUser() {
-    const api = await get(`/v1/platform_admin/companies/1/users/${id}`)
+    const api = await get(`/v1/platform_admin/companies/${companyId}/users/${userId}`)
     if (response.ok) {
       setUser(api.data.user)
     }
@@ -68,11 +68,10 @@ function Show() {
                       </Form.Group>
                     </Col>
                   </Row>
-                 
                   <Button
                     className="btn-fill pull-right"
                     variant="info"
-                  >
+                   >
                     Edit
                   </Button>
                   <div className="clearfix"></div>
