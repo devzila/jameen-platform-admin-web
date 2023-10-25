@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
-import useFetch from 'use-http'
+import React, { useEffect, useState } from "react";
+import useFetch from 'use-http';
+import { useForm } from "react-hook-form"
 
-// react-bootstrap components
 import {
   Button,
   Card,
@@ -11,21 +11,41 @@ import {
   Col,
   FormSelect
 } from "react-bootstrap";
+import { post } from "jquery";
 
 function Add() {
-  const { get, post, response, loading, error } = useFetch()
-  const [subscriptionPlans, setSubscriptionPlans] = useState({})
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm()
 
-  useEffect(()=>{
-    loadSubscriptionPlans()
-  }, [])
 
-  async function loadSubscriptionPlans() {
-    const api = await get(`/v1/platform_admin/options`)
+  const { get, post, response } = useFetch();
+  const [companyData, setCompanyData] = useState({})
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  
+
+
+  useEffect(() => {
+    async function loadSubscriptionPlans() {
+      const api = await get(`/v1/platform_admin/options`);
+      if (response.ok) {
+        setSubscriptionPlans(api.subscription_plans || []);
+      }
+    }
+
+    loadSubscriptionPlans();
+  }, [get, response]);
+
+  async function onSubmit(data) {
+    console.log(data)
+    const api = await post(`/v1/platform_admin/companies`, { company: data })
     if (response.ok) {
-      setSubscriptionPlans(api.subscription_plans)
     }
   }
+
 
   return (
     <>
@@ -37,27 +57,16 @@ function Add() {
                 <Card.Title as="h4">Add Company</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue=""
-                          placeholder="Company Name"
+                          defaultValue={companyData.name}
+                          placeholder="User Name"
                           type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                    <Form.Group>
-                        <label>Identifier (No space, No special letter)</label>
-                        <Form.Control
-                          defaultValue=""
-                          placeholder="Identifier"
-                          type="text"
+                          {...register("name")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -65,23 +74,43 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Scheme</label>
-                        <Form.Select>
-                        {subscriptionPlans.map(plan => 
-                          <option id={plan.id}>{plan.name}</option>
-                        )}
+                        <label>Identifier</label>
+                        <Form.Control
+                          defaultValue={companyData.slug}
+                          placeholder="slug"
+                          type="text"
+                          {...register("slug")}
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col className="pr-1" md="12">
+                      <Form.Group>
+                        <label>Subscription</label>
+                        <Form.Select {...register("subscription")}>
+                          {Array.isArray(subscriptionPlans) &&
+                            subscriptionPlans.map(plan => (
+                              <option key={plan.id} value={plan.id}>{plan.id}</option>
+
+                            ))}
                         </Form.Select>
                       </Form.Group>
                     </Col>
                   </Row>
+                 
+     
                   <Button
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
                   >
-                    Submit
+                    Add Company
                   </Button>
                   <div className="clearfix"></div>
+
+                  {/* Your form code */}
                 </Form>
               </Card.Body>
             </Card>

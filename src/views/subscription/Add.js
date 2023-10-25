@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useFetch from 'use-http';
 import { useForm } from "react-hook-form"
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 // react-bootstrap components
 import {
   Button,
@@ -22,9 +21,8 @@ function Add() {
       formState: { errors },
     } = useForm()
 
-    const {companyId} = useParams()
     const { get, post, response } = useFetch();
-    const [userData, setUserData] = useState({})
+    const [subscriptionData, setSubscriptionData] = useState({})
     
     useEffect(()=>{
 
@@ -32,7 +30,7 @@ function Add() {
 
     async function onSubmit(data) {
       console.log(data)
-      const api = await post(`/v1/platform_admin/companies/${companyId}/users`, { user: data })
+      const api = await post(`/v1/platform_admin/subscriptions`, { subscription: data })
       if (response.ok) {
       }
     }
@@ -43,7 +41,7 @@ function Add() {
           <Col md="12">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">Add User</Card.Title>
+                <Card.Title as="h4">Add Subscription</Card.Title>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
@@ -52,8 +50,8 @@ function Add() {
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue={userData.name}
-                          placeholder="User Name"
+                          defaultValue={subscriptionData.name}
+                          placeholder="subscription Name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -65,10 +63,10 @@ function Add() {
                     <Form.Group>
                         <label>Email</label>
                         <Form.Control
-                          defaultValue={userData.email}
+                          defaultValue={subscriptionData.max_no_of_units}
                           placeholder="Identifier"
                           type="text"
-                          {...register("email")}
+                          {...register("max_no_of_units")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -76,56 +74,17 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>username</label>
+                        <label>subscriptionname</label>
                         <Form.Control
-                          defaultValue={userData.username}
+                          defaultValue={subscriptionData.max_no_of_compounds}
                           placeholder="Identifier"
                           type="text"
-                          {...register("username")}
+                          {...register("max_no_of_compounds")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                    <Form.Group>
-                        <label>Password</label>
-                        <Form.Control
-                          defaultValue={userData.password}
-                          placeholder="Identifier"
-                          type="text"
-                          {...register("password")}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                    <Form.Group>
-                        <label>Role</label>
-                        <Form.Control
-                          defaultValue={userData.role_id}
-                          placeholder="Identifier"
-                          type="text"
-                          {...register("role_id")}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Ph No</label>
-                        <Form.Control
-                          defaultValue={userData.mobile_number}
-                          placeholder="Subscription Scheme"
-                          type="text"
-                          {...register("mobile_number")}
-
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                 
                   <Button
                     className="btn-fill pull-right"
                     type="submit"

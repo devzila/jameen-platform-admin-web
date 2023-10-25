@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react";
 import useFetch from 'use-http'
 import Paginate from '../../components/Paginate'
 import { useHistory } from "react-router-dom"
@@ -6,10 +6,6 @@ import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
-
-
-
-// react-bootstrap components
 import {
   Button,
   Card,
@@ -19,29 +15,30 @@ import {
   Col,
 } from "react-bootstrap";
 
+
 function Index() {
-  const [companies, setCompanies] = useState([])
+  const [subscriptions, setSubscriptions] = useState([])
   const [pagination, setPagination] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const { get, post, response, loading, error } = useFetch()
-  useEffect(() => { loadInitialCompanies() }, [currentPage])
+  useEffect(() => { loadInitialSubscriptions() }, [currentPage])
   const history = useHistory();
-  const addCompany = () => {
-    history.push(`/companies/add`);
+  const addSubscription = () => {
+    history.push(`/subscriptions/add`);
   }
 
-  async function loadInitialCompanies() {
-    const initialCompanies = await get(`/v1/platform_admin/companies?page=${currentPage}`)
+
+  async function loadInitialSubscriptions() {
+    const initialSubscriptions = await get(`/v1/platform_admin/subscriptions?page=${currentPage}`)
     if (response.ok) {
-      setCompanies(initialCompanies.data.companies)
-      setPagination(initialCompanies.data.pagination)
+      setSubscriptions(initialSubscriptions.data.subscriptions)
+      setPagination(initialSubscriptions.data.pagination)
     }
   }
 
   function handlePageClick(e) {
     setCurrentPage(e.selected + 1)
   }
-
 
 
   return (
@@ -54,40 +51,40 @@ function Index() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Companies</Card.Title>
-                <Button onClick={addCompany}>Add Company</Button>
+                <Card.Title as="h4">subscriptions</Card.Title>
+                <Button onClick={addSubscription}>Add Subscription</Button>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
                       <th className="border-0">Name</th>
-                      <th className="border-0">Identifier</th>
-                      <th className="border-0">Max Compound</th>
+                      <th className="border-0"> max_no_of_units</th>
+                      <th className="border-0"> max_Compounds</th>
                       <th className="border-0">Crated At</th>
                       <th className="border-0">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                  {companies.map(company => (
-                      <tr key={company.id}>
-                        <td>{company.name}</td>
-                        <td>{company.slug}</td>
-                        <td>{company.max_compound}</td>
-                        <td>{company.created_at.substring(0, 10)}</td>
+                  {subscriptions.map(subscription => (
+                      <tr key={subscription.id}>
+                        <td>{subscription.name}</td>
+                        <td>{subscription.max_no_of_units}</td>
+                        <td>{subscription.max_no_of_compounds}</td>
+                        <td>{subscription.created_at.substring(0, 10)}</td>
                         <td>
-                          <Dropdown key={company.id}>
+                          <Dropdown key={subscription.id}>
                             <Dropdown.Toggle as={CustomDivToggle} style={{ cursor: "pointer" }}>
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item key={`edit-${company.id}`} as={Link} to={`/companies/${company.id}/edit`}>
+                              <Dropdown.Item key={`edit-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}/edit`}>
                                 Edit
                               </Dropdown.Item>
-                              <Dropdown.Item key={`companys-${company.id}`} as={Link} to={`/companies/${company.id}/users`}>
-                                 Users
+                              <Dropdown.Item key={`subscriptions-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}/companies`}>
+                                 Company
                               </Dropdown.Item>
-                              <Dropdown.Item key={`show-${company.id}`} as={Link} to={`/companies/${company.id}`}>
+                              <Dropdown.Item key={`show-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}`}>
                                 Show
                               </Dropdown.Item>
                 

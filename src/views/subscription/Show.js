@@ -13,15 +13,15 @@ import {
 } from "react-bootstrap";
 
 function Show() {
-  const {companyId, userId} = useParams()
-  const [user, setUser] = useState({})
+  const { id } = useParams()
+  const [subscription, setSubscription] = useState({})
   const { get, response, loading, error } = useFetch()
-  useEffect(()=>{ loadUser() }, [])
+  useEffect(()=>{ loadSubscription() }, [])
 
-  async function loadUser() {
-    const api = await get(`/v1/platform_admin/companies/${companyId}/users/${userId}`)
+  async function loadSubscription() {
+    const api = await get(`/v1/platform_admin/subscriptions/${id}`)
     if (response.ok) {
-      setUser(api.data.user)
+      setSubscription(api.data.subscription)
     }
   }
 
@@ -37,33 +37,31 @@ function Show() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Name:</label>
-                        <span>{user.name}</span>
+                        <span>{subscription.name}</span>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>email: </label>
-                        <span>{user.email} </span>
-
+                        <label>Slug: </label>
+                        <span>{subscription.max_no_of_units}</span>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="12">
+                    <Form.Group>
+                        <label>Slug: </label>
+                        <span>{subscription.max_no_of_compounds}</span>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Ph-No:</label>
-                        <span>{user.mobile_number} </span>
-
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Created At:</label>
-                        <span>{user.created_at} </span>
+                        <label>Created_at:</label>
+                        <span>{subscription.created_at}</span>
 
                       </Form.Group>
                     </Col>
@@ -71,7 +69,7 @@ function Show() {
                   <Button
                     className="btn-fill pull-right"
                     variant="info"
-                   >
+                  >
                     Edit
                   </Button>
                   <div className="clearfix"></div>

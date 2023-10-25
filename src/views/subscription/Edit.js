@@ -26,22 +26,23 @@ function Edit() {
 
   const { id } = useParams()
   const { get, put, response, loading, error } = useFetch()
-  const [companyData, setCompanyData] = useState({})
+  const [subscriptionData, setSubscriptionData] = useState({})
 
   useEffect(()=>{
-    loadComapny()
+    loadSubscription()
   }, [id])
 
-  async function loadComapny() {
-    const api = await get(`/v1/platform_admin/companies/${id}`)
+
+  async function loadSubscription() {
+    const api = await get(`/v1/platform_admin/subscriptions/${id}`)
     if (response.ok) {
-      setCompanyData(api.data.company)
+      setSubscriptionData(api.data.subscription)
     }
   }
 
   async function onSubmit(data) { 
     console.log(data)
-    const api = await put(`/v1/platform_admin/companies/${id}`, {company: data})
+    const api = await put(`/v1/platform_admin/subscriptions/${id}`, {subscription: data})
     if (response.ok) {
     }
   }
@@ -53,7 +54,7 @@ function Edit() {
           <Col md="12">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">Edit Company</Card.Title>
+                <Card.Title as="h4">Edit subscription</Card.Title>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}> 
@@ -62,8 +63,8 @@ function Edit() {
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue={companyData.name}
-                          placeholder="Company Name"
+                          defaultValue={subscriptionData.name}
+                          placeholder="subscription Name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -73,29 +74,30 @@ function Edit() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>Identifier (No space, No special letter)</label>
+                        <label>max_no_of_units</label>
                         <Form.Control
-                          defaultValue={companyData.slug}
+                          defaultValue={subscriptionData.max_no_of_units}
                           placeholder="Identifier"
                           type="text"
-                          {...register("slug")}
+                          {...register("max_no_of_units")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Scheme</label>
+                    <Form.Group>
+                        <label>max_no_of_compounds</label>
                         <Form.Control
-                          defaultValue={companyData.subscription?.name}
-                          placeholder="Subscription Scheme"
+                          defaultValue={subscriptionData.max_no_of_compounds}
+                          placeholder="Identifier"
                           type="text"
-                          {...register("subscription_name")}
+                          {...register("max_no_of_compounds")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
+                 
                   <Button
                     className="btn-fill pull-right"
                     type="submit"
