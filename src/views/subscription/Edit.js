@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from "react";
-import useFetch from 'use-http';
+import React, { useEffect, useState } from "react"
+import { useParams } from 'react-router-dom'
 import { useForm } from "react-hook-form"
+import useFetch from 'use-http'
 
+// react-bootstrap components
 import {
+  Badge,
   Button,
   Card,
   Form,
+  Navbar,
+  Nav,
   Container,
   Row,
-  Col,
-  FormSelect
+  Col
 } from "react-bootstrap";
-import { post } from "jquery";
 
-function Add() {
+function Edit() {
   const {
     register,
     handleSubmit,
@@ -21,31 +24,28 @@ function Add() {
     formState: { errors },
   } = useForm()
 
+  const { id } = useParams()
+  const { get, put, response, loading, error } = useFetch()
+  const [subscriptionData, setSubscriptionData] = useState({})
 
-  const { get, post, response } = useFetch();
-  const [companyData, setCompanyData] = useState({})
-  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
-  
+  useEffect(()=>{
+    loadSubscription()
+  }, [id])
 
 
-  useEffect(() => {
-    async function loadSubscriptionPlans() {
-      const api = await get(`/v1/platform_admin/options`);
-      if (response.ok) {
-        setSubscriptionPlans(api.subscription_plans || []);
-      }
-    }
-
-    loadSubscriptionPlans();
-  }, [get, response]);
-
-  async function onSubmit(data) {
-    console.log(data)
-    const api = await post(`/v1/platform_admin/companies`, { company: data })
+  async function loadSubscription() {
+    const api = await get(`/v1/platform_admin/subscriptions/${id}`)
     if (response.ok) {
+      setSubscriptionData(api.data.subscription)
     }
   }
 
+  async function onSubmit(data) { 
+    console.log(data)
+    const api = await put(`/v1/platform_admin/subscriptions/${id}`, {subscription: data})
+    if (response.ok) {
+    }
+  }
 
   return (
     <>
@@ -54,17 +54,17 @@ function Add() {
           <Col md="12">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">Add Company</Card.Title>
+                <Card.Title as="h4">Edit subscription</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form onSubmit={handleSubmit(onSubmit)}>
+                <Form onSubmit={handleSubmit(onSubmit)}> 
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue={companyData.name}
-                          placeholder="User Name"
+                          defaultValue={subscriptionData.name}
+                          placeholder="subscription Name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -73,44 +73,39 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Identifier</label>
+                    <Form.Group>
+                        <label>max_no_of_units</label>
                         <Form.Control
-                          defaultValue={companyData.slug}
-                          placeholder="slug"
+                          defaultValue={subscriptionData.max_no_of_units}
+                          placeholder="Identifier"
                           type="text"
-                          {...register("slug")}
+                          {...register("max_no_of_units")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
-
                   <Row>
                     <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Subscription</label>
-                        <Form.Select {...register("subscription")}>
-                          {Array.isArray(subscriptionPlans) &&
-                            subscriptionPlans.map(plan => (
-                              <option key={plan.id} value={plan.id}>{plan.id}</option>
-
-                            ))}
-                        </Form.Select>
+                    <Form.Group>
+                        <label>max_no_of_compounds</label>
+                        <Form.Control
+                          defaultValue={subscriptionData.max_no_of_compounds}
+                          placeholder="Identifier"
+                          type="text"
+                          {...register("max_no_of_compounds")}
+                        ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
                  
-     
                   <Button
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
                   >
-                    Add Company
+                    Update
                   </Button>
                   <div className="clearfix"></div>
-
-                  {/* Your form code */}
                 </Form>
               </Card.Body>
             </Card>
@@ -121,4 +116,4 @@ function Add() {
   );
 }
 
-export default Add;
+export default Edit;

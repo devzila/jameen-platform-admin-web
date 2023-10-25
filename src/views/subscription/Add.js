@@ -1,52 +1,39 @@
 import React, { useEffect, useState } from "react";
 import useFetch from 'use-http';
 import { useForm } from "react-hook-form"
-
+// react-bootstrap components
 import {
   Button,
   Card,
   Form,
   Container,
   Row,
-  Col,
-  FormSelect
+  Col
 } from "react-bootstrap";
 import { post } from "jquery";
 
+
 function Add() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm()
+    const {
+      register,
+      handleSubmit,
+      watch,
+      formState: { errors },
+    } = useForm()
 
+    const { get, post, response } = useFetch();
+    const [subscriptionData, setSubscriptionData] = useState({})
+    
+    useEffect(()=>{
 
-  const { get, post, response } = useFetch();
-  const [companyData, setCompanyData] = useState({})
-  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
-  
+    }, [])
 
-
-  useEffect(() => {
-    async function loadSubscriptionPlans() {
-      const api = await get(`/v1/platform_admin/options`);
+    async function onSubmit(data) {
+      console.log(data)
+      const api = await post(`/v1/platform_admin/subscriptions`, { subscription: data })
       if (response.ok) {
-        setSubscriptionPlans(api.subscription_plans || []);
       }
     }
-
-    loadSubscriptionPlans();
-  }, [get, response]);
-
-  async function onSubmit(data) {
-    console.log(data)
-    const api = await post(`/v1/platform_admin/companies`, { company: data })
-    if (response.ok) {
-    }
-  }
-
-
   return (
     <>
       <Container fluid>
@@ -54,7 +41,7 @@ function Add() {
           <Col md="12">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">Add Company</Card.Title>
+                <Card.Title as="h4">Add Subscription</Card.Title>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
@@ -63,8 +50,8 @@ function Add() {
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue={companyData.name}
-                          placeholder="User Name"
+                          defaultValue={subscriptionData.name}
+                          placeholder="subscription Name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -73,44 +60,39 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Identifier</label>
+                    <Form.Group>
+                        <label>Email</label>
                         <Form.Control
-                          defaultValue={companyData.slug}
-                          placeholder="slug"
+                          defaultValue={subscriptionData.max_no_of_units}
+                          placeholder="Identifier"
                           type="text"
-                          {...register("slug")}
+                          {...register("max_no_of_units")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
-
                   <Row>
                     <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Subscription</label>
-                        <Form.Select {...register("subscription")}>
-                          {Array.isArray(subscriptionPlans) &&
-                            subscriptionPlans.map(plan => (
-                              <option key={plan.id} value={plan.id}>{plan.id}</option>
-
-                            ))}
-                        </Form.Select>
+                    <Form.Group>
+                        <label>subscriptionname</label>
+                        <Form.Control
+                          defaultValue={subscriptionData.max_no_of_compounds}
+                          placeholder="Identifier"
+                          type="text"
+                          {...register("max_no_of_compounds")}
+                        ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
                  
-     
                   <Button
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
                   >
-                    Add Company
+                    Update Profile
                   </Button>
                   <div className="clearfix"></div>
-
-                  {/* Your form code */}
                 </Form>
               </Card.Body>
             </Card>
@@ -119,6 +101,7 @@ function Add() {
       </Container>
     </>
   );
-}
+  }
+
 
 export default Add;
