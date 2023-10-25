@@ -10,7 +10,6 @@ import {
   Row,
   Col
 } from "react-bootstrap";
-import { post } from "jquery";
 
 
 function Add() {

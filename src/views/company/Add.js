@@ -11,7 +11,6 @@ import {
   Col,
   FormSelect
 } from "react-bootstrap";
-import { post } from "jquery";
 
 function Add() {
   const {
