@@ -88,7 +88,7 @@ function Add() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Subscription</label>
-                        <Form.Select {...register("subscription")}>
+                        <Form.Select {...register("subscription_id")}>
                           {Array.isArray(subscriptionPlans) &&
                             subscriptionPlans.map(plan => (
                               <option key={plan.id} value={plan.id}>{plan.id}</option>
