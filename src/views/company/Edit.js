@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useContext } from "react"
 import { useParams } from 'react-router-dom'
 import { useForm } from "react-hook-form"
 import useFetch from 'use-http'
+import AppDataContext from "contexts/AppDataContext"
 
 // react-bootstrap components
 import {
@@ -20,13 +21,13 @@ function Edit() {
   const {
     register,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors },
   } = useForm()
 
   const { id } = useParams()
   const { get, put, response, loading, error } = useFetch()
-  const [companyData, setCompanyData] = useState({})
+  const appData = useContext(AppDataContext);
 
   useEffect(()=>{
     loadComapny()
@@ -35,7 +36,9 @@ function Edit() {
   async function loadComapny() {
     const api = await get(`/v1/platform_admin/companies/${id}`)
     if (response.ok) {
-      setCompanyData(api.data.company)
+      setValue('name', api.data.company.name)
+      setValue('slug', api.data.company.slug)
+      setValue('subscription_id', api.data.company.subscription.id)
     }
   }
 
@@ -62,7 +65,6 @@ function Edit() {
                       <Form.Group>
                         <label>Name</label>
                         <Form.Control
-                          defaultValue={companyData.name}
                           placeholder="Company Name"
                           type="text"
                           {...register("name")}
@@ -75,7 +77,6 @@ function Edit() {
                     <Form.Group>
                         <label>Identifier (No space, No special letter)</label>
                         <Form.Control
-                          defaultValue={companyData.slug}
                           placeholder="Identifier"
                           type="text"
                           {...register("slug")}
@@ -86,13 +87,13 @@ function Edit() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Scheme</label>
-                        <Form.Control
-                          defaultValue={companyData.subscription?.name}
-                          placeholder="Subscription Scheme"
-                          type="text"
-                          {...register("subscription_name")}
-                        ></Form.Control>
+                        <label>Subscription</label>
+                        <Form.Select {...register("subscription_id")}>
+                          {Array.isArray(appData?.subscription_plans) &&
+                            appData.subscription_plans.map(plan => (
+                              <option key={plan.id} value={plan.id}>{plan.name}</option>
+                            ))}
+                        </Form.Select>
                       </Form.Group>
                     </Col>
                   </Row>
