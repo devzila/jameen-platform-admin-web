@@ -20,7 +20,8 @@ const options = {
       return response
     }
     */
-  }
+  },
+  cachePolicy: 'no-cache'
 }
 
 export default options
