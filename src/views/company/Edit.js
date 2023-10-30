@@ -1,5 +1,6 @@
 import React, { useEffect, useContext } from "react"
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useForm } from "react-hook-form"
 import useFetch from 'use-http'
 import AppDataContext from "contexts/AppDataContext"
@@ -27,11 +28,12 @@ function Edit() {
 
   const { id } = useParams()
   const { get, put, response, loading, error } = useFetch()
-  const appData = useContext(AppDataContext);
+  const appData = useContext(AppDataContext)
+  const history = useHistory()
 
   useEffect(()=>{
     loadComapny()
-  }, [id])
+  }, [])
 
   async function loadComapny() {
     const api = await get(`/v1/platform_admin/companies/${id}`)
@@ -43,9 +45,12 @@ function Edit() {
   }
 
   async function onSubmit(data) { 
-    console.log(data)
     const api = await put(`/v1/platform_admin/companies/${id}`, {company: data})
     if (response.ok) {
+      history.push("/companies")
+    }
+    else{
+      toast(response.data?.message)
     }
   }
 
