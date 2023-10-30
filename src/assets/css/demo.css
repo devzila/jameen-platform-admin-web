@@ -836,4 +836,8 @@ label {
   color: rgb(34, 34, 34);
 }
 
+.align-right{
+  text-align: right;
+}
+
 /* end css for login page */
