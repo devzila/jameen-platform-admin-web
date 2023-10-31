@@ -94,7 +94,7 @@ function Edit() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Subscription</label>
-                        <Form.Select {...register("subscription_id")}>
+                        <Form.Select {...register("subscription_id")} className="form-control">
                           {Array.isArray(appData?.subscription_plans) &&
                             appData.subscription_plans.map(plan => (
                               <option key={plan.id} value={plan.id}>{plan.name}</option>

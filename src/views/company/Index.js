@@ -54,8 +54,18 @@ function Index() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Companies</Card.Title>
-                <Button onClick={addCompany}>Add Company</Button>
+                <Row>
+                  <Col md="8">
+                  <Card.Title as="h4"> Companies </Card.Title>
+                  </Col>
+                  <Col md="4" className="align-right">
+                    <Button onClick={addCompany}>Add Company</Button>
+                  </Col>
+                </Row>
+                
+                
+                
+                
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
@@ -63,7 +73,7 @@ function Index() {
                     <tr>
                       <th className="border-0">Name</th>
                       <th className="border-0">Identifier</th>
-                      <th className="border-0">Max Compound</th>
+                      <th className="border-0">Subscription</th>
                       <th className="border-0">Crated At</th>
                       <th className="border-0">Action</th>
                     </tr>
@@ -73,7 +83,7 @@ function Index() {
                       <tr key={company.id}>
                         <td>{company.name}</td>
                         <td>{company.slug}</td>
-                        <td>{company.max_compound}</td>
+                        <td>{company.subscription?.name}</td>
                         <td>{company.created_at.substring(0, 10)}</td>
                         <td>
                           <Dropdown key={company.id}>
