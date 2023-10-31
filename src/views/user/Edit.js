@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { toast } from 'react-toastify'
 import useFetch from "use-http";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
@@ -8,12 +9,15 @@ function EditUser() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
 
   const { companyId, userId } = useParams();
   const { get, put, response, loading, error } = useFetch();
   const [userData, setUserData] = useState({});
+  const history = useHistory()
+
 
   useEffect(() => {
     loadUser();
@@ -22,20 +26,21 @@ function EditUser() {
   async function loadUser() {
     const api = await get(`/v1/platform_admin/companies/${companyId}/users/${userId}`);
     if (response.ok) {
-      setUserData(api.data.user);
+      setValue('name', api.data.user.name)
+      setValue('email', api.data.user.email)
+      setValue('mobile_number', api.data.user.mobile_number)
     }
   }
   async function onSubmit(data) {
-    try {
       const api = await put(`/v1/platform_admin/companies/${companyId}/users/${userId}`, { user: data });
-      if (api.ok) {
+      if (response.ok) {
+        history.push(`/companies/${companyId}/users`)
+        toast("user edited Successfully")
       } else {
-        const responseData = await api.json(); 
-        console.error("Error updating user:", responseData.errors);
+        toast(response.data?.message)
       }
-    } catch (error) {
-      console.error("Error updating user:", error.message);
-    }
+   
+    
   }
   return (
     <Container fluid>

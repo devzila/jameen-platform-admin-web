@@ -81,9 +81,6 @@ function Index() {
                               <Dropdown.Item key={`edit-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}/edit`}>
                                 Edit
                               </Dropdown.Item>
-                              <Dropdown.Item key={`subscriptions-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}/companies`}>
-                                 Company
-                              </Dropdown.Item>
                               <Dropdown.Item key={`show-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}`}>
                                 Show
                               </Dropdown.Item>

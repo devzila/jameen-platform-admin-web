@@ -48,6 +48,7 @@ function Edit() {
     const api = await put(`/v1/platform_admin/companies/${id}`, {company: data})
     if (response.ok) {
       history.push("/companies")
+      toast("company edited successfully")
     }
     else{
       toast(response.data?.message)

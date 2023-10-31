@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { useForm } from "react-hook-form"
 import useFetch from 'use-http'
+import { toast } from 'react-toastify'
+
 
 // react-bootstrap components
 import {
@@ -21,12 +23,14 @@ function Edit() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm()
 
   const { id } = useParams()
   const { get, put, response, loading, error } = useFetch()
   const [subscriptionData, setSubscriptionData] = useState({})
+  const history = useHistory()
 
   useEffect(()=>{
     loadSubscription()
@@ -36,7 +40,9 @@ function Edit() {
   async function loadSubscription() {
     const api = await get(`/v1/platform_admin/subscriptions/${id}`)
     if (response.ok) {
-      setSubscriptionData(api.data.subscription)
+      setValue('name', api.data.subscription.name)
+      setValue('max_no_of_units', api.data.subscription.max_no_of_units)
+      setValue('max_no_of_compounds', api.data.subscription.max_no_of_compounds)
     }
   }
 
@@ -44,6 +50,11 @@ function Edit() {
     console.log(data)
     const api = await put(`/v1/platform_admin/subscriptions/${id}`, {subscription: data})
     if (response.ok) {
+      history.push("/subscriptions")
+      toast("subscription  edited successfully")
+    }
+    else{
+      toast(response.data?.message)
     }
   }
 

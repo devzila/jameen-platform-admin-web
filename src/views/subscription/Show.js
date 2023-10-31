@@ -44,7 +44,7 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>Slug: </label>
+                        <label>max_no_of_units </label>
                         <span>{subscription.max_no_of_units}</span>
                       </Form.Group>
                     </Col>
@@ -52,7 +52,7 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>Slug: </label>
+                        <label>max_no_of_compounds </label>
                         <span>{subscription.max_no_of_compounds}</span>
                       </Form.Group>
                     </Col>

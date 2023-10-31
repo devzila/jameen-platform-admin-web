@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from 'react-router-dom'
 import useFetch from 'use-http';
 import { useForm } from "react-hook-form"
+import { toast } from 'react-toastify'
+
 
 import {
   Button,
@@ -16,6 +19,7 @@ function Add() {
   const {
     register,
     handleSubmit,
+    setValue,
     watch,
     formState: { errors },
   } = useForm()
@@ -24,7 +28,8 @@ function Add() {
   const { get, post, response } = useFetch();
   const [companyData, setCompanyData] = useState({})
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
-  
+  const history = useHistory()
+
 
 
   useEffect(() => {
@@ -42,6 +47,14 @@ function Add() {
     console.log(data)
     const api = await post(`/v1/platform_admin/companies`, { company: data })
     if (response.ok) {
+      setValue('name', api.data.company.name)
+      setValue('slug', api.data.company.slug)
+      setValue('subscription_id', api.data.company.subscription.id)
+      history.push("/companies")
+      toast("Successfully Created")
+    }
+    else{
+      toast(response.data?.message)
     }
   }
 

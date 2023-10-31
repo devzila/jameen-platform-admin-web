@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import useFetch from 'use-http';
 import { useForm } from "react-hook-form"
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import { useParams, useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { toast } from 'react-toastify'
+
 // react-bootstrap components
 import {
   Button,
@@ -18,12 +20,15 @@ function Add() {
       register,
       handleSubmit,
       watch,
+      setValue,
       formState: { errors },
     } = useForm()
 
     const {companyId} = useParams()
     const { get, post, response } = useFetch();
     const [userData, setUserData] = useState({})
+    const history = useHistory()
+
     
     useEffect(()=>{
 
@@ -33,8 +38,16 @@ function Add() {
       console.log(data)
       const api = await post(`/v1/platform_admin/companies/${companyId}/users`, { user: data })
       if (response.ok) {
+        setValue('name', api.data.user.name)
+        setValue('email', api.data.user.email)
+        setValue('mobile_number', api.data.user.mobile_number)
+        history.push(`/companies/${companyId}/users`)
+        toast("user added Successfully")
+      } else {
+        toast(response.data?.message)
       }
     }
+
   return (
     <>
       <Container fluid>
