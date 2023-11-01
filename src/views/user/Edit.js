@@ -13,7 +13,7 @@ function EditUser() {
     formState: { errors },
   } = useForm();
 
-  const { companyId, userId } = useParams();
+  const { companyId, userId, role_id } = useParams();
   const { get, put, response, loading, error } = useFetch();
   const [userData, setUserData] = useState({});
   const history = useHistory()
@@ -29,27 +29,42 @@ function EditUser() {
       setValue('name', api.data.user.name)
       setValue('email', api.data.user.email)
       setValue('mobile_number', api.data.user.mobile_number)
+      setValue('username', api.data.user.username)
+      setValue('role_id', api.data.user.role_id)
     }
   }
   async function onSubmit(data) {
-      const api = await put(`/v1/platform_admin/companies/${companyId}/users/${userId}`, { user: data });
-      if (response.ok) {
-        history.push(`/companies/${companyId}/users`)
-        toast("user edited Successfully")
-      } else {
-        toast(response.data?.message)
-      }
-   
-    
+    const api = await put(`/v1/platform_admin/companies/${companyId}/users/${userId}`, { user: data });
+    if (response.ok) {
+      history.push(`/companies/${companyId}/users`)
+      toast("user edited Successfully")
+    } else {
+      toast(response.data?.message)
+    }
+
   }
+
+  const handleGoBack = () => {
+    history.goBack();
+  };
+
   return (
     <Container fluid>
       <Row>
         <Col md="12">
           <Card>
-            <Card.Header>
-              <Card.Title as="h4">Edit User</Card.Title>
-            </Card.Header>
+          <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">Edit Company</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Header>
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row>
@@ -91,6 +106,34 @@ function EditUser() {
                     </Form.Group>
                   </Col>
                 </Row>
+                <Row>
+                  <Col className="pr-1" md="12">
+                    <Form.Group>
+                      <label>UserName</label>
+                      <Form.Control
+                        defaultValue={userData.username}
+                        placeholder="username"
+                        type="text"
+                        {...register("username")}
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col className="pr-1" md="12">
+                    <Form.Group>
+                      <label>Role_id</label>
+                      <Form.Control
+                        defaultValue={userData.role}
+                        placeholder="Role_id"
+                        type="text"
+                        {...register("role.id")}
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
                 <Button
                   className="btn-fill pull-right"
                   type="submit"

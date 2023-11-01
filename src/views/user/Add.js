@@ -41,6 +41,9 @@ function Add() {
         setValue('name', api.data.user.name)
         setValue('email', api.data.user.email)
         setValue('mobile_number', api.data.user.mobile_number)
+        setValue('username', api.data.user.username)
+        setValue('password', api.data.user.password)
+        setValue('role_id', api.data.user.role_id)
         history.push(`/companies/${companyId}/users`)
         toast("user added Successfully")
       } else {
@@ -48,14 +51,29 @@ function Add() {
       }
     }
 
+
+    const handleGoBack = () => {
+      history.goBack();
+    };
+
+
   return (
     <>
       <Container fluid>
         <Row>
           <Col md="12">
             <Card>
-              <Card.Header>
-                <Card.Title as="h4">Add User</Card.Title>
+            <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">Add User</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
@@ -65,7 +83,7 @@ function Add() {
                         <label>Name</label>
                         <Form.Control
                           defaultValue={userData.name}
-                          placeholder="User Name"
+                          placeholder="Name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -78,7 +96,7 @@ function Add() {
                         <label>Email</label>
                         <Form.Control
                           defaultValue={userData.email}
-                          placeholder="Identifier"
+                          placeholder="Email"
                           type="text"
                           {...register("email")}
                         ></Form.Control>
@@ -91,7 +109,7 @@ function Add() {
                         <label>username</label>
                         <Form.Control
                           defaultValue={userData.username}
-                          placeholder="Identifier"
+                          placeholder="UserName"
                           type="text"
                           {...register("username")}
                         ></Form.Control>
@@ -104,7 +122,7 @@ function Add() {
                         <label>Password</label>
                         <Form.Control
                           defaultValue={userData.password}
-                          placeholder="Identifier"
+                          placeholder="Password"
                           type="text"
                           {...register("password")}
                         ></Form.Control>
@@ -117,7 +135,7 @@ function Add() {
                         <label>Role</label>
                         <Form.Control
                           defaultValue={userData.role_id}
-                          placeholder="Identifier"
+                          placeholder="Role"
                           type="text"
                           {...register("role_id")}
                         ></Form.Control>
@@ -130,7 +148,7 @@ function Add() {
                         <label>Ph No</label>
                         <Form.Control
                           defaultValue={userData.mobile_number}
-                          placeholder="Subscription Scheme"
+                          placeholder="Ph Number"
                           type="text"
                           {...register("mobile_number")}
 
@@ -142,6 +160,7 @@ function Add() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
+                    
                   >
                     Update Profile
                   </Button>

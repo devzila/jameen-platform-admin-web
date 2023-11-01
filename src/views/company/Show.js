@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import useFetch from 'use-http'
 
 // react-bootstrap components
@@ -16,6 +16,7 @@ function Show() {
   const { id } = useParams()
   const [company, setCompany] = useState({})
   const { get, response, loading, error } = useFetch()
+  const history = useHistory()
   useEffect(()=>{ loadCompany() }, [])
 
   async function loadCompany() {
@@ -24,6 +25,10 @@ function Show() {
       setCompany(api.data.company)
     }
   }
+  const handleGoBack = () => {
+    history.goBack();
+  };
+
 
   return (
     <>
@@ -31,6 +36,18 @@ function Show() {
         <Row>
           <Col md="12">
             <Card>
+            <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">Edit Company</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Header>
               <Card.Body>
                 <Form>
                   <Row>
@@ -58,12 +75,7 @@ function Show() {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Button
-                    className="btn-fill pull-right"
-                    variant="info"
-                  >
-                    Edit
-                  </Button>
+                  
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>

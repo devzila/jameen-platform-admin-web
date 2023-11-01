@@ -38,10 +38,9 @@ const dashboardRoutes = [
   { path: "/companies/:companyId/users/add", component: UserAdd, redirect: true },
   { path: "/companies/:companyId/users/:userId", component: UserShow, redirect: true },
   { path: "/companies/:companyId/users/:userId/edit", component: UserEdit, redirect: true },
-  { path: "subscriptions/add", component: SubscriptionIndex, redirect: true},
+  { path: "/subscriptions/add", component: SubscriptionAdd, redirect: true},
   { path: "/subscriptions/:id", component: SubscriptionShow, redirect: true },
   { path: "/subscriptions/:id/edit", component: SubscriptionEdit, redirect: true },
-  { path: "/subscriptions/add", component: SubscriptionAdd, redirect: true },
 
 ];
 

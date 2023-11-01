@@ -28,6 +28,7 @@ function Add() {
     const [subscriptionData, setSubscriptionData] = useState({})
     const history = useHistory()
 
+
     
     useEffect(()=>{
 
@@ -47,14 +48,29 @@ function Add() {
         toast(response.data?.message)
       }
     }
+
+    const handleGoBack = () => {
+      history.goBack();
+    };
+
+
   return (
     <>
       <Container fluid>
         <Row>
           <Col md="12">
             <Card>
-              <Card.Header>
-                <Card.Title as="h4">Add Subscription</Card.Title>
+            <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">Add Subscription</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
@@ -74,10 +90,10 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>Email</label>
+                        <label>MAX UNITS</label>
                         <Form.Control
                           defaultValue={subscriptionData.max_no_of_units}
-                          placeholder="Identifier"
+                          placeholder="Units"
                           type="text"
                           {...register("max_no_of_units")}
                         ></Form.Control>
@@ -87,10 +103,10 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                     <Form.Group>
-                        <label>subscriptionname</label>
+                        <label>MAX COMPOUNDS</label>
                         <Form.Control
                           defaultValue={subscriptionData.max_no_of_compounds}
-                          placeholder="Identifier"
+                          placeholder="Compounds"
                           type="text"
                           {...register("max_no_of_compounds")}
                         ></Form.Control>

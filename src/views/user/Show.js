@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import useFetch from 'use-http'
 
 // react-bootstrap components
@@ -13,9 +13,10 @@ import {
 } from "react-bootstrap";
 
 function Show() {
-  const {companyId, userId} = useParams()
+  const {companyId, userId, } = useParams()
   const [user, setUser] = useState({})
   const { get, response, loading, error } = useFetch()
+  const history = useHistory()
   useEffect(()=>{ loadUser() }, [])
 
   async function loadUser() {
@@ -25,12 +26,30 @@ function Show() {
     }
   }
 
+  const handleGoBack = () => {
+    history.goBack();
+  };
+
+
+
   return (
     <>
       <Container fluid>
         <Row>
           <Col md="12">
             <Card>
+            <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">User Show</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Header>
               <Card.Body>
                 <Form>
                   <Row>
@@ -62,18 +81,23 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
+                        <label>UserName:</label>
+                        <span>{user.username} </span>
+
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                
+                  <Row>
+                    <Col className="pr-1" md="12">
+                      <Form.Group>
                         <label>Created At:</label>
                         <span>{user.created_at} </span>
 
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Button
-                    className="btn-fill pull-right"
-                    variant="info"
-                   >
-                    Edit
-                  </Button>
+                 
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>

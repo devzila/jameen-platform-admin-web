@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
-import { useParams } from 'react-router-dom';
-import useFetch from 'use-http'
+import React, { useEffect, useState } from "react";
+import { useParams, useHistory } from 'react-router-dom';
+import useFetch from 'use-http';
 
 // react-bootstrap components
 import {
@@ -13,17 +13,25 @@ import {
 } from "react-bootstrap";
 
 function Show() {
-  const { id } = useParams()
-  const [subscription, setSubscription] = useState({})
-  const { get, response, loading, error } = useFetch()
-  useEffect(()=>{ loadSubscription() }, [])
+  const { id } = useParams();
+  const [subscription, setSubscription] = useState({});
+  const { get, response, loading, error } = useFetch();
+  const history = useHistory();
+
+  useEffect(() => {
+    loadSubscription();
+  }, []);
 
   async function loadSubscription() {
-    const api = await get(`/v1/platform_admin/subscriptions/${id}`)
+    const api = await get(`/v1/platform_admin/subscriptions/${id}`);
     if (response.ok) {
-      setSubscription(api.data.subscription)
+      setSubscription(api.data.subscription);
     }
   }
+
+  const goBack = () => {
+    history.goBack();
+  };
 
   return (
     <>
@@ -43,7 +51,7 @@ function Show() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>max_no_of_units </label>
                         <span>{subscription.max_no_of_units}</span>
                       </Form.Group>
@@ -51,7 +59,7 @@ function Show() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>max_no_of_compounds </label>
                         <span>{subscription.max_no_of_compounds}</span>
                       </Form.Group>
@@ -62,22 +70,25 @@ function Show() {
                       <Form.Group>
                         <label>Created_at:</label>
                         <span>{subscription.created_at}</span>
-
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Button
-                    className="btn-fill pull-right"
-                    variant="info"
-                  >
-                    Edit
-                  </Button>
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>
             </Card>
           </Col>
         </Row>
+        
+                      <Button
+                        className="btn-fill pull-right"
+                        variant="info"
+                        onClick={goBack}
+                      >
+                        Go Back
+                      </Button>
+                   
+                    
       </Container>
     </>
   );

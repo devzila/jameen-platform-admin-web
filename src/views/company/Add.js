@@ -57,6 +57,9 @@ function Add() {
       toast(response.data?.message)
     }
   }
+  const handleGoBack = () => {
+    history.goBack();
+  };
 
 
   return (
@@ -65,8 +68,17 @@ function Add() {
         <Row>
           <Col md="12">
             <Card>
-              <Card.Header>
-                <Card.Title as="h4">Add Company</Card.Title>
+            <Card.Header>
+                <Row>
+                  <Col md="6">
+                    <Card.Title as="h4">Add Company</Card.Title>
+                  </Col>
+                  <Col md="6" className="text-right">
+                    <Button variant="info" onClick={handleGoBack}>
+                      Go Back
+                    </Button>
+                  </Col>
+                </Row>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>

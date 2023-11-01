@@ -47,12 +47,22 @@ function Index() {
       {loading && "Loading..."}
 
       <Container fluid>
-        <Row>
+      <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">subscriptions</Card.Title>
-                <Button onClick={addSubscription}>Add Subscription</Button>
+                <Row>
+                  <Col md="8">
+                  <Card.Title as="h4"> Subscriptions </Card.Title>
+                  </Col>
+                  <Col md="4" className="align-right">
+                    <Button onClick={addSubscription}>Add Subscription</Button>
+                  </Col>
+                </Row>
+                
+                
+                
+                
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
