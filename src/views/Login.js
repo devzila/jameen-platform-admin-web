@@ -1,33 +1,34 @@
-import React from "react"
-import { toast } from 'react-toastify'
-import { AuthContext } from '../contexts/AuthContext'
+import React from "react";
+import { toast } from "react-toastify";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Login = () => {
-  const { dispatch } = React.useContext(AuthContext)
+  const { dispatch } = React.useContext(AuthContext);
+
   const initialState = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     isSubmitting: false,
     errorMessage: null,
-  }
-  const [data, setData] = React.useState(initialState)
+  };
+  const [data, setData] = React.useState(initialState);
   const handleInputChange = (event) => {
     setData({
       ...data,
       [event.target.name]: event.target.value,
-    })
-  }
+    });
+  };
   const handleFormSubmit = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     setData({
       ...data,
       isSubmitting: true,
       errorMessage: null,
-    })
+    });
     fetch(`${process.env.REACT_APP_API_URL}/v1/platform_admin/auth/session`, {
-      method: 'post',
+      method: "post",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         username: data.email,
@@ -36,36 +37,36 @@ const Login = () => {
     })
       .then((res) => {
         if (res.ok) {
-          return res.json()
+          return res.json();
         }
-        throw res
+        throw res;
       })
       .then((resJson) => {
         dispatch({
-          type: 'LOGIN',
+          type: "LOGIN",
           payload: resJson,
-        })
+        });
       })
       .catch((error) => {
-        if (!('json' in error) || error.status == 404) {
-          toast('Unknown Error Occured. Server response not received.')
+        if (!("json" in error) || error.status == 404) {
+          toast("Unknown Error Occured. Server response not received.");
           setData({
             ...data,
             isSubmitting: false,
-          })
-          return
+          });
+          return;
         }
-        console.log(error.status)
+        console.log(error.status);
         error.json().then((response) => {
-          toast(response.message)
+          toast(response.message);
           setData({
             ...data,
             isSubmitting: false,
             errorMessage: response.message || error.statusText,
-          })
-        })
-      })
-  }
+          });
+        });
+      });
+  };
 
   return (
     <div className="Auth-form-container">
@@ -92,18 +93,18 @@ const Login = () => {
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={data.isSubmitting}
             >
-              {data.isSubmitting ? 'Loading...' : 'Login'}
+              {data.isSubmitting ? "Loading..." : "Login"}
             </button>
           </div>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
