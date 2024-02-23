@@ -30,8 +30,8 @@ function Index() {
 
     console.log(response);
     if (response.ok) {
-      setCompanies(initialCompanies.data.companies);
-      setPagination(initialCompanies.data.pagination);
+      setCompanies(initialCompanies.data);
+      setPagination(initialCompanies.pagination);
     }
   }
 

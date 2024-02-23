@@ -1,45 +1,39 @@
 import React, { useEffect, useState } from "react";
-import useFetch from 'use-http'
-import Paginate from '../../components/Paginate'
-import { useHistory } from "react-router-dom"
+import useFetch from "use-http";
+import Paginate from "../../components/Paginate";
+import { useHistory } from "react-router-dom";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
-import {
-  Button,
-  Card,
-  Table,
-  Container,
-  Row,
-  Col,
-} from "react-bootstrap";
-
+import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
 
 function Index() {
-  const [subscriptions, setSubscriptions] = useState([])
-  const [pagination, setPagination] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const { get, post, response, loading, error } = useFetch()
-  useEffect(() => { loadInitialSubscriptions() }, [currentPage])
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { get, post, response, loading, error } = useFetch();
+  useEffect(() => {
+    loadInitialSubscriptions();
+  }, [currentPage]);
   const history = useHistory();
   const addSubscription = () => {
     history.push(`/subscriptions/add`);
-  }
-
+  };
 
   async function loadInitialSubscriptions() {
-    const initialSubscriptions = await get(`/v1/platform_admin/subscriptions?page=${currentPage}`)
+    const initialSubscriptions = await get(
+      `/v1/platform_admin/subscriptions?page=${currentPage}`
+    );
     if (response.ok) {
-      setSubscriptions(initialSubscriptions.data.subscriptions)
-      setPagination(initialSubscriptions.data.pagination)
+      setSubscriptions(initialSubscriptions.data);
+      setPagination(initialSubscriptions.pagination);
     }
   }
 
   function handlePageClick(e) {
-    setCurrentPage(e.selected + 1)
+    setCurrentPage(e.selected + 1);
   }
-
 
   return (
     <>
@@ -47,22 +41,18 @@ function Index() {
       {loading && "Loading..."}
 
       <Container fluid>
-      <Row>
+        <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
                 <Row>
                   <Col md="8">
-                  <Card.Title as="h4"> Subscriptions </Card.Title>
+                    <Card.Title as="h4"> Subscriptions </Card.Title>
                   </Col>
                   <Col md="4" className="align-right">
                     <Button onClick={addSubscription}>Add Subscription</Button>
                   </Col>
                 </Row>
-                
-                
-                
-                
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
@@ -76,7 +66,7 @@ function Index() {
                     </tr>
                   </thead>
                   <tbody>
-                  {subscriptions.map(subscription => (
+                    {subscriptions?.map((subscription) => (
                       <tr key={subscription.id}>
                         <td>{subscription.name}</td>
                         <td>{subscription.max_no_of_units}</td>
@@ -84,17 +74,27 @@ function Index() {
                         <td>{subscription.created_at.substring(0, 10)}</td>
                         <td>
                           <Dropdown key={subscription.id}>
-                            <Dropdown.Toggle as={CustomDivToggle} style={{ cursor: "pointer" }}>
+                            <Dropdown.Toggle
+                              as={CustomDivToggle}
+                              style={{ cursor: "pointer" }}
+                            >
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item key={`edit-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}/edit`}>
+                              <Dropdown.Item
+                                key={`edit-${subscription.id}`}
+                                as={Link}
+                                to={`/subscriptions/${subscription.id}/edit`}
+                              >
                                 Edit
                               </Dropdown.Item>
-                              <Dropdown.Item key={`show-${subscription.id}`} as={Link} to={`/subscriptions/${subscription.id}`}>
+                              <Dropdown.Item
+                                key={`show-${subscription.id}`}
+                                as={Link}
+                                to={`/subscriptions/${subscription.id}`}
+                              >
                                 Show
                               </Dropdown.Item>
-                
                             </Dropdown.Menu>
                           </Dropdown>
                         </td>
@@ -108,14 +108,16 @@ function Index() {
         </Row>
         <Row>
           <Col md="12">
-            {pagination ?
+            {pagination ? (
               <Paginate
                 onPageChange={handlePageClick}
                 pageRangeDisplayed={pagination.per_page}
                 pageCount={pagination.total_pages}
                 forcePage={currentPage - 1}
               />
-              : <br />}
+            ) : (
+              <br />
+            )}
           </Col>
         </Row>
       </Container>
