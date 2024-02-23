@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from 'react-router-dom'
-import useFetch from 'use-http';
-import { useForm } from "react-hook-form"
-import { toast } from 'react-toastify'
+import { useHistory } from "react-router-dom";
+import useFetch from "use-http";
+import { useForm, Controller } from "react-hook-form";
+import { toast } from "react-toastify";
+import Select from "react-select";
 
-
-import {
-  Button,
-  Card,
-  Form,
-  Container,
-  Row,
-  Col,
-  FormSelect
-} from "react-bootstrap";
+import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 
 function Add() {
   const {
@@ -21,60 +13,81 @@ function Add() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
-  } = useForm()
-
+  } = useForm();
 
   const { get, post, response } = useFetch();
-  const [companyData, setCompanyData] = useState({})
+  const [companyData, setCompanyData] = useState({});
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
-  const history = useHistory()
-
-
+  const [country_array, setCountry_array] = useState([]);
+  const history = useHistory();
 
   useEffect(() => {
     async function loadSubscriptionPlans() {
       const api = await get(`/v1/platform_admin/options`);
       if (response.ok) {
-        setSubscriptionPlans(api.subscription_plans || []);
+        console.log(api.subscription_plans);
+        setSubscriptionPlans(
+          api.subscription_plans.map((element) => ({
+            value: element.id,
+            label: element.name,
+          })) || []
+        );
       }
     }
+    loadCountry();
 
     loadSubscriptionPlans();
   }, [get, response]);
 
-  async function onSubmit(data) {
-    console.log(data)
-    const api = await post(`/v1/platform_admin/companies`, { company: data })
+  async function loadCountry() {
+    const endpoint = await get(`/v1/platform_admin/countries`);
+    console.log(endpoint);
     if (response.ok) {
-      setValue('name', api.data.company.name)
-      setValue('slug', api.data.company.slug)
-      setValue('subscription_id', api.data.company.subscription.id)
-      history.push("/companies")
-      toast("Successfully Created")
+      formatcountrydata(endpoint);
     }
-    else{
-      toast(response.data?.message)
+  }
+
+  function formatcountrydata(data) {
+    const temp_array = data.map((element) => ({
+      label: element.name_en,
+      value: element.id,
+    }));
+    setCountry_array(temp_array);
+  }
+
+  async function onSubmit(data) {
+    console.log(data);
+    const api = await post(`/v1/platform_admin/companies`, { company: data });
+    if (response.ok) {
+      history.push("/companies");
+      toast("Successfully Created");
+    } else {
+      toast(response.data?.message);
     }
   }
   const handleGoBack = () => {
     history.goBack();
   };
 
-
   return (
     <>
       <Container fluid>
-        <Row>
+        <Row className="mt-3 ">
           <Col md="12">
             <Card>
-            <Card.Header>
+              <Card.Header>
                 <Row>
                   <Col md="6">
                     <Card.Title as="h4">Add Company</Card.Title>
                   </Col>
-                  <Col md="6" className="text-right">
-                    <Button variant="info" onClick={handleGoBack}>
+                  <Col md="6" className="text-right ">
+                    <Button
+                      variant="info"
+                      className="rounded-0"
+                      onClick={handleGoBack}
+                    >
                       Go Back
                     </Button>
                   </Col>
@@ -110,23 +123,54 @@ function Add() {
                   </Row>
 
                   <Row>
-                    <Col className="pr-1" md="12">
+                    <Col className="pr-1 mt-3" md="12">
                       <Form.Group>
                         <label>Subscription</label>
-                        <Form.Select {...register("subscription_id")}>
-                          {Array.isArray(subscriptionPlans) &&
-                            subscriptionPlans.map(plan => (
-                              <option key={plan.id} value={plan.id}>{plan.id}</option>
 
-                            ))}
-                        </Form.Select>
+                        <Controller
+                          name="subscription_id"
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={subscriptionPlans}
+                              value={subscriptionPlans.find(
+                                (c) => c.value === field.value
+                              )}
+                              onChange={(val) => field.onChange(val.value)}
+                              placeholder=" Select Subscription"
+                            />
+                          )}
+                          control={control}
+                        />
                       </Form.Group>
                     </Col>
                   </Row>
-                 
-     
+                  <Row>
+                    <Col className="pr-1 mt-3" md="12">
+                      <Form.Group>
+                        <label>Country</label>
+
+                        <Controller
+                          name="country_id"
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={country_array}
+                              value={country_array.find(
+                                (c) => c.value === field.value
+                              )}
+                              onChange={(val) => field.onChange(val.value)}
+                            />
+                          )}
+                          control={control}
+                          placeholder="Role"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
                   <Button
-                    className="btn-fill pull-right"
+                    className="rounded-0 btn-fill mt-3"
                     type="submit"
                     variant="info"
                   >
