@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from 'react-router-dom';
-import useFetch from 'use-http';
+import { useParams, useHistory } from "react-router-dom";
+import useFetch from "use-http";
 
 // react-bootstrap components
-import {
-  Button,
-  Card,
-  Form,
-  Container,
-  Row,
-  Col
-} from "react-bootstrap";
+import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 
 function Show() {
   const { id } = useParams();
@@ -25,7 +18,7 @@ function Show() {
   async function loadSubscription() {
     const api = await get(`/v1/platform_admin/subscriptions/${id}`);
     if (response.ok) {
-      setSubscription(api.data.subscription);
+      setSubscription(api.data);
     }
   }
 
@@ -79,16 +72,10 @@ function Show() {
             </Card>
           </Col>
         </Row>
-        
-                      <Button
-                        className="btn-fill pull-right"
-                        variant="info"
-                        onClick={goBack}
-                      >
-                        Go Back
-                      </Button>
-                   
-                    
+
+        <Button className="btn-fill pull-right" variant="info" onClick={goBack}>
+          Go Back
+        </Button>
       </Container>
     </>
   );

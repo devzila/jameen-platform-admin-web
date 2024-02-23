@@ -1,9 +1,10 @@
-import React, { useEffect, useContext } from "react"
-import { useParams, useHistory } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import { useForm } from "react-hook-form"
-import useFetch from 'use-http'
-import AppDataContext from "contexts/AppDataContext"
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useHistory } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useForm, Controller } from "react-hook-form";
+import useFetch from "use-http";
+import AppDataContext from "contexts/AppDataContext";
+import Select from "react-select";
 
 // react-bootstrap components
 import {
@@ -15,7 +16,7 @@ import {
   Nav,
   Container,
   Row,
-  Col
+  Col,
 } from "react-bootstrap";
 
 function Edit() {
@@ -23,43 +24,78 @@ function Edit() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
-  const { id } = useParams()
-  const { get, put, response, loading, error } = useFetch()
-  const appData = useContext(AppDataContext)
-  const history = useHistory()
+  const { id } = useParams();
+  const { get, put, response, loading, error } = useFetch();
+  const appData = useContext(AppDataContext);
+  const history = useHistory();
+  const [companyData, setCompanyData] = useState({});
+  const [country_array, setCountry_array] = useState([]);
 
-  useEffect(()=>{
-    loadComapny()
-  }, [])
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  useEffect(() => {
+    async function loadSubscriptionPlans() {
+      const api = await get(`/v1/platform_admin/options`);
+      if (response.ok) {
+        console.log(api.subscription_plans);
+        setSubscriptionPlans(
+          api.subscription_plans.map((element) => ({
+            value: element.id,
+            label: element.name,
+          })) || []
+        );
+      }
+      console.log(subscriptionPlans);
+    }
+    loadCountry();
+    loadSubscriptionPlans();
+  }, [get, response]);
+
+  async function loadCountry() {
+    const endpoint = await get(`/v1/platform_admin/countries`);
+    console.log(endpoint);
+    if (response.ok) {
+      formatcountrydata(endpoint);
+    }
+  }
+
+  function formatcountrydata(data) {
+    const temp_array = data.map((element) => ({
+      label: element.name_en,
+      value: element.id,
+    }));
+    setCountry_array(temp_array);
+  }
 
   async function loadComapny() {
-    const api = await get(`/v1/platform_admin/companies/${id}`)
+    const api = await get(`/v1/platform_admin/companies/${id}`);
+    console.log(api);
     if (response.ok) {
-      setValue('name', api.data.company.name)
-      setValue('slug', api.data.company.slug)
-      setValue('subscription_id', api.data.company.subscription.id)
+      setValue("name", api.data.name);
+      setValue("slug", api.data.slug);
+      setValue("subscription_id", api.data?.subscription?.id);
+      setValue("country_id", api.data?.country?.id);
     }
   }
 
-  async function onSubmit(data) { 
-    const api = await put(`/v1/platform_admin/companies/${id}`, {company: data})
+  async function onSubmit(data) {
+    const api = await put(`/v1/platform_admin/companies/${id}`, {
+      company: data,
+    });
     if (response.ok) {
-      history.push("/companies")
-      toast("company edited successfully")
-    }
-    else{
-      toast(response.data?.message)
+      history.push("/companies");
+      toast("company edited successfully");
+    } else {
+      toast(response.data?.message);
     }
   }
-
 
   const handleGoBack = () => {
     history.goBack();
   };
-
 
   return (
     <>
@@ -67,7 +103,7 @@ function Edit() {
         <Row>
           <Col md="12">
             <Card>
-            <Card.Header>
+              <Card.Header>
                 <Row>
                   <Col md="6">
                     <Card.Title as="h4">Edit Company</Card.Title>
@@ -79,9 +115,9 @@ function Edit() {
                   </Col>
                 </Row>
               </Card.Header>
-              
+
               <Card.Body>
-                <Form onSubmit={handleSubmit(onSubmit)}> 
+                <Form onSubmit={handleSubmit(onSubmit)}>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
@@ -96,7 +132,7 @@ function Edit() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>Identifier (No space, No special letter)</label>
                         <Form.Control
                           placeholder="Identifier"
@@ -107,15 +143,48 @@ function Edit() {
                     </Col>
                   </Row>
                   <Row>
-                    <Col className="pr-1" md="12">
+                    <Col className="pr-1 mt-3" md="12">
                       <Form.Group>
                         <label>Subscription</label>
-                        <Form.Select {...register("subscription_id")} className="form-control">
-                          {Array.isArray(appData?.subscription_plans) &&
-                            appData.subscription_plans.map(plan => (
-                              <option key={plan.id} value={plan.id}>{plan.name}</option>
-                            ))}
-                        </Form.Select>
+
+                        <Controller
+                          name="subscription_id"
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={subscriptionPlans}
+                              value={subscriptionPlans.find(
+                                (c) => c.value === field.value
+                              )}
+                              onChange={(val) => field.onChange(val.value)}
+                              placeholder=" Select Subscription"
+                            />
+                          )}
+                          control={control}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1 mt-3" md="12">
+                      <Form.Group>
+                        <label>Country</label>
+
+                        <Controller
+                          name="country_id"
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={country_array}
+                              value={country_array.find(
+                                (c) => c.value === field.value
+                              )}
+                              onChange={(val) => field.onChange(val.value)}
+                            />
+                          )}
+                          control={control}
+                          placeholder="Role"
+                        />
                       </Form.Group>
                     </Col>
                   </Row>

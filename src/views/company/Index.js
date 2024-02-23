@@ -64,6 +64,8 @@ function Index() {
                     <tr>
                       <th className="border-0">Name</th>
                       <th className="border-0">Identifier</th>
+                      <th className="border-0">Country</th>
+
                       <th className="border-0">Subscription</th>
                       <th className="border-0">Crated At</th>
                       <th className="border-0">Action</th>
@@ -74,6 +76,8 @@ function Index() {
                       <tr key={company.id}>
                         <td>{company.name}</td>
                         <td>{company.slug}</td>
+                        <td>{company.country.name_en}</td>
+
                         <td>{company.subscription?.name}</td>
                         <td>{company.created_at.substring(0, 10)}</td>
                         <td>

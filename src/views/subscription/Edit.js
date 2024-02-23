@@ -26,9 +26,9 @@ function Edit() {
   async function loadSubscription() {
     const api = await get(`/v1/platform_admin/subscriptions/${id}`);
     if (response.ok) {
-      setValue("name", api.data.subscription.name);
-      setValue("max_no_of_units", api.data.subscription.max_no_of_units);
-      setValue("max_no_of_compounds", api.data.subscription.max_no_of_compounds);
+      setValue("name", api.data.name);
+      setValue("max_no_of_units", api.data.max_no_of_units);
+      setValue("max_no_of_compounds", api.data.max_no_of_compounds);
     }
   }
 

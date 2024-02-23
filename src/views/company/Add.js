@@ -35,6 +35,7 @@ function Add() {
           })) || []
         );
       }
+      console.log(subscriptionPlans);
     }
     loadCountry();
 

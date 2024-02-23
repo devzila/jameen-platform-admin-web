@@ -1,61 +1,53 @@
 import React, { useEffect, useState } from "react";
-import useFetch from 'use-http';
-import { useForm } from "react-hook-form"
-import { useParams, useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { toast } from 'react-toastify'
+import useFetch from "use-http";
+import { useForm } from "react-hook-form";
+import {
+  useParams,
+  useHistory,
+} from "react-router-dom/cjs/react-router-dom.min";
+import { toast } from "react-toastify";
 
 // react-bootstrap components
-import {
-  Button,
-  Card,
-  Form,
-  Container,
-  Row,
-  Col
-} from "react-bootstrap";
-
+import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 
 function Add() {
-    const {
-      register,
-      handleSubmit,
-      watch,
-      setValue,
-      formState: { errors },
-    } = useForm()
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
-    const {companyId} = useParams()
-    const { get, post, response } = useFetch();
-    const [userData, setUserData] = useState({})
-    const history = useHistory()
+  const { companyId } = useParams();
+  const { get, post, response } = useFetch();
+  const [userData, setUserData] = useState({});
+  const history = useHistory();
 
-    
-    useEffect(()=>{
+  useEffect(() => {}, []);
 
-    }, [])
-
-    async function onSubmit(data) {
-      console.log(data)
-      const api = await post(`/v1/platform_admin/companies/${companyId}/users`, { user: data })
-      if (response.ok) {
-        setValue('name', api.data.user.name)
-        setValue('email', api.data.user.email)
-        setValue('mobile_number', api.data.user.mobile_number)
-        setValue('username', api.data.user.username)
-        setValue('password', api.data.user.password)
-        setValue('role_id', api.data.user.role_id)
-        history.push(`/companies/${companyId}/users`)
-        toast("user added Successfully")
-      } else {
-        toast(response.data?.message)
-      }
+  async function onSubmit(data) {
+    console.log(data);
+    const api = await post(`/v1/platform_admin/companies/${companyId}/users`, {
+      user: data,
+    });
+    if (response.ok) {
+      setValue("name", api.data.name);
+      setValue("email", api.data.email);
+      setValue("mobile_number", api.data.mobile_number);
+      setValue("username", api.data.username);
+      setValue("password", api.data.password);
+      setValue("role_id", api.data.role_id);
+      history.push(`/companies/${companyId}/users`);
+      toast("user added Successfully");
+    } else {
+      toast(response.data?.message);
     }
+  }
 
-
-    const handleGoBack = () => {
-      history.goBack();
-    };
-
+  const handleGoBack = () => {
+    history.goBack();
+  };
 
   return (
     <>
@@ -63,7 +55,7 @@ function Add() {
         <Row>
           <Col md="12">
             <Card>
-            <Card.Header>
+              <Card.Header>
                 <Row>
                   <Col md="6">
                     <Card.Title as="h4">Add User</Card.Title>
@@ -92,7 +84,7 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>Email</label>
                         <Form.Control
                           defaultValue={userData.email}
@@ -105,7 +97,7 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>username</label>
                         <Form.Control
                           defaultValue={userData.username}
@@ -118,7 +110,7 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>Password</label>
                         <Form.Control
                           defaultValue={userData.password}
@@ -131,7 +123,7 @@ function Add() {
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
-                    <Form.Group>
+                      <Form.Group>
                         <label>Role</label>
                         <Form.Control
                           defaultValue={userData.role_id}
@@ -151,7 +143,6 @@ function Add() {
                           placeholder="Ph Number"
                           type="text"
                           {...register("mobile_number")}
-
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -160,7 +151,6 @@ function Add() {
                     className="btn-fill pull-right"
                     type="submit"
                     variant="info"
-                    
                   >
                     Update Profile
                   </Button>
@@ -173,7 +163,6 @@ function Add() {
       </Container>
     </>
   );
-  }
-
+}
 
 export default Add;
