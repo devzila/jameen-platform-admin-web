@@ -1,5 +1,5 @@
-import React from "react";
-import { useLocation, Route, Switch } from "react-router-dom";
+import React, { Suspense } from "react";
+import { useLocation, Route, Routes } from "react-router-dom";
 import { Provider, useFetch } from "use-http";
 
 import Sidebar from "components/Sidebar/Sidebar";
@@ -17,7 +17,6 @@ import AppDataContext from "contexts/AppDataContext";
 import options from "./Options";
 
 function Admin() {
-  console.log(options);
   const [image, setImage] = React.useState(sidebarImage);
   const [appData, setAppData] = React.useState(null);
   const [color, setColor] = React.useState("black");
@@ -31,22 +30,10 @@ function Admin() {
     []
   );
 
-  async function loadAppData() {
-    const api = await get("/v1/platform_admin/options");
-    if (response.ok) {
-      setAppData(api);
-    }
-  }
-
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       return (
-        <Route
-          exact
-          path={prop.path}
-          render={(props) => <prop.component {...props} />}
-          key={key}
-        />
+        <Route exact path={prop.path} element={prop.component} key={key} />
       );
     });
   };
@@ -64,9 +51,6 @@ function Admin() {
         var element = document.getElementById("bodyClick");
         element.parentNode.removeChild(element);
       }
-    }
-    if (!appData) {
-      loadAppData();
     }
   }, [location]);
   return (
@@ -94,7 +78,9 @@ function Admin() {
               />
               <div className="main-panel" ref={mainPanel}>
                 <div className="content">
-                  <Switch>{getRoutes(routes)}</Switch>
+                  <Suspense>
+                    <Routes>{getRoutes(routes)}</Routes>
+                  </Suspense>
                 </div>
               </div>
             </AppDataContext.Provider>

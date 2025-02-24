@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "use-http";
 import { useForm } from "react-hook-form";
-import {
-  useParams,
-  useHistory,
-} from "react-router-dom/cjs/react-router-dom.min";
 import { toast } from "react-toastify";
 
 // react-bootstrap components
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 
 function Add() {
   const {
@@ -22,7 +19,7 @@ function Add() {
   const { companyId } = useParams();
   const { get, post, response } = useFetch();
   const [userData, setUserData] = useState({});
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {}, []);
 
@@ -38,7 +35,7 @@ function Add() {
       setValue("username", api.data.username);
       setValue("password", api.data.password);
       setValue("role_id", api.data.role_id);
-      history.push(`/companies/${companyId}/users`);
+      navigate(`/companies/${companyId}/users`);
       toast("user added Successfully");
     } else {
       toast(response.data?.message);
@@ -46,7 +43,7 @@ function Add() {
   }
 
   const handleGoBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (

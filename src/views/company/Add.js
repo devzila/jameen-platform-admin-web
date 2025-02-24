@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useFetch from "use-http";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -21,13 +21,12 @@ function Add() {
   const [companyData, setCompanyData] = useState({});
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [country_array, setCountry_array] = useState([]);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadSubscriptionPlans() {
       const api = await get(`/v1/platform_admin/options`);
       if (response.ok) {
-        console.log(api.subscription_plans);
         setSubscriptionPlans(
           api.subscription_plans.map((element) => ({
             value: element.id,
@@ -35,7 +34,6 @@ function Add() {
           })) || []
         );
       }
-      console.log(subscriptionPlans);
     }
     loadCountry();
 
@@ -44,7 +42,6 @@ function Add() {
 
   async function loadCountry() {
     const endpoint = await get(`/v1/platform_admin/countries`);
-    console.log(endpoint);
     if (response.ok) {
       formatcountrydata(endpoint);
     }
@@ -59,17 +56,16 @@ function Add() {
   }
 
   async function onSubmit(data) {
-    console.log(data);
     const api = await post(`/v1/platform_admin/companies`, { company: data });
     if (response.ok) {
-      history.push("/companies");
-      toast("Successfully Created");
+      navigate("/companies");
+      toast.success("Successfully Created");
     } else {
-      toast(response.data?.message);
+      toast.error(response.data?.message);
     }
   }
   const handleGoBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (

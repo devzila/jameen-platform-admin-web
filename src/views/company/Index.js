@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
-import { useHistory } from "react-router-dom";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
-
 // react-bootstrap components
 import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
@@ -18,9 +16,9 @@ function Index() {
   useEffect(() => {
     loadInitialCompanies();
   }, [currentPage]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const addCompany = () => {
-    history.push(`/companies/add`);
+    navigate(`/companies/add`);
   };
 
   async function loadInitialCompanies() {
@@ -89,26 +87,29 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item
-                                key={`edit-${company.id}`}
-                                as={Link}
-                                to={`/companies/${company.id}/edit`}
-                              >
-                                Edit
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`edit-${company.id}`}
+                                  to={`/companies/${company.id}/edit`}
+                                >
+                                  Edit
+                                </NavLink>
                               </Dropdown.Item>
-                              <Dropdown.Item
-                                key={`companys-${company.id}`}
-                                as={Link}
-                                to={`/companies/${company.id}/users`}
-                              >
-                                Users
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`companys-${company.id}`}
+                                  to={`/companies/${company.id}/users`}
+                                >
+                                  Users
+                                </NavLink>
                               </Dropdown.Item>
-                              <Dropdown.Item
-                                key={`show-${company.id}`}
-                                as={Link}
-                                to={`/companies/${company.id}`}
-                              >
-                                Show
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`show-${company.id}`}
+                                  to={`/companies/${company.id}`}
+                                >
+                                  Show
+                                </NavLink>
                               </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>

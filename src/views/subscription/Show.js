@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "use-http";
 
 // react-bootstrap components
@@ -9,7 +9,7 @@ function Show() {
   const { id } = useParams();
   const [subscription, setSubscription] = useState({});
   const { get, response, loading, error } = useFetch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadSubscription();
@@ -23,7 +23,7 @@ function Show() {
   }
 
   const goBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (

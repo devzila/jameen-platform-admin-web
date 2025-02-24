@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm, Controller } from "react-hook-form";
 import useFetch from "use-http";
@@ -31,7 +31,7 @@ function Edit() {
   const { id } = useParams();
   const { get, put, response, loading, error } = useFetch();
   const appData = useContext(AppDataContext);
-  const history = useHistory();
+  const navigate = useNavigate();
   const [companyData, setCompanyData] = useState({});
   const [country_array, setCountry_array] = useState([]);
 
@@ -40,15 +40,14 @@ function Edit() {
     async function loadSubscriptionPlans() {
       const api = await get(`/v1/platform_admin/options`);
       if (response.ok) {
-        console.log(api.subscription_plans);
         setSubscriptionPlans(
           api.subscription_plans.map((element) => ({
             value: element.id,
             label: element.name,
           })) || []
         );
+        user;
       }
-      console.log(subscriptionPlans);
     }
     loadCountry();
     loadSubscriptionPlans();
@@ -56,7 +55,6 @@ function Edit() {
 
   async function loadCountry() {
     const endpoint = await get(`/v1/platform_admin/countries`);
-    console.log(endpoint);
     if (response.ok) {
       formatcountrydata(endpoint);
     }
@@ -86,7 +84,7 @@ function Edit() {
       company: data,
     });
     if (response.ok) {
-      history.push("/companies");
+      navigate("/companies");
       toast("company edited successfully");
     } else {
       toast(response.data?.message);
@@ -94,7 +92,7 @@ function Edit() {
   }
 
   const handleGoBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (

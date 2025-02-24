@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
 import useFetch from "use-http";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
@@ -16,36 +16,39 @@ function EditUser() {
   const { companyId, userId, role_id } = useParams();
   const { get, put, response, loading, error } = useFetch();
   const [userData, setUserData] = useState({});
-  const history = useHistory()
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadUser();
   }, [userId]);
 
   async function loadUser() {
-    const api = await get(`/v1/platform_admin/companies/${companyId}/users/${userId}`);
+    const api = await get(
+      `/v1/platform_admin/companies/${companyId}/users/${userId}`
+    );
     if (response.ok) {
-      setValue('name', api.data.user.name)
-      setValue('email', api.data.user.email)
-      setValue('mobile_number', api.data.user.mobile_number)
-      setValue('username', api.data.user.username)
-      setValue('role_id', api.data.user.role_id)
+      setValue("name", api.data.user.name);
+      setValue("email", api.data.user.email);
+      setValue("mobile_number", api.data.user.mobile_number);
+      setValue("username", api.data.user.username);
+      setValue("role_id", api.data.user.role_id);
     }
   }
   async function onSubmit(data) {
-    const api = await put(`/v1/platform_admin/companies/${companyId}/users/${userId}`, { user: data });
+    const api = await put(
+      `/v1/platform_admin/companies/${companyId}/users/${userId}`,
+      { user: data }
+    );
     if (response.ok) {
-      history.push(`/companies/${companyId}/users`)
-      toast("user edited Successfully")
+      navigate(`/companies/${companyId}/users`);
+      toast.success("User updated successfully");
     } else {
-      toast(response.data?.message)
+      toast.error(response.data?.message);
     }
-
   }
 
   const handleGoBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (
@@ -53,18 +56,18 @@ function EditUser() {
       <Row>
         <Col md="12">
           <Card>
-          <Card.Header>
-                <Row>
-                  <Col md="6">
-                    <Card.Title as="h4">Edit Company</Card.Title>
-                  </Col>
-                  <Col md="6" className="text-right">
-                    <Button variant="info" onClick={handleGoBack}>
-                      Go Back
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Header>
+            <Card.Header>
+              <Row>
+                <Col md="6">
+                  <Card.Title as="h4">Edit Company</Card.Title>
+                </Col>
+                <Col md="6" className="text-right">
+                  <Button variant="info" onClick={handleGoBack}>
+                    Go Back
+                  </Button>
+                </Col>
+              </Row>
+            </Card.Header>
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row>

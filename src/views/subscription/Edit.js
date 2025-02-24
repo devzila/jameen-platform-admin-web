@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import useFetch from "use-http";
 import { toast } from "react-toastify";
@@ -17,7 +17,7 @@ function Edit() {
 
   const { id } = useParams();
   const { get, put, response, loading, error } = useFetch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadSubscription();
@@ -38,7 +38,7 @@ function Edit() {
       subscription: data,
     });
     if (response.ok) {
-      history.push("/subscriptions");
+      navigate("/subscriptions");
       toast("Subscription edited successfully");
     } else {
       toast(response.data?.message || "Error editing subscription");
@@ -46,7 +46,7 @@ function Edit() {
   }
 
   const handleGoBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (

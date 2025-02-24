@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
-import { useHistory } from "react-router-dom";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const { get, post, response, loading, error } = useFetch();
+  const { get, response, loading, error } = useFetch();
   useEffect(() => {
     loadInitialSubscriptions();
   }, [currentPage]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const addSubscription = () => {
-    history.push(`/subscriptions/add`);
+    navigate(`/subscriptions/add`);
   };
 
   async function loadInitialSubscriptions() {
@@ -81,19 +80,21 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item
-                                key={`edit-${subscription.id}`}
-                                as={Link}
-                                to={`/subscriptions/${subscription.id}/edit`}
-                              >
-                                Edit
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`edit-${subscription.id}`}
+                                  to={`/subscriptions/${subscription.id}/edit`}
+                                >
+                                  Edit
+                                </NavLink>
                               </Dropdown.Item>
-                              <Dropdown.Item
-                                key={`show-${subscription.id}`}
-                                as={Link}
-                                to={`/subscriptions/${subscription.id}`}
-                              >
-                                Show
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`show-${subscription.id}`}
+                                  to={`/subscriptions/${subscription.id}`}
+                                >
+                                  Show
+                                </NavLink>
                               </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>

@@ -8,8 +8,6 @@ export const initialAuthState = {
 };
 
 export const reducer = (state, action) => {
-  console.log(action);
-
   switch (action.type) {
     case "LOGIN":
       localStorage.setItem("user", JSON.stringify(action.payload.object));

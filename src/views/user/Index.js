@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
-import { useHistory } from "react-router-dom";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "components/CustomDivToggle";
-import { Link, useParams } from "react-router-dom/cjs/react-router-dom.min";
 
 // react-bootstrap components
 import {
-  Badge,
   Button,
   Card,
   Navbar,
@@ -19,7 +16,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 function Index() {
   const { companyId } = useParams();
   const [users, setusers] = useState([]);
@@ -29,9 +26,9 @@ function Index() {
   useEffect(() => {
     loadInitialusers();
   }, [currentPage]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const addUser = () => {
-    history.push(`/companies/${companyId}/users/add`);
+    navigate(`/companies/${companyId}/users/add`);
   };
 
   async function loadInitialusers() {
@@ -98,20 +95,22 @@ function Index() {
                               <BsThreeDots />
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                              <Dropdown.Item
-                                key={`edit-${user.id}`}
-                                as={Link}
-                                to={`/companies/${companyId}/users/${user.id}/edit`}
-                              >
-                                Edit
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`edit-${user.id}`}
+                                  to={`/companies/${companyId}/users/${user.id}/edit`}
+                                >
+                                  Edit
+                                </NavLink>
                               </Dropdown.Item>
 
-                              <Dropdown.Item
-                                key={`user-show-${user.id}`}
-                                as={Link}
-                                to={`/companies/${companyId}/users/${user.id}`}
-                              >
-                                User Show
+                              <Dropdown.Item>
+                                <NavLink
+                                  key={`user-show-${user.id}`}
+                                  to={`/companies/${companyId}/users/${user.id}`}
+                                >
+                                  User Show
+                                </NavLink>
                               </Dropdown.Item>
                             </Dropdown.Menu>
                           </Dropdown>
