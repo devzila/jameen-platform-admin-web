@@ -6,7 +6,6 @@ import UserIndex from "views/user/Index.js";
 import UserEdit from "views/user/Edit.js";
 import UserAdd from "views/user/Add.js";
 import UserShow from "views/user/Show.js";
-import TableList from "views/TableList.js";
 import SubscriptionIndex from "views/subscription/Index.js";
 import SubscriptionShow from "views/subscription/Show.js";
 import SubscriptionEdit from "views/subscription/Edit.js";
@@ -19,18 +18,14 @@ const dashboardRoutes = [
     name: "Comapnies",
     icon: "nc-icon nc-chart-pie-35",
     component: <CompanyIndex />,
-  },
-  {
-    path: "/table",
-    name: "Table List",
-    icon: "nc-icon nc-notes",
-    component: <TableList />,
+    main: true,
   },
   {
     path: "/subscriptions",
     name: "Subscription",
     icon: "nc-icon nc-notes",
     component: <SubscriptionIndex />,
+    main: true,
   },
   { path: "/", component: <Navigate to="/companies" /> },
   { path: "/companies/add", component: <CompanyAdd /> },

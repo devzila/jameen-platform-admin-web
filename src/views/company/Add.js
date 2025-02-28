@@ -174,8 +174,6 @@ function Add() {
                     Add Company
                   </Button>
                   <div className="clearfix"></div>
-
-                  {/* Your form code */}
                 </Form>
               </Card.Body>
             </Card>

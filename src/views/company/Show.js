@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "use-http";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import { formatdate } from "services/utility_functions";
 
 function Show() {
   const { id } = useParams();
@@ -62,7 +63,7 @@ function Show() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Created_at:</label>
-                        <span>{company.created_at}</span>
+                        <span>{formatdate(company.created_at)}</span>
                       </Form.Group>
                     </Col>
                   </Row>

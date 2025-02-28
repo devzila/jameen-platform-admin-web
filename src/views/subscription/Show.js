@@ -4,6 +4,7 @@ import useFetch from "use-http";
 
 // react-bootstrap components
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import { formatdate } from "services/utility_functions";
 
 function Show() {
   const { id } = useParams();
@@ -62,7 +63,7 @@ function Show() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Created_at:</label>
-                        <span>{subscription.created_at}</span>
+                        <span>{formatdate(subscription.created_at)}</span>
                       </Form.Group>
                     </Col>
                   </Row>

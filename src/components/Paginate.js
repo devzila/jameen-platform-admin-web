@@ -1,27 +1,32 @@
-import React from "react"
-import ReactPaginate from 'react-paginate'
+import React from "react";
+import ReactPaginate from "react-paginate";
 
-export default function Paginate({forcePage, pageCount, pageRangeDisplayed, onPageChange}) {
+export default function Paginate({
+  forcePage,
+  pageCount,
+  pageRangeDisplayed,
+  onPageChange,
+}) {
   return (
     <ReactPaginate
       breakLabel="..."
-      nextLabel="next >"
-      breakClassName="page-item"
-      breakLinkClassName="page-link"
-      containerClassName="pagination justify-content-center"
-      pageClassName="page-item"
-      pageLinkClassName="page-link"
-      previousClassName="page-item"
-      previousLinkClassName="page-link"
-      nextClassName="page-item"
-      nextLinkClassName="page-link"
-      activeClassName="active"
+      nextLabel="►"
+      breakClassName="btn"
+      breakLinkClassName="btn mx-1 "
+      containerClassName=" pagination justify-content-center d-flex list-unstyled "
+      pageClassName=" mx-1 "
+      pageLinkClassName="btn mx-1 text-dark rounded-1 shadow-lg border-0 "
+      previousClassName="  border-0"
+      previousLinkClassName="btn text-dark border-0 "
+      nextClassName=""
+      nextLinkClassName="btn border-0  text-dark "
+      activeClassName=" custom_background_color rounded-1 text-white border-0"
       onPageChange={onPageChange}
       pageRangeDisplayed={pageRangeDisplayed}
       pageCount={pageCount}
-      previousLabel="< previous"
+      previousLabel="◄"
       renderOnZeroPageCount={null}
       forcePage={forcePage}
     />
-  )
+  );
 }

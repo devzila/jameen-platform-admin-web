@@ -6,18 +6,15 @@ import useFetch from "use-http";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
 function EditUser() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
 
-  const { companyId, userId, role_id } = useParams();
-  const { get, put, response, loading, error } = useFetch();
+  const { get, put, response } = useFetch();
   const [userData, setUserData] = useState({});
+  const [errors, setErrors] = useState({});
+
   const navigate = useNavigate();
 
+  const { companyId, userId } = useParams();
   useEffect(() => {
     loadUser();
   }, [userId]);
@@ -27,22 +24,28 @@ function EditUser() {
       `/v1/platform_admin/companies/${companyId}/users/${userId}`
     );
     if (response.ok) {
-      setValue("name", api.data.user.name);
-      setValue("email", api.data.user.email);
-      setValue("mobile_number", api.data.user.mobile_number);
-      setValue("username", api.data.user.username);
-      setValue("role_id", api.data.user.role_id);
+      setValue("name", api.data.name);
+      setValue("email", api.data.email);
+      setValue("mobile_number", api.data.mobile_number);
+      setValue("username", api.data.username);
+      setValue("password", api.data.password);
+      setValue("role_id", api.data.role.id);
+
+      setUserData(api.data);
     }
   }
   async function onSubmit(data) {
     const api = await put(
       `/v1/platform_admin/companies/${companyId}/users/${userId}`,
-      { user: data }
+      {
+        user: data,
+      }
     );
     if (response.ok) {
       navigate(`/companies/${companyId}/users`);
-      toast.success("User updated successfully");
+      toast.success("User added Successfully");
     } else {
+      setErrors(api.errors);
       toast.error(response.data?.message);
     }
   }
@@ -59,7 +62,7 @@ function EditUser() {
             <Card.Header>
               <Row>
                 <Col md="6">
-                  <Card.Title as="h4">Edit Company</Card.Title>
+                  <Card.Title as="h4">Add User</Card.Title>
                 </Col>
                 <Col md="6" className="text-right">
                   <Button variant="info" onClick={handleGoBack}>
@@ -76,7 +79,7 @@ function EditUser() {
                       <label>Name</label>
                       <Form.Control
                         defaultValue={userData.name}
-                        placeholder="User Name"
+                        placeholder="Name"
                         type="text"
                         {...register("name")}
                       ></Form.Control>
@@ -87,6 +90,10 @@ function EditUser() {
                   <Col className="pr-1" md="12">
                     <Form.Group>
                       <label>Email</label>
+                      <small className="text-danger">
+                        *{errors ? errors.email : null}{" "}
+                      </small>
+
                       <Form.Control
                         defaultValue={userData.email}
                         placeholder="Email"
@@ -99,51 +106,84 @@ function EditUser() {
                 <Row>
                   <Col className="pr-1" md="12">
                     <Form.Group>
-                      <label>Phone Number</label>
-                      <Form.Control
-                        defaultValue={userData.mobile_number}
-                        placeholder="Phone Number"
-                        type="text"
-                        {...register("mobile_number")}
-                      ></Form.Control>
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col className="pr-1" md="12">
-                    <Form.Group>
-                      <label>UserName</label>
+                      <label>
+                        username
+                        <small className="text-danger">
+                          {" "}
+                          *{errors ? errors.username : null}{" "}
+                        </small>
+                      </label>
                       <Form.Control
                         defaultValue={userData.username}
-                        placeholder="username"
+                        placeholder="UserName"
                         type="text"
                         {...register("username")}
                       ></Form.Control>
                     </Form.Group>
                   </Col>
                 </Row>
-
                 <Row>
                   <Col className="pr-1" md="12">
                     <Form.Group>
-                      <label>Role_id</label>
+                      <label>
+                        Password
+                        <small className="text-danger">
+                          *{errors ? errors.password : null}{" "}
+                        </small>
+                      </label>
+
                       <Form.Control
-                        defaultValue={userData.role}
-                        placeholder="Role_id"
+                        defaultValue={userData.password}
+                        placeholder="Password"
                         type="text"
-                        {...register("role.id")}
+                        {...register("password")}
                       ></Form.Control>
                     </Form.Group>
                   </Col>
                 </Row>
-
-                <Button
-                  className="btn-fill pull-right"
+                <Row>
+                  <Col className="pr-1" md="12">
+                    <Form.Group>
+                      <label>
+                        Role
+                        <small className="text-danger">
+                          *{errors ? errors.role : null}{" "}
+                        </small>
+                      </label>
+                      <Form.Control
+                        defaultValue={userData.role_id}
+                        placeholder="Role"
+                        type="text"
+                        {...register("role_id")}
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="pr-1" md="12">
+                    <Form.Group>
+                      <label>
+                        Mobile Number
+                        <small className="text-danger">
+                          *{errors ? errors.role : null}
+                        </small>
+                      </label>
+                      <Form.Control
+                        defaultValue={userData.mobile_number}
+                        placeholder="Mobile Number"
+                        type="text"
+                        {...register("mobile_number")}
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <button
+                  className="btn custom_theme_button"
                   type="submit"
                   variant="info"
                 >
-                  Update User
-                </Button>
+                  Update Profile
+                </button>
                 <div className="clearfix"></div>
               </Form>
             </Card.Body>

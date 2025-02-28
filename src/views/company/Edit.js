@@ -20,13 +20,7 @@ import {
 } from "react-bootstrap";
 
 function Edit() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    control,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue, control } = useForm();
 
   const { id } = useParams();
   const { get, put, response, loading, error } = useFetch();
@@ -37,6 +31,7 @@ function Edit() {
 
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   useEffect(() => {
+    loadComapny();
     async function loadSubscriptionPlans() {
       const api = await get(`/v1/platform_admin/options`);
       if (response.ok) {
@@ -46,7 +41,6 @@ function Edit() {
             label: element.name,
           })) || []
         );
-        user;
       }
     }
     loadCountry();
@@ -85,9 +79,9 @@ function Edit() {
     });
     if (response.ok) {
       navigate("/companies");
-      toast("company edited successfully");
+      toast.success("Company edited successfully");
     } else {
-      toast(response.data?.message);
+      toast.error(response.data?.message);
     }
   }
 
@@ -187,7 +181,7 @@ function Edit() {
                     </Col>
                   </Row>
                   <Button
-                    className="btn-fill pull-right"
+                    className="btn custom_theme_button"
                     type="submit"
                     variant="info"
                   >

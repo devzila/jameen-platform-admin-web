@@ -4,6 +4,7 @@ import useFetch from "use-http";
 
 // react-bootstrap components
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import { formatdate } from "services/utility_functions";
 
 function Show() {
   const { companyId, userId } = useParams();
@@ -19,7 +20,7 @@ function Show() {
       `/v1/platform_admin/companies/${companyId}/users/${userId}`
     );
     if (response.ok) {
-      setUser(api.data.user);
+      setUser(api.data);
     }
   }
 
@@ -84,7 +85,7 @@ function Show() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Created At:</label>
-                        <span>{user.created_at} </span>
+                        <span>{formatdate(user.created_at)} </span>
                       </Form.Group>
                     </Col>
                   </Row>

@@ -15,6 +15,7 @@ import {
 } from "../contexts/AuthContext";
 import AppDataContext from "contexts/AppDataContext";
 import options from "./Options";
+import Loader from "components/Loader";
 
 function Admin() {
   const [image, setImage] = React.useState(sidebarImage);
@@ -78,7 +79,7 @@ function Admin() {
               />
               <div className="main-panel" ref={mainPanel}>
                 <div className="content">
-                  <Suspense>
+                  <Suspense fallback={<Loader />}>
                     <Routes>{getRoutes(routes)}</Routes>
                   </Suspense>
                 </div>

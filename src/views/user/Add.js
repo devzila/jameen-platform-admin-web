@@ -8,17 +8,13 @@ import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Add() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, watch, setValue } = useForm();
 
   const { companyId } = useParams();
   const { get, post, response } = useFetch();
   const [userData, setUserData] = useState({});
+  const [errors, setErrors] = useState({});
+
   const navigate = useNavigate();
 
   useEffect(() => {}, []);
@@ -29,16 +25,11 @@ function Add() {
       user: data,
     });
     if (response.ok) {
-      setValue("name", api.data.name);
-      setValue("email", api.data.email);
-      setValue("mobile_number", api.data.mobile_number);
-      setValue("username", api.data.username);
-      setValue("password", api.data.password);
-      setValue("role_id", api.data.role_id);
       navigate(`/companies/${companyId}/users`);
-      toast("user added Successfully");
+      toast.success("User added Successfully");
     } else {
-      toast(response.data?.message);
+      setErrors(api.errors);
+      toast.error(response.data?.message);
     }
   }
 
@@ -83,6 +74,10 @@ function Add() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Email</label>
+                        <small className="text-danger">
+                          *{errors ? errors.email : null}{" "}
+                        </small>
+
                         <Form.Control
                           defaultValue={userData.email}
                           placeholder="Email"
@@ -95,7 +90,13 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>username</label>
+                        <label>
+                          username
+                          <small className="text-danger">
+                            {" "}
+                            *{errors ? errors.username : null}{" "}
+                          </small>
+                        </label>
                         <Form.Control
                           defaultValue={userData.username}
                           placeholder="UserName"
@@ -108,7 +109,13 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Password</label>
+                        <label>
+                          Password
+                          <small className="text-danger">
+                            *{errors ? errors.password : null}{" "}
+                          </small>
+                        </label>
+
                         <Form.Control
                           defaultValue={userData.password}
                           placeholder="Password"
@@ -121,7 +128,12 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Role</label>
+                        <label>
+                          Role
+                          <small className="text-danger">
+                            *{errors ? errors.role : null}{" "}
+                          </small>
+                        </label>
                         <Form.Control
                           defaultValue={userData.role_id}
                           placeholder="Role"
@@ -134,23 +146,28 @@ function Add() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Ph No</label>
+                        <label>
+                          Mobile Number
+                          <small className="text-danger">
+                            *{errors ? errors.role : null}
+                          </small>
+                        </label>
                         <Form.Control
                           defaultValue={userData.mobile_number}
-                          placeholder="Ph Number"
+                          placeholder="Mobile Number"
                           type="text"
                           {...register("mobile_number")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Button
-                    className="btn-fill pull-right"
+                  <button
+                    className="btn custom_theme_button"
                     type="submit"
                     variant="info"
                   >
                     Update Profile
-                  </Button>
+                  </button>
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>
