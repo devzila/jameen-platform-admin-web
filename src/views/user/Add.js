@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "use-http";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
+import { format_react_select } from "services/utility_functions";
 
-// react-bootstrap components
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Add() {
-  const { register, handleSubmit, watch, setValue } = useForm();
+  const { register, handleSubmit, setValue, control } = useForm();
 
   const { companyId } = useParams();
   const { get, post, response } = useFetch();
@@ -17,7 +17,16 @@ function Add() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  async function fetchRoles() {
+    const api = await get("/v1/admin/roles");
+    if (response.ok) {
+      setRoles_data(format_react_select(api.data, ["id", "name"]));
+    }
+  }
 
   async function onSubmit(data) {
     console.log(data);
@@ -91,7 +100,7 @@ function Add() {
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>
-                          username
+                          Username
                           <small className="text-danger">
                             {" "}
                             *{errors ? errors.username : null}{" "}
@@ -102,25 +111,6 @@ function Add() {
                           placeholder="UserName"
                           type="text"
                           {...register("username")}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>
-                          Password
-                          <small className="text-danger">
-                            *{errors ? errors.password : null}{" "}
-                          </small>
-                        </label>
-
-                        <Form.Control
-                          defaultValue={userData.password}
-                          placeholder="Password"
-                          type="text"
-                          {...register("password")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -166,7 +156,7 @@ function Add() {
                     type="submit"
                     variant="info"
                   >
-                    Update Profile
+                    Save
                   </button>
                   <div className="clearfix"></div>
                 </Form>

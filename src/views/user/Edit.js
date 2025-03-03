@@ -1,23 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import useFetch from "use-http";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { format_react_select } from "services/utility_functions";
+import Select from "react-select";
 
 function EditUser() {
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, control } = useForm();
 
   const { get, put, response } = useFetch();
   const [userData, setUserData] = useState({});
   const [errors, setErrors] = useState({});
+  const [roles_data, setRoles_data] = useState([]);
 
   const navigate = useNavigate();
 
   const { companyId, userId } = useParams();
   useEffect(() => {
     loadUser();
+    fetchRoles();
   }, [userId]);
+
+  async function fetchRoles() {
+    const api = await get("/v1/admin/roles");
+    if (response.ok) {
+      setRoles_data(format_react_select(api.data, ["id", "name"]));
+    }
+  }
 
   async function loadUser() {
     const api = await get(
@@ -43,7 +54,7 @@ function EditUser() {
     );
     if (response.ok) {
       navigate(`/companies/${companyId}/users`);
-      toast.success("User added Successfully");
+      toast.success("User data updated successfully");
     } else {
       setErrors(api.errors);
       toast.error(response.data?.message);
@@ -107,7 +118,7 @@ function EditUser() {
                   <Col className="pr-1" md="12">
                     <Form.Group>
                       <label>
-                        username
+                        Username
                         <small className="text-danger">
                           {" "}
                           *{errors ? errors.username : null}{" "}
@@ -123,7 +134,7 @@ function EditUser() {
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="pr-1" md="12">
+                  {/* <Col className="pr-1" md="12">
                     <Form.Group>
                       <label>
                         Password
@@ -139,7 +150,7 @@ function EditUser() {
                         {...register("password")}
                       ></Form.Control>
                     </Form.Group>
-                  </Col>
+                  </Col> */}
                 </Row>
                 <Row>
                   <Col className="pr-1" md="12">
@@ -150,12 +161,21 @@ function EditUser() {
                           *{errors ? errors.role : null}{" "}
                         </small>
                       </label>
-                      <Form.Control
-                        defaultValue={userData.role_id}
+                      <Controller
+                        name="role_id"
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={roles_data}
+                            value={roles_data.find(
+                              (c) => c.value === field.value
+                            )}
+                            onChange={(val) => field.onChange(val.value)}
+                          />
+                        )}
+                        control={control}
                         placeholder="Role"
-                        type="text"
-                        {...register("role_id")}
-                      ></Form.Control>
+                      />
                     </Form.Group>
                   </Col>
                 </Row>
@@ -182,7 +202,7 @@ function EditUser() {
                   type="submit"
                   variant="info"
                 >
-                  Update Profile
+                  Save
                 </button>
                 <div className="clearfix"></div>
               </Form>

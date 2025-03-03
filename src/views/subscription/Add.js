@@ -28,12 +28,6 @@ function Add() {
       subscription: data,
     });
     if (response.ok) {
-      setValue("name", api.data.subscription.name);
-      setValue(
-        "max_no_of_compounds",
-        api.data.subscription.max_no_of_compounds
-      );
-      setValue("max_no_of_units", api.data.subscription.max_no_of_units);
       navigate("/subscriptions");
       toast.success("Successfully Created");
     } else {
@@ -71,7 +65,7 @@ function Add() {
                         <label>Name</label>
                         <Form.Control
                           defaultValue={subscriptionData.name}
-                          placeholder="subscription Name"
+                          placeholder="Subscription name"
                           type="text"
                           {...register("name")}
                         ></Form.Control>
@@ -85,7 +79,7 @@ function Add() {
                         <Form.Control
                           defaultValue={subscriptionData.max_no_of_units}
                           placeholder="Units"
-                          type="text"
+                          type="number"
                           {...register("max_no_of_units")}
                         ></Form.Control>
                       </Form.Group>
@@ -98,20 +92,20 @@ function Add() {
                         <Form.Control
                           defaultValue={subscriptionData.max_no_of_compounds}
                           placeholder="Compounds"
-                          type="text"
+                          type="number"
                           {...register("max_no_of_compounds")}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
 
-                  <Button
-                    className="btn-fill pull-right"
+                  <button
+                    className="btn custom_theme_button"
                     type="submit"
                     variant="info"
                   >
-                    Update Profile
-                  </Button>
+                    Save
+                  </button>
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>

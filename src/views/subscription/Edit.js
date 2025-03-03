@@ -39,9 +39,9 @@ function Edit() {
     });
     if (response.ok) {
       navigate("/subscriptions");
-      toast("Subscription edited successfully");
+      toast.success("Subscription updated successfully");
     } else {
-      toast(response.data?.message || "Error editing subscription");
+      toast.error(response.data?.message || "Error editing subscription");
     }
   }
 
@@ -86,8 +86,8 @@ function Edit() {
                       <Form.Group>
                         <label>Max Number of Units</label>
                         <Form.Control
-                          placeholder="Identifier"
-                          type="text"
+                          placeholder="0"
+                          type="number"
                           {...register("max_no_of_units")}
                         />
                       </Form.Group>
@@ -98,8 +98,8 @@ function Edit() {
                       <Form.Group>
                         <label>Max Number of Compounds</label>
                         <Form.Control
-                          placeholder="Identifier"
-                          type="text"
+                          placeholder="0"
+                          type="number"
                           {...register("max_no_of_compounds")}
                         />
                       </Form.Group>

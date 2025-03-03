@@ -65,8 +65,8 @@ function Index() {
                     <thead>
                       <tr>
                         <th className="border-0">Name</th>
-                        <th className="border-0"> max_no_of_units</th>
-                        <th className="border-0"> max_Compounds</th>
+                        <th className="border-0"> Max no of units</th>
+                        <th className="border-0"> Max Compounds</th>
                         <th className="border-0">Crated At</th>
                         <th className="border-0">Action</th>
                       </tr>
