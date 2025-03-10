@@ -370,7 +370,13 @@ label {
 
 .custom_search_button {
   border-radius: 0px;
+  margin: 0px !important;
+  border: 1px solid;
   border-left: 0px;
+  padding-block: 7px !important;
+  font-size: medium !important;
+  color: #28a745 !important;
+  border-color: #28a745 !important;
 }
 
 .theme_color {

@@ -7,10 +7,15 @@ import CustomDivToggle from "../../components/CustomDivToggle";
 import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
+import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { freeSet } from "@coreui/icons";
 
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [pagination, setPagination] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const { get, response, loading, error } = useFetch();
   useEffect(() => {
@@ -22,9 +27,13 @@ function Index() {
   };
 
   async function loadInitialSubscriptions() {
-    const initialSubscriptions = await get(
-      `/v1/platform_admin/subscriptions?page=${currentPage}`
-    );
+    let endpoint = `/v1/platform_admin/subscriptions?page=${currentPage}`;
+
+    if (searchKeyword) {
+      endpoint += `&q[name_cont]=${searchKeyword}`;
+    }
+    let initialSubscriptions = await get(endpoint);
+
     if (response.ok) {
       setSubscriptions(initialSubscriptions.data);
       setPagination(initialSubscriptions.pagination);
@@ -37,40 +46,58 @@ function Index() {
 
   return (
     <>
-      {error ? error.Error : null}
-      {loading ? (
-        <Loader />
-      ) : (
-        <Container fluid>
-          <Row>
-            <Col md="12">
-              <Card className="strpied-tabled-with-hover">
-                <Card.Header>
-                  <Row>
-                    <Col md="8">
-                      <Card.Title as="h4"> Subscriptions </Card.Title>
-                    </Col>
-                    <Col md="4" className="align-right">
-                      <button
-                        className="custom_theme_button btn"
-                        onClick={addSubscription}
-                      >
-                        Add Subscription
-                      </button>
-                    </Col>
-                  </Row>
-                </Card.Header>
-                <Card.Body className="table-full-width table-responsive px-0">
-                  <Table className="table-hover table-striped">
-                    <thead>
-                      <tr>
-                        <th className="border-0">Name</th>
-                        <th className="border-0"> Max no of units</th>
-                        <th className="border-0"> Max Compounds</th>
-                        <th className="border-0">Crated At</th>
-                        <th className="border-0">Action</th>
-                      </tr>
-                    </thead>
+      <Container fluid>
+        <Row>
+          <Col md="12">
+            <Card className="strpied-tabled-with-hover">
+              <CNavbar expand="lg" colorScheme="light" className="bg-white">
+                <CContainer fluid>
+                  <CNavbarBrand href="#">Subscriptions </CNavbarBrand>
+
+                  <div className="d-flex justify-content-end">
+                    <div className="d-flex align-items-center" role="search">
+                      <input
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onReset={loadInitialSubscriptions}
+                        className="form-control  custom_input"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                      />
+                      <div>
+                        <button
+                          onClick={loadInitialSubscriptions}
+                          className="btn btn-outline-success custom_search_button"
+                          type="submit"
+                        >
+                          <CIcon icon={freeSet.cilSearch} />
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      className="custom_theme_button btn"
+                      onClick={addSubscription}
+                    >
+                      Add Subscription
+                    </button>
+                  </div>
+                </CContainer>
+              </CNavbar>
+
+              <Card.Body className="table-full-width table-responsive px-0">
+                <Table className="table-hover table-striped">
+                  <thead>
+                    <tr>
+                      <th className="border-0">Name</th>
+                      <th className="border-0"> Max no of units</th>
+                      <th className="border-0"> Max Compounds</th>
+                      <th className="border-0">Crated At</th>
+                      <th className="border-0">Action</th>
+                    </tr>
+                  </thead>
+                  {loading ? (
+                    <Loader />
+                  ) : (
                     <tbody>
                       {subscriptions?.map((subscription) => (
                         <tr key={subscription.id}>
@@ -109,27 +136,27 @@ function Index() {
                         </tr>
                       ))}
                     </tbody>
-                  </Table>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col md="12">
-              {pagination?.total_pages > 1 ? (
-                <Paginate
-                  onPageChange={handlePageClick}
-                  pageRangeDisplayed={pagination.per_page}
-                  pageCount={pagination.total_pages}
-                  forcePage={currentPage - 1}
-                />
-              ) : (
-                <br />
-              )}
-            </Col>
-          </Row>
-        </Container>
-      )}
+                  )}
+                </Table>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="12">
+            {pagination?.total_pages > 1 ? (
+              <Paginate
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={pagination.per_page}
+                pageCount={pagination.total_pages}
+                forcePage={currentPage - 1}
+              />
+            ) : (
+              <br />
+            )}
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 }

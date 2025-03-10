@@ -8,11 +8,16 @@ import CustomDivToggle from "../../components/CustomDivToggle";
 import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
+import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { freeSet } from "@coreui/icons";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchKeyword, setSearchKeyword] = useState(null);
+
   const { get, post, response, loading, error } = useFetch();
   useEffect(() => {
     loadInitialCompanies();
@@ -23,11 +28,12 @@ function Index() {
   };
 
   async function loadInitialCompanies() {
-    const initialCompanies = await get(
-      `/v1/platform_admin/companies?page=${currentPage}`
-    );
+    let endpoint = `/v1/platform_admin/companies?page=${currentPage}`;
+    if (searchKeyword) {
+      endpoint += `&q[name_cont]=${searchKeyword}`;
+    }
+    let initialCompanies = await get(endpoint);
 
-    console.log(response);
     if (response.ok) {
       setCompanies(initialCompanies.data);
       setPagination(initialCompanies.pagination);
@@ -40,43 +46,59 @@ function Index() {
 
   return (
     <>
-      {error ? error.Error : null}
-      {loading ? (
-        <Loader />
-      ) : (
-        <Container fluid>
-          <Row>
-            <Col md="12">
-              <Card className="strpied-tabled-with-hover">
-                <Card.Header>
-                  <Row>
-                    <Col md="8">
-                      <Card.Title as="h4"> Companies </Card.Title>
-                    </Col>
-                    <Col md="4" className="align-right">
+      <Container fluid>
+        <Row>
+          <Col md="12">
+            <Card className="strpied-tabled-with-hover">
+              <CNavbar expand="lg" colorScheme="light" className="bg-white">
+                <CContainer fluid>
+                  <CNavbarBrand href="#">Companies</CNavbarBrand>
+                  <div className="d-flex justify-content-end">
+                    <div className="d-flex align-items-center" role="search">
+                      <input
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onReset={loadInitialCompanies}
+                        className="form-control  custom_input"
+                        type="search"
+                        placeholder="Search"
+                        aria-label="Search"
+                      />
                       <button
-                        className="custom_theme_button btn"
-                        onClick={addCompany}
+                        onClick={loadInitialCompanies}
+                        className="btn btn-outline-success custom_search_button"
+                        type="submit"
                       >
-                        Add Company
+                        <CIcon icon={freeSet.cilSearch} />
                       </button>
-                    </Col>
-                  </Row>
-                </Card.Header>
-                <Card.Body className="table-full-width table-responsive px-0">
-                  <div className="table-responsive bg-white">
-                    <table className="table table-striped mb-1">
-                      <thead>
-                        <tr>
-                          <th className="border-0">Name</th>
-                          <th className="border-0">Identifier</th>
-                          <th className="border-0">Country</th>
+                    </div>
+                    <button
+                      className="custom_theme_button btn m-0 mx-2"
+                      onClick={addCompany}
+                    >
+                      Add Company
+                    </button>
+                  </div>
+                </CContainer>
+              </CNavbar>
+              <hr className="p-0 m-0 text-secondary" />
 
-                          <th className="border-0">Subscription</th>
-                          <th className="border-0">Crated At</th>
-                          <th className="border-0">Action</th>
-                        </tr>
-                      </thead>
+              <Card.Body className="table-full-width table-responsive px-0">
+                <div className="table-responsive bg-white">
+                  <table className="table table-striped mb-1">
+                    <thead>
+                      <tr>
+                        <th className="border-0">Name</th>
+                        <th className="border-0">Identifier</th>
+                        <th className="border-0">Country</th>
+
+                        <th className="border-0">Subscription</th>
+                        <th className="border-0">Crated At</th>
+                        <th className="border-0">Action</th>
+                      </tr>
+                    </thead>
+                    {loading ? (
+                      <Loader />
+                    ) : (
                       <tbody>
                         {companies.map((company) => (
                           <tr key={company.id}>
@@ -125,28 +147,28 @@ function Index() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col md="12">
-              {pagination?.total_pages > 1 ? (
-                <Paginate
-                  onPageChange={handlePageClick}
-                  pageRangeDisplayed={pagination.per_page}
-                  pageCount={pagination.total_pages}
-                  forcePage={currentPage - 1}
-                />
-              ) : (
-                <br />
-              )}
-            </Col>
-          </Row>
-        </Container>
-      )}
+                    )}
+                  </table>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="12">
+            {pagination?.total_pages > 1 ? (
+              <Paginate
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={pagination.per_page}
+                pageCount={pagination.total_pages}
+                forcePage={currentPage - 1}
+              />
+            ) : (
+              <br />
+            )}
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 }

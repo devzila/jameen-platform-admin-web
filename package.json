@@ -2,6 +2,9 @@
   "name": "light-bootstrap-dashboard-react",
   "version": "2.0.1",
   "dependencies": {
+    "@coreui/icons": "^3.0.1",
+    "@coreui/icons-react": "^2.3.0",
+    "@coreui/react": "^5.5.0",
     "@fortawesome/fontawesome-free": "5.15.2",
     "bootstrap": "^4.6.0",
     "react": "^18.2.0",
