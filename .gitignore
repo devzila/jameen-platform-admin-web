@@ -3,4 +3,5 @@ node_modules/
 .eslintcache
 .DS_Store
 .env
+.env.production
 build/
