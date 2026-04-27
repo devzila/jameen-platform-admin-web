@@ -133,7 +133,11 @@ function Index() {
                                     >
                                       User Show
                                     </NavLink>
-                                  </Dropdown.Item>
+                                  </Dropdown.Item>  
+                                   <Dropdown.Item> 
+                                      onClick={() => handleResetPassword(user.id)}
+                                    Reset Password
+                                   </Dropdown.Item>
                                 </Dropdown.Menu>
                               </Dropdown>
                             </td>
