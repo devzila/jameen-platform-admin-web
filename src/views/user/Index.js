@@ -49,10 +49,8 @@ function Index() {
   return (
     <div className="p-3">
 
-      {/* HEADER (Breadcrumb + Actions) */}
       <div className="d-flex justify-content-between align-items-center mb-3">
 
-        {/* BREADCRUMB */}
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 bg-transparent p-0">
             <li className="breadcrumb-item">
