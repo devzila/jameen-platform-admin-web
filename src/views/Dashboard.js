@@ -66,7 +66,7 @@ function Dashboard() {
               </Card.Body>
               <Card.Footer>
                 <hr></hr>
-                <div className="stats">
+                <div className="starts">
                   <i className="far fa-calendar-alt mr-1"></i>
                   Last day
                 </div>
