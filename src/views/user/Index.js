@@ -21,25 +21,26 @@ function Index() {
 
   useEffect(() => {
     loadInitialusers();
-  }, [currentPage]);
+  }, [currentPage, searchKeyword]);
+
 
   const addUser = () => {
     navigate(`/companies/${companyId}/users/add`);
   };
 
   async function loadInitialusers() {
-    let endpoint = `/v1/platform_admin/companies/${companyId}/users?page=${currentPage}`;
+  let endpoint = `/v1/platform_admin/companies/${companyId}/users?page=${currentPage}`;
 
-    if (searchKeyword) {
-      endpoint += `&q[username_cont]=${searchKeyword}`;
-    }
+      if (searchKeyword) {
+        endpoint += `&q[email_or_name_eq]=${searchKeyword}`;
+      }
 
-    const initialusers = await get(endpoint);
+      const initialusers = await get(endpoint);
 
-    if (response.ok) {
-      setusers(initialusers.data);
-      setPagination(initialusers.data.pagination);
-    }
+      if (response.ok) {
+        setusers(initialusers.data);
+        setPagination(initialusers.data.pagination);
+      }
   }
 
   function handlePageClick(e) {
@@ -69,7 +70,10 @@ function Index() {
         <div className="d-flex align-items-center gap-2">
 
           <input
-            onChange={(e) => setSearchKeyword(e.target.value)}
+            onChange={(e) => {
+              setSearchKeyword(e.target.value);
+              setCurrentPage(1); // reset page when searching
+            }}
             className="form-control custom_input"
             type="search"
             placeholder="Search"
