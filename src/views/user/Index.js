@@ -61,7 +61,7 @@ function Index() {
       if (response.ok) {
         alert("Password reset ");
       } else {
-        alert("password reset successfully");
+        alert("password reset failed");
       }
     } catch (err) {
       console.error(err);

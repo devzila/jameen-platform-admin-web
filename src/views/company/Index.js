@@ -11,6 +11,7 @@ import Loader from "components/Loader";
 import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
+import { formatdate } from "services/utility_functions";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
@@ -107,7 +108,7 @@ function Index() {
                             <td>{company.country.name_en}</td>
 
                             <td>{company.subscription?.name}</td>
-                            <td>{company.created_at.substring(0, 10)}</td>
+                            <td>{formatdate(company.created_at)}</td>
                             <td>
                               <Dropdown key={company.id}>
                                 <Dropdown.Toggle
