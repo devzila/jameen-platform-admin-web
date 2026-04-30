@@ -4,7 +4,7 @@ import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
-import { Button, Card, Container, Row, Col } from "react-bootstrap";
+import { Card, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
 import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
@@ -13,7 +13,7 @@ import { freeSet } from "@coreui/icons";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
-  const [pagination, setPagination] = useState(null);
+  const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -35,13 +35,19 @@ function Index() {
 
     if (response.ok) {
       setCompanies(data.data || []);
-      setPagination(data.pagination || null);
+      setPagination(data.pagination || {});
+
+      // Fix: if current page exceeds total pages → reset
+      if (data.pagination && currentPage > data.pagination.total_pages) {
+        setCurrentPage(1);
+      }
     }
   };
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       loadInitialCompanies();
-    }, 400); // debounce for better UX
+    }, 400);
 
     return () => clearTimeout(delayDebounce);
   }, [currentPage, searchKeyword]);
@@ -61,12 +67,10 @@ function Index() {
 
                 <div className="d-flex justify-content-end">
                   <div className="d-flex align-items-center">
-                    
-                
                     <input
                       value={searchKeyword}
                       onChange={(e) => {
-                        setCurrentPage(1); 
+                        setCurrentPage(1);
                         setSearchKeyword(e.target.value);
                       }}
                       className="form-control custom_input"
@@ -176,20 +180,19 @@ function Index() {
           </Card>
         </Col>
       </Row>
-
-      
-      <Row>
-        <Col md="12">
-          {pagination?.total_pages > 1 && (
+      {pagination && (
+        <Row className="mt-3">
+          <Col className="d-flex justify-content-center">
             <Paginate
               onPageChange={handlePageClick}
-              pageRangeDisplayed={pagination.per_page}
-              pageCount={pagination.total_pages}
+              pageRangeDisplayed={5}
+              marginPagesDisplayed={2}
+              pageCount={pagination.total_pages || 2}
               forcePage={currentPage - 1}
             />
-          )}
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      )}v
     </Container>
   );
 }
