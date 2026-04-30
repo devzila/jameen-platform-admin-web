@@ -4,7 +4,6 @@ import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "components/CustomDivToggle";
-import { CNavbar, CContainer, CNavbarBrand, CCol, CRow } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
 
