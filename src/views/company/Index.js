@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
-import { Dropdown } from "react-bootstrap";
-import CustomDivToggle from "../../components/CustomDivToggle";
+import { Dropdown, Badge } from "react-bootstrap";
 import { Card, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
@@ -17,7 +16,7 @@ function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { get, response, loading } = useFetch();
+  const { get, post, response, loading } = useFetch();
   const navigate = useNavigate();
 
   const addCompany = () => {
@@ -37,7 +36,6 @@ function Index() {
       setCompanies(data.data || []);
       setPagination(data.pagination || {});
 
-      // Fix: if current page exceeds total pages → reset
       if (data.pagination && currentPage > data.pagination.total_pages) {
         setCurrentPage(1);
       }
@@ -54,6 +52,29 @@ function Index() {
 
   const handlePageClick = (e) => {
     setCurrentPage(e.selected + 1);
+  };
+
+  // ✅ Toggle Active/Inactive
+  const toggleCompanyStatus = async (company) => {
+    const action = company.active ? "deactivate" : "activate";
+
+    const confirmAction = window.confirm(
+      `Are you sure you want to ${action} this company?`
+    );
+
+    if (!confirmAction) return;
+
+    const endpoint = `/v1/platform_admin/companies/${company.id}/${action}`;
+
+    try {
+      await post(endpoint);
+
+      // Always refresh after action
+      await loadInitialCompanies();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Something went wrong!");
+    }
   };
 
   return (
@@ -107,6 +128,7 @@ function Index() {
                       <th>Identifier</th>
                       <th>Country</th>
                       <th>Subscription</th>
+                      <th>Status</th>
                       <th>Created At</th>
                       <th>Action</th>
                     </tr>
@@ -115,7 +137,7 @@ function Index() {
                   {loading ? (
                     <tbody>
                       <tr>
-                        <td colSpan="6">
+                        <td colSpan="7">
                           <Loader />
                         </td>
                       </tr>
@@ -129,36 +151,63 @@ function Index() {
                             <td>{company.slug}</td>
                             <td>{company.country?.name_en}</td>
                             <td>{company.subscription?.name}</td>
+
+                            {/* ✅ Status */}
+                            <td>
+                              {company.active ? (
+                                <Badge bg="success">Active</Badge>
+                              ) : (
+                                <Badge bg="secondary">Inactive</Badge>
+                              )}
+                            </td>
+
                             <td>
                               {company.created_at?.substring(0, 10)}
                             </td>
 
+                            {/* ✅ Working Dropdown */}
                             <td>
                               <Dropdown>
                                 <Dropdown.Toggle
-                                  as={CustomDivToggle}
-                                  style={{ cursor: "pointer" }}
+                                  variant="light"
+                                  size="sm"
+                                  style={{ border: "none" }}
                                 >
                                   <BsThreeDots />
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}/edit`}>
-                                      Edit
-                                    </NavLink>
+                                  <Dropdown.Item
+                                    as={NavLink}
+                                    to={`/companies/${company.id}/edit`}
+                                  >
+                                    Edit
                                   </Dropdown.Item>
 
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}/users`}>
-                                      Users
-                                    </NavLink>
+                                  <Dropdown.Item
+                                    as={NavLink}
+                                    to={`/companies/${company.id}/users`}
+                                  >
+                                    Users
                                   </Dropdown.Item>
 
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}`}>
-                                      Show
-                                    </NavLink>
+                                  <Dropdown.Item
+                                    as={NavLink}
+                                    to={`/companies/${company.id}`}
+                                  >
+                                    Show
+                                  </Dropdown.Item>
+
+                                  <Dropdown.Divider />
+
+                                  <Dropdown.Item
+                                    onClick={() =>
+                                      toggleCompanyStatus(company)
+                                    }
+                                  >
+                                    {company.active
+                                      ? "Deactivate"
+                                      : "Activate"}
                                   </Dropdown.Item>
                                 </Dropdown.Menu>
                               </Dropdown>
@@ -167,7 +216,7 @@ function Index() {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="6" className="text-center">
+                          <td colSpan="7" className="text-center">
                             No companies found
                           </td>
                         </tr>
@@ -180,6 +229,7 @@ function Index() {
           </Card>
         </Col>
       </Row>
+
       {pagination && (
         <Row className="mt-3">
           <Col className="d-flex justify-content-center">
@@ -192,7 +242,7 @@ function Index() {
             />
           </Col>
         </Row>
-      )}v
+      )}
     </Container>
   );
 }
