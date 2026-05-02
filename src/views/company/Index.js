@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
-import { Dropdown } from "react-bootstrap";
-import CustomDivToggle from "../../components/CustomDivToggle";
+import { Dropdown, Badge } from "react-bootstrap";
 import { Card, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
@@ -17,13 +16,14 @@ function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { get, response, loading } = useFetch();
+  const { get, post, loading } = useFetch();
   const navigate = useNavigate();
 
   const addCompany = () => {
     navigate(`/companies/add`);
   };
 
+  // ✅ Load Companies
   const loadInitialCompanies = async () => {
     let endpoint = `/v1/platform_admin/companies?page=${currentPage}`;
 
@@ -31,36 +31,61 @@ function Index() {
       endpoint += `&q[name_cont]=${searchKeyword}`;
     }
 
-    const data = await get(endpoint);
+    try {
+      const data = await get(endpoint);
 
-    if (response.ok) {
-      setCompanies(data.data || []);
-      setPagination(data.pagination || {});
+      setCompanies(data?.data || []);
+      setPagination(data?.pagination || {});
 
-      // Fix: if current page exceeds total pages → reset
-      if (data.pagination && currentPage > data.pagination.total_pages) {
+      if (data?.pagination && currentPage > data.pagination.total_pages) {
         setCurrentPage(1);
       }
+    } catch (err) {
+      console.error("Fetch error:", err);
     }
   };
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
+    const delay = setTimeout(() => {
       loadInitialCompanies();
     }, 400);
 
-    return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(delay);
   }, [currentPage, searchKeyword]);
 
   const handlePageClick = (e) => {
     setCurrentPage(e.selected + 1);
   };
 
+  // ✅ Toggle Status (FIXED)
+  const toggleCompanyStatus = async (company) => {
+    const action = company.active ? "deactivate" : "activate";
+
+    if (!window.confirm(`Are you sure you want to ${action} this company?`)) return;
+
+    const endpoint = `/v1/platform_admin/companies/${company.id}/${action}`;
+
+    try {
+      await post(endpoint);
+
+      // ✅ Instant UI update (no reload)
+      setCompanies((prev) =>
+        prev.map((c) =>
+          c.id === company.id ? { ...c, active: !c.active } : c
+        )
+      );
+
+    } catch (err) {
+      console.error("Status update failed:", err);
+      alert("Something went wrong!");
+    }
+  };
+
   return (
     <Container fluid>
       <Row>
         <Col md="12">
-          <Card className="strpied-tabled-with-hover">
+          <Card>
             <CNavbar expand="lg" className="bg-white">
               <CContainer fluid>
                 <CNavbarBrand>Companies</CNavbarBrand>
@@ -73,21 +98,21 @@ function Index() {
                         setCurrentPage(1);
                         setSearchKeyword(e.target.value);
                       }}
-                      className="form-control custom_input"
+                      className="form-control"
                       type="search"
                       placeholder="Search company..."
                     />
 
                     <button
                       onClick={loadInitialCompanies}
-                      className="btn btn-outline-success custom_search_button"
+                      className="btn btn-outline-success"
                     >
                       <CIcon icon={freeSet.cilSearch} />
                     </button>
                   </div>
 
                   <button
-                    className="custom_theme_button btn m-0 mx-2"
+                    className="btn btn-primary mx-2"
                     onClick={addCompany}
                   >
                     Add Company
@@ -96,103 +121,117 @@ function Index() {
               </CContainer>
             </CNavbar>
 
-            <hr className="p-0 m-0 text-secondary" />
+            <Card.Body className="table-responsive">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Identifier</th>
+                    <th>Country</th>
+                    <th>Subscription</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
 
-            <Card.Body className="table-full-width table-responsive px-0">
-              <div className="table-responsive bg-white">
-                <table className="table table-striped mb-1">
-                  <thead>
+                {loading ? (
+                  <tbody>
                     <tr>
-                      <th>Name</th>
-                      <th>Identifier</th>
-                      <th>Country</th>
-                      <th>Subscription</th>
-                      <th>Created At</th>
-                      <th>Action</th>
+                      <td colSpan="7">
+                        <Loader />
+                      </td>
                     </tr>
-                  </thead>
+                  </tbody>
+                ) : (
+                  <tbody>
+                    {companies.length > 0 ? (
+                      companies.map((company) => (
+                        <tr key={company.id}>
+                          <td>{company.name}</td>
+                          <td>{company.slug}</td>
+                          <td>{company.country?.name_en}</td>
+                          <td>{company.subscription?.name}</td>
 
-                  {loading ? (
-                    <tbody>
-                      <tr>
-                        <td colSpan="6">
-                          <Loader />
-                        </td>
-                      </tr>
-                    </tbody>
-                  ) : (
-                    <tbody>
-                      {companies.length > 0 ? (
-                        companies.map((company) => (
-                          <tr key={company.id}>
-                            <td>{company.name}</td>
-                            <td>{company.slug}</td>
-                            <td>{company.country?.name_en}</td>
-                            <td>{company.subscription?.name}</td>
-                            <td>
-                              {company.created_at?.substring(0, 10)}
-                            </td>
+                          {/* ✅ Status */}
+                          <td>
+                            {company.active ? (
+                              <Badge bg="success">Active</Badge>
+                            ) : (
+                              <Badge bg="secondary">Inactive</Badge>
+                            )}
+                          </td>
 
-                            <td>
-                              <Dropdown>
-                                <Dropdown.Toggle
-                                  as={CustomDivToggle}
-                                  style={{ cursor: "pointer" }}
+                          <td>{company.created_at?.substring(0, 10)}</td>
+
+                          {/* ✅ Actions */}
+                          <td>
+                            <Dropdown>
+                              <Dropdown.Toggle variant="light" size="sm">
+                                <BsThreeDots />
+                              </Dropdown.Toggle>
+
+                              <Dropdown.Menu>
+                                <Dropdown.Item
+                                  as={NavLink}
+                                  to={`/companies/${company.id}/edit`}
                                 >
-                                  <BsThreeDots />
-                                </Dropdown.Toggle>
+                                  Edit
+                                </Dropdown.Item>
 
-                                <Dropdown.Menu>
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}/edit`}>
-                                      Edit
-                                    </NavLink>
-                                  </Dropdown.Item>
+                                <Dropdown.Item
+                                  as={NavLink}
+                                  to={`/companies/${company.id}/users`}
+                                >
+                                  Users
+                                </Dropdown.Item>
 
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}/users`}>
-                                      Users
-                                    </NavLink>
-                                  </Dropdown.Item>
+                                <Dropdown.Item
+                                  as={NavLink}
+                                  to={`/companies/${company.id}`}
+                                >
+                                  Show
+                                </Dropdown.Item>
 
-                                  <Dropdown.Item as="div">
-                                    <NavLink to={`/companies/${company.id}`}>
-                                      Show
-                                    </NavLink>
-                                  </Dropdown.Item>
-                                </Dropdown.Menu>
-                              </Dropdown>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="6" className="text-center">
-                            No companies found
+                                <Dropdown.Divider />
+
+                                <Dropdown.Item
+                                  onClick={() => toggleCompanyStatus(company)}
+                                >
+                                  {company.active ? "Deactivate" : "Activate"}
+                                </Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
                           </td>
                         </tr>
-                      )}
-                    </tbody>
-                  )}
-                </table>
-              </div>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          No companies found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                )}
+              </table>
             </Card.Body>
           </Card>
         </Col>
       </Row>
+
+      {/* ✅ Pagination */}
       {pagination && (
         <Row className="mt-3">
           <Col className="d-flex justify-content-center">
             <Paginate
               onPageChange={handlePageClick}
-              pageRangeDisplayed={5}
-              marginPagesDisplayed={2}
-              pageCount={pagination.total_pages || 2}
+              pageCount={pagination.total_pages || 1}
               forcePage={currentPage - 1}
             />
           </Col>
         </Row>
-      )}v
+      )}
     </Container>
   );
 }
