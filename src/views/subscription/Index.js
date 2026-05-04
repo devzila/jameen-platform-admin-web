@@ -37,7 +37,6 @@ function Index() {
     if (response.ok) {
       setSubscriptions(initialSubscriptions.data);
       setPagination(initialSubscriptions.pagination);
-      console.log(initialSubscriptions.data);
     }
   }
 
@@ -110,7 +109,6 @@ function Index() {
                         date = date.slice(date.indexOf("-") + 1, date.length);
                         var day = date;
                         date = day + "-" + month + "-" + year;
-                        console.log(date);
                       return (
                         <tr key={subscription.id}>
                           <td>{subscription.name}</td>
