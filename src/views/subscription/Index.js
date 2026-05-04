@@ -37,6 +37,7 @@ function Index() {
     if (response.ok) {
       setSubscriptions(initialSubscriptions.data);
       setPagination(initialSubscriptions.pagination);
+      console.log(initialSubscriptions.data);
     }
   }
 
@@ -99,12 +100,23 @@ function Index() {
                     <Loader />
                   ) : (
                     <tbody>
-                      {subscriptions?.map((subscription) => (
+                      {subscriptions?.map((subscription) => {
+
+                        // coverting date to correct format
+                        var date = subscription.created_at.substring(0, 10);
+                        var year = date.substring(0, date.indexOf("-"));
+                        date = date.slice(date.indexOf("-") + 1, date.length);
+                        var month = date.substring(0, date.indexOf("-"));
+                        date = date.slice(date.indexOf("-") + 1, date.length);
+                        var day = date;
+                        date = day + "-" + month + "-" + year;
+                        console.log(date);
+                      return (
                         <tr key={subscription.id}>
                           <td>{subscription.name}</td>
                           <td>{subscription.max_no_of_units}</td>
                           <td>{subscription.max_no_of_compounds}</td>
-                          <td>{subscription.created_at.substring(0, 10)}</td>
+                          <td>{date}</td>
                           <td>
                             <Dropdown key={subscription.id}>
                               <Dropdown.Toggle
@@ -134,7 +146,7 @@ function Index() {
                             </Dropdown>
                           </td>
                         </tr>
-                      ))}
+                      )})}
                     </tbody>
                   )}
                 </Table>
