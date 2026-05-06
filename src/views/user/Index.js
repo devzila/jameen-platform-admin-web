@@ -88,8 +88,7 @@ function Index() {
 
           <button
             className="custom_theme_button btn"
-            onClick={addUser}
-          >
+            onClick={addUser}>
             Add User
           </button>
 
