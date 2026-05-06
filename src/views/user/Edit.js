@@ -53,7 +53,6 @@ function EditUser() {
       setValue("name", api.data.name);
       setValue("email", api.data.email);
       setValue("mobile_number", api.data.mobile_number);
-      setValue("username", api.data.username);
       setValue("role_id", api.data.role?.id || null);
     } else {
       toast.error("Failed to load user");
@@ -68,7 +67,6 @@ function EditUser() {
       user: {
         name: data.name,
         email: data.email,
-        username: data.username,
         mobile_number: data.mobile_number,
         role_id: Number(data.role_id),
       },
@@ -146,27 +144,6 @@ function EditUser() {
                         type="email"
                         {...register("email", {
                           required: "Email is required",
-                        })}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Username */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Username{" "}
-                        <small className="text-danger">
-                          {formErrors?.username?.message ||
-                            apiErrors?.username}
-                        </small>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="Username"
-                        {...register("username", {
-                          required: "Username is required",
                         })}
                       />
                     </Form.Group>

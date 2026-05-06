@@ -49,7 +49,7 @@ function Add() {
     if (
       !data.name ||
       !data.email ||
-      !data.username ||
+      
       !data.password ||
       !data.mobile_number ||
       !data.role_id
@@ -62,7 +62,7 @@ function Add() {
       user: {
         name: data.name,
         email: data.email,
-        username: data.username,
+        
         password: data.password,
         mobile_number: data.mobile_number,
         role_id: Number(data.role_id),
@@ -150,27 +150,6 @@ function Add() {
                             value: /^\S+@\S+$/i,
                             message: "Invalid email format",
                           },
-                        })}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Username */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Username{" "}
-                        <small className="text-danger">
-                          {formErrors?.username?.message || apiErrors?.username}
-                        </small>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="Enter Username"
-                        type="text"
-                        {...register("username", {
-                          required: "Username is required",
                         })}
                       />
                     </Form.Group>

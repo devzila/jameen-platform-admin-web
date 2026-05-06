@@ -25,6 +25,8 @@ function Index() {
   const { get, put, response, loading } = useFetch();
   const navigate = useNavigate();
 
+  const isSearching = searchKeyword.length > 0;
+
   useEffect(() => {
     loadInitialusers();
   }, [currentPage, searchKeyword]);
@@ -75,7 +77,6 @@ function Index() {
 
   return (
     <div className="p-3">
-      {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0 bg-transparent p-0">
@@ -84,7 +85,13 @@ function Index() {
                 Companies
               </Link>
             </li>
+
             <li className="breadcrumb-item active text-dark">Users</li>
+
+
+            <li className="breadcrumb-item active text-dark">
+              Users
+
           </ol>
         </nav>
 
@@ -105,8 +112,12 @@ function Index() {
           >
             <CIcon icon={freeSet.cilSearch} />
           </button>
-
           <button className="custom_theme_button btn" onClick={addUser}>
+
+          <button
+            className="custom_theme_button btn"
+            onClick={addUser}>
+
             Add User
           </button>
         </div>
@@ -128,6 +139,7 @@ function Index() {
           </thead>
 
           <tbody>
+
             {users.map((user) => (
               <tr key={user.id}>
                 <th>{user.name}</th>
@@ -163,13 +175,72 @@ function Index() {
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
+
+            {!loading && users.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center py-5">
+                  <div>
+                    <h5 className="mb-2">
+                      {isSearching ? "No Matching Users Found" : "No Users Found"}
+                    </h5>
+
+                    <p className="text-muted mb-3">
+                      {isSearching
+                        ? "Try searching with a different name or email."
+                        : "No users have been added to this company yet."}
+                    </p>
+
+                    {!isSearching && (
+                      <button
+                        className="btn btn-primary"
+                        onClick={addUser}
+                      >
+                        Add First User
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <th>{user.name}</th>
+                  <td>{user.email}</td>
+                  <td>{user.mobile_number}</td>
+                  <td>{user.role?.name}</td>
+
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle as={CustomDivToggle}>
+                        <BsThreeDots />
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item>
+                          <NavLink to={`/companies/${companyId}/users/${user.id}/edit`}>
+                            Edit
+                          </NavLink>
+                        </Dropdown.Item>
+
+                        <Dropdown.Item>
+                          <NavLink to={`/companies/${companyId}/users/${user.id}`}>
+                            User Show
+                          </NavLink>
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
-        {loading && <Loader />}
+        {loading && (
+          <div className="text-center py-3">
+            <Loader />
+          </div>
+        )}
       </div>
 
       {/* PAGINATION */}

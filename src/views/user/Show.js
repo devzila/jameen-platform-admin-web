@@ -72,15 +72,7 @@ function Show() {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>UserName:</label>
-                        <span>{user.username} </span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
+              
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
