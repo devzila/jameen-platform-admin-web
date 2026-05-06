@@ -51,24 +51,24 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Name:</label>
-                        <span>{user.name}</span>
+                        <label className="col-2 fw-bold">Name</label>
+                        <span >:{user.name}</span>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>email: </label>
-                        <span>{user.email} </span>
+                        <label className="col-2 fw-bold">Email</label>
+                        <span>:{user.email} </span>
                       </Form.Group>
                     </Col>
                   </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Ph-No:</label>
-                        <span>{user.mobile_number} </span>
+                        <label className="col-2 fw-bold">PhoneNumber</label>
+                        <span>:{user.mobile_number} </span>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -76,8 +76,8 @@ function Show() {
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Created At:</label>
-                        <span>{formatdate(user.created_at)} </span>
+                        <label className="col-2 fw-bold">Created At</label>
+                        <span>:{formatdate(user.created_at)} </span>
                       </Form.Group>
                     </Col>
                   </Row>
