@@ -10,6 +10,7 @@ import Loader from "components/Loader";
 import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
+import dateFormat from "../../utilities/DateFormat";
 
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -100,21 +101,13 @@ function Index() {
                   ) : (
                     <tbody>
                       {subscriptions?.map((subscription) => {
-
-                        // coverting date to correct format
-                        var date = subscription.created_at.substring(0, 10);
-                        var year = date.substring(0, date.indexOf("-"));
-                        date = date.slice(date.indexOf("-") + 1, date.length);
-                        var month = date.substring(0, date.indexOf("-"));
-                        date = date.slice(date.indexOf("-") + 1, date.length);
-                        var day = date;
-                        date = day + "-" + month + "-" + year;
+                          console.log(subscription.created_at.substring(0, 10));
                       return (
                         <tr key={subscription.id}>
                           <td>{subscription.name}</td>
                           <td>{subscription.max_no_of_units}</td>
                           <td>{subscription.max_no_of_compounds}</td>
-                          <td>{date}</td>
+                          <td>{dateFormat(subscription.created_at.substring(0, 10))}</td>
                           <td>
                             <Dropdown key={subscription.id}>
                               <Dropdown.Toggle

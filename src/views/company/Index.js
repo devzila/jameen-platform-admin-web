@@ -9,6 +9,7 @@ import Loader from "components/Loader";
 import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
+import dateFormat from "../../utilities/DateFormat";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
@@ -162,7 +163,7 @@ function Index() {
                             )}
                           </td>
 
-                          <td>{company.created_at?.substring(0, 10)}</td>
+                          <td>{dateFormat(company.created_at?.substring(0, 10))}</td>
 
                           {/* ✅ Actions */}
                           <td>
