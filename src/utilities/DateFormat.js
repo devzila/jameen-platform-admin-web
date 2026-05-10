@@ -1,55 +1,11 @@
 function MonthConverter(monthId){
-    const id = Number(monthId);
-    switch (id)
-    {
-        case 1:
-            return "Jan";
-            break;
-        case 2:
-            return "Feb";
-            break;
-        case 3:
-            return "Mar";
-            break;
-        case 4:
-            return "Apr";
-            break;
-        case 5:
-            return "May";
-            break;
-        case 6:
-            return "Jun";
-            break;
-        case 7:
-            return "Jul";
-            break;
-        case 8:
-            return "Aug";
-            break;
-        case 9:
-            return "Sep";
-            break;
-        case 10:
-            return "Oct";
-            break;
-        case 11:
-            return "Nov";
-            break;
-        case 12:
-            return "Dec";
-            break;
-    }
+    const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return names[monthId - 1];
 }
 
 export function dateFormat(date){
-    var year = date.substring(0, date.indexOf("-"));
-    date = date.slice(date.indexOf("-") + 1, date.length);
-    var month = date.substring(0, date.indexOf("-"));
-    date = date.slice(date.indexOf("-") + 1, date.length);
-    var day = date;
-    var monthName = MonthConverter(month);
-    date = monthName + " " + day + ", " + year;
-    return date;
+    const [year, month, day] = date.split("-");
+    return `${MonthConverter(month)} ${day}, ${year}` ;
 }
 
 export default dateFormat;
