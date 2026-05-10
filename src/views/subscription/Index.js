@@ -10,6 +10,7 @@ import Loader from "components/Loader";
 import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
+import dateFormat from "../../utilities/DateFormat";
 
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -99,12 +100,14 @@ function Index() {
                     <Loader />
                   ) : (
                     <tbody>
-                      {subscriptions?.map((subscription) => (
+                      {subscriptions?.map((subscription) => {
+                          console.log(subscription.created_at.substring(0, 10));
+                      return (
                         <tr key={subscription.id}>
                           <td>{subscription.name}</td>
                           <td>{subscription.max_no_of_units}</td>
                           <td>{subscription.max_no_of_compounds}</td>
-                          <td>{subscription.created_at.substring(0, 10)}</td>
+                          <td>{dateFormat(subscription.created_at.substring(0, 10))}</td>
                           <td>
                             <Dropdown key={subscription.id}>
                               <Dropdown.Toggle
@@ -134,7 +137,7 @@ function Index() {
                             </Dropdown>
                           </td>
                         </tr>
-                      ))}
+                      )})}
                     </tbody>
                   )}
                 </Table>
