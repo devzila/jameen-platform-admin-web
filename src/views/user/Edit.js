@@ -13,6 +13,7 @@ function EditUser() {
     handleSubmit,
     setValue,
     control,
+    setError,
     formState: { errors: formErrors },
   } = useForm({
     defaultValues: {
@@ -22,8 +23,6 @@ function EditUser() {
 
   const { get, put, response } = useFetch();
   const [rolesData, setRolesData] = useState([]);
-  const [apiErrors, setApiErrors] = useState({});
-
   const navigate = useNavigate();
   const { companyId, userId } = useParams();
 
@@ -81,9 +80,15 @@ function EditUser() {
       toast.success("User updated successfully");
       navigate(`/companies/${companyId}/users`);
     } else {
-      console.log("API ERROR:", api);
-      setApiErrors(api?.errors || {});
-      toast.error(api?.message || "Update failed");
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(api?.message || "Update failed");
+      }
     }
   }
 
@@ -118,7 +123,7 @@ function EditUser() {
                       <Form.Label>
                         Name{" "}
                         <small className="text-danger">
-                          {formErrors?.name?.message || apiErrors?.name}
+                          {formErrors?.name?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
@@ -136,7 +141,7 @@ function EditUser() {
                       <Form.Label>
                         Email{" "}
                         <small className="text-danger">
-                          {formErrors?.email?.message || apiErrors?.email}
+                          {formErrors?.email?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
@@ -157,8 +162,7 @@ function EditUser() {
                       <Form.Label>
                         Role{" "}
                         <small className="text-danger">
-                          {formErrors?.role_id?.message ||
-                            apiErrors?.role_id}
+                          {formErrors?.role_id?.message}
                         </small>
                       </Form.Label>
 
@@ -195,8 +199,7 @@ function EditUser() {
                       <Form.Label>
                         Mobile Number{" "}
                         <small className="text-danger">
-                          {formErrors?.mobile_number?.message ||
-                            apiErrors?.mobile_number}
+                          {formErrors?.mobile_number?.message}
                         </small>
                       </Form.Label>
                       <Form.Control

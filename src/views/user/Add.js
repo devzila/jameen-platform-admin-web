@@ -13,6 +13,7 @@ function Add() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors: formErrors },
   } = useForm({
     defaultValues: {
@@ -24,8 +25,6 @@ function Add() {
   const { get, post, response } = useFetch();
 
   const [rolesData, setRolesData] = useState([]);
-  const [apiErrors, setApiErrors] = useState({});
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,9 +79,15 @@ function Add() {
       toast.success("User added Successfully");
       navigate(`/companies/${companyId}/users`);
     } else {
-      console.log("API ERROR:", api);
-      setApiErrors(api?.errors || {});
-      toast.error(api?.message || "Invalid data");
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(api?.message || "Invalid data");
+      }
     }
   }
 
@@ -117,7 +122,7 @@ function Add() {
                       <Form.Label>
                         Name{" "}
                         <small className="text-danger">
-                          {formErrors?.name?.message || apiErrors?.name}
+                          {formErrors?.name?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
@@ -138,7 +143,7 @@ function Add() {
                       <Form.Label>
                         Email{" "}
                         <small className="text-danger">
-                          {formErrors?.email?.message || apiErrors?.email}
+                          {formErrors?.email?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
@@ -163,7 +168,7 @@ function Add() {
                       <Form.Label>
                         Password{" "}
                         <small className="text-danger">
-                          {formErrors?.password?.message || apiErrors?.password}
+                          {formErrors?.password?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
@@ -188,7 +193,7 @@ function Add() {
                       <Form.Label>
                         Role{" "}
                         <small className="text-danger">
-                          {formErrors?.role_id?.message || apiErrors?.role_id}
+                          {formErrors?.role_id?.message}
                         </small>
                       </Form.Label>
 
@@ -225,8 +230,7 @@ function Add() {
                       <Form.Label>
                         Mobile Number{" "}
                         <small className="text-danger">
-                          {formErrors?.mobile_number?.message ||
-                            apiErrors?.mobile_number}
+                          {formErrors?.mobile_number?.message}
                         </small>
                       </Form.Label>
                       <Form.Control
