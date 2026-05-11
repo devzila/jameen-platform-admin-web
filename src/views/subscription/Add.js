@@ -13,6 +13,7 @@ function Add() {
     handleSubmit,
     setValue,
     watch,
+    setError,
     formState: { errors },
   } = useForm();
 
@@ -31,7 +32,15 @@ function Add() {
       navigate("/subscriptions");
       toast.success("Successfully Created");
     } else {
-      toast.error(response.data?.message);
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(response.data?.message);
+      }
     }
   }
 
@@ -67,8 +76,12 @@ function Add() {
                           defaultValue={subscriptionData.name}
                           placeholder="Subscription name"
                           type="text"
+                          isInvalid={!!errors.name}
                           {...register("name")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.name?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -80,8 +93,12 @@ function Add() {
                           defaultValue={subscriptionData.max_no_of_units}
                           placeholder="Units"
                           type="number"
+                          isInvalid={!!errors.max_no_of_units}
                           {...register("max_no_of_units")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.max_no_of_units?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -93,8 +110,12 @@ function Add() {
                           defaultValue={subscriptionData.max_no_of_compounds}
                           placeholder="Compounds"
                           type="number"
+                          isInvalid={!!errors.max_no_of_compounds}
                           {...register("max_no_of_compounds")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.max_no_of_compounds?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>

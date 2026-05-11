@@ -12,6 +12,7 @@ function Edit() {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm();
 
@@ -41,7 +42,15 @@ function Edit() {
       navigate("/subscriptions");
       toast.success("Subscription updated successfully");
     } else {
-      toast.error(response.data?.message || "Error editing subscription");
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(response.data?.message || "Error editing subscription");
+      }
     }
   }
 
@@ -76,8 +85,12 @@ function Edit() {
                         <Form.Control
                           placeholder="Subscription Name"
                           type="text"
+                          isInvalid={!!errors.name}
                           {...register("name")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.name?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -88,8 +101,12 @@ function Edit() {
                         <Form.Control
                           placeholder="0"
                           type="number"
+                          isInvalid={!!errors.max_no_of_units}
                           {...register("max_no_of_units")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.max_no_of_units?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -100,8 +117,12 @@ function Edit() {
                         <Form.Control
                           placeholder="0"
                           type="number"
+                          isInvalid={!!errors.max_no_of_compounds}
                           {...register("max_no_of_compounds")}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.max_no_of_compounds?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
