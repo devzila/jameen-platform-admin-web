@@ -14,6 +14,7 @@ function Add() {
     setValue,
     watch,
     control,
+    setError,
     formState: { errors },
   } = useForm();
 
@@ -61,7 +62,15 @@ function Add() {
       navigate("/companies");
       toast.success("Successfully Created");
     } else {
-      toast.error(response.data?.message);
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(response.data?.message);
+      }
     }
   }
   const handleGoBack = () => {
@@ -100,8 +109,12 @@ function Add() {
                           defaultValue={companyData.name}
                           placeholder="User Name"
                           type="text"
+                          isInvalid={!!errors.name}
                           {...register("name")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.name?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -113,8 +126,12 @@ function Add() {
                           defaultValue={companyData.slug}
                           placeholder="slug"
                           type="text"
+                          isInvalid={!!errors.slug}
                           {...register("slug")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.slug?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -139,6 +156,11 @@ function Add() {
                           )}
                           control={control}
                         />
+                        {errors.subscription_id && (
+                          <div className="text-danger mt-1">
+                            {errors.subscription_id.message}
+                          </div>
+                        )}
                       </Form.Group>
                     </Col>
                   </Row>
@@ -162,6 +184,11 @@ function Add() {
                           control={control}
                           placeholder="Role"
                         />
+                        {errors.country_id && (
+                          <div className="text-danger mt-1">
+                            {errors.country_id.message}
+                          </div>
+                        )}
                       </Form.Group>
                     </Col>
                   </Row>

@@ -20,7 +20,14 @@ import {
 } from "react-bootstrap";
 
 function Edit() {
-  const { register, handleSubmit, setValue, control } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    setError,
+    formState: { errors },
+  } = useForm();
 
   const { id } = useParams();
   const { get, put, response, loading, error } = useFetch();
@@ -81,7 +88,15 @@ function Edit() {
       navigate("/companies");
       toast.success("Company edited successfully");
     } else {
-      toast.error(response.data?.message);
+      if (response.status === 422 && response.data?.errors) {
+        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+          if (Array.isArray(fieldErrors) && fieldErrors.length) {
+            setError(field, { type: "server", message: fieldErrors[0] });
+          }
+        });
+      } else {
+        toast.error(response.data?.message);
+      }
     }
   }
 
@@ -117,8 +132,12 @@ function Edit() {
                         <Form.Control
                           placeholder="Company Name"
                           type="text"
+                          isInvalid={!!errors.name}
                           {...register("name")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.name?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -129,8 +148,12 @@ function Edit() {
                         <Form.Control
                           placeholder="Identifier"
                           type="text"
+                          isInvalid={!!errors.slug}
                           {...register("slug")}
                         ></Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.slug?.message}
+                        </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -154,6 +177,11 @@ function Edit() {
                           )}
                           control={control}
                         />
+                        {errors.subscription_id && (
+                          <div className="text-danger mt-1">
+                            {errors.subscription_id.message}
+                          </div>
+                        )}
                       </Form.Group>
                     </Col>
                   </Row>
@@ -177,6 +205,11 @@ function Edit() {
                           control={control}
                           placeholder="Role"
                         />
+                        {errors.country_id && (
+                          <div className="text-danger mt-1">
+                            {errors.country_id.message}
+                          </div>
+                        )}
                       </Form.Group>
                     </Col>
                   </Row>
