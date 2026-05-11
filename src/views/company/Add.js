@@ -22,6 +22,9 @@ function Add() {
   const [companyData, setCompanyData] = useState({});
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [country_array, setCountry_array] = useState([]);
+  const [apiErrors, setApiErrors] = useState({})
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,6 +65,7 @@ function Add() {
       navigate("/companies");
       toast.success("Successfully Created");
     } else {
+      setApiErrors(response.data?.errors || {})
       if (response.status === 422 && response.data?.errors) {
         Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
           if (Array.isArray(fieldErrors) && fieldErrors.length) {
@@ -118,6 +122,26 @@ function Add() {
                       </Form.Group>
                     </Col>
                   </Row>
+
+                  <Row>
+                    <Col md="12">
+                      <Form.Group>
+                        <Form.Label>
+                          Company Logo{" "}
+                          <small className="text-danger">
+                            {apiErrors?.logo}
+                          </small>
+                        </Form.Label>
+
+                        <Form.Control
+                          type="file"
+                          accept="image/*"
+                          {...register('logo')}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
