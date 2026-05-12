@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import useFetch from "use-http";
 import AppDataContext from "contexts/AppDataContext";
 import Select from "react-select";
+import defaultLogo from "assets/img/jameen-logo.png";
 
 // react-bootstrap components
 import {
@@ -73,6 +74,7 @@ function Edit() {
     const api = await get(`/v1/platform_admin/companies/${id}`);
     console.log(api);
     if (response.ok) {
+      setCompanyData(api.data || {});
       setValue("name", api.data.name);
       setValue("slug", api.data.slug);
       setValue("subscription_id", api.data?.subscription?.id);
@@ -81,9 +83,27 @@ function Edit() {
   }
 
   async function onSubmit(data) {
-    const api = await put(`/v1/platform_admin/companies/${id}`, {
-      company: data,
-    });
+    const { logo, ...companyFields } = data;
+    const hasLogo =
+      logo &&
+      typeof logo.length === "number" &&
+      logo.length > 0 &&
+      logo[0] instanceof File;
+
+    const body = hasLogo
+      ? (() => {
+          const fd = new FormData();
+          Object.entries(companyFields).forEach(([key, value]) => {
+            if (value != null && value !== "") {
+              fd.append(`company[${key}]`, value);
+            }
+          });
+          fd.append("company[logo]", logo[0]);
+          return fd;
+        })()
+      : { company: companyFields };
+
+    const api = await put(`/v1/platform_admin/companies/${id}`, body);
     if (response.ok) {
       navigate("/companies");
       toast.success("Company edited successfully");
@@ -125,6 +145,37 @@ function Edit() {
 
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
+                  <Row>
+                    <Col className="pr-1" md="12">
+                      <Form.Group>
+                        <label>Company Logo</label>
+                        <div className="mb-2">
+                          <img
+                            src={companyData?.logo_url || defaultLogo}
+                            alt={companyData?.name || "Company logo"}
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              objectFit: "cover",
+                              borderRadius: "6px",
+                            }}
+                          />
+                        </div>
+                        <Form.Control
+                          type="file"
+                          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                          isInvalid={!!errors.logo}
+                          {...register("logo")}
+                        />
+                        <Form.Text className="text-muted">
+                          Upload JPG or PNG to replace logo.
+                        </Form.Text>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.logo?.message}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
