@@ -10,6 +10,7 @@ import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
 import dateFormat from "../../utilities/DateFormat";
+import defaultLogo from "assets/img/jameen-logo.png";
 
 function Index() {
   const [companies, setCompanies] = useState([]);
@@ -126,6 +127,7 @@ function Index() {
               <table className="table table-striped">
                 <thead>
                   <tr>
+                    <th>Logo</th>
                     <th>Name</th>
                     <th>Identifier</th>
                     <th>Country</th>
@@ -139,7 +141,7 @@ function Index() {
                 {loading ? (
                   <tbody>
                     <tr>
-                      <td colSpan="7">
+                      <td colSpan="8">
                         <Loader />
                       </td>
                     </tr>
@@ -149,6 +151,20 @@ function Index() {
                     {companies.length > 0 ? (
                       companies.map((company) => (
                         <tr key={company.id}>
+                          <td>
+                            <img
+                              src={company.logo_url || defaultLogo}
+                              alt={company.name || "Company logo"}
+                              width={20}
+                              height={20}
+                              style={{
+                                width: "20px",
+                                height: "20px",
+                                objectFit: "cover",
+                                borderRadius: "2px",
+                              }}
+                            />
+                          </td>
                           <td>{company.name}</td>
                           <td>{company.slug}</td>
                           <td>{company.country?.name_en}</td>
@@ -208,7 +224,7 @@ function Index() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="text-center">
+                        <td colSpan="8" className="text-center">
                           No companies found
                         </td>
                       </tr>

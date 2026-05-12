@@ -57,7 +57,27 @@ function Add() {
   }
 
   async function onSubmit(data) {
-    const api = await post(`/v1/platform_admin/companies`, { company: data });
+    const { logo, ...companyFields } = data;
+    const hasLogo =
+      logo &&
+      typeof logo.length === "number" &&
+      logo.length > 0 &&
+      logo[0] instanceof File;
+
+    const body = hasLogo
+      ? (() => {
+          const fd = new FormData();
+          Object.entries(companyFields).forEach(([key, value]) => {
+            if (value != null && value !== "") {
+              fd.append(`company[${key}]`, value);
+            }
+          });
+          fd.append("company[logo]", logo[0]);
+          return fd;
+        })()
+      : { company: companyFields };
+
+    const api = await post(`/v1/platform_admin/companies`, body);
     if (response.ok) {
       navigate("/companies");
       toast.success("Successfully Created");
@@ -101,6 +121,25 @@ function Add() {
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
+                  <Row>
+                    <Col className="pr-1" md="12">
+                      <Form.Group>
+                        <Form.Label>Logo</Form.Label>
+                        <Form.Control
+                          type="file"
+                          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                          isInvalid={!!errors.logo}
+                          {...register("logo")}
+                        />
+                        <Form.Text className="text-muted">
+                          JPG or PNG
+                        </Form.Text>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.logo?.message}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
