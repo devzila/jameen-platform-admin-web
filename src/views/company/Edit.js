@@ -6,14 +6,12 @@ import useFetch from "use-http";
 import AppDataContext from "contexts/AppDataContext";
 import Select from "react-select";
 
+
 // react-bootstrap components
 import {
-  Badge,
   Button,
   Card,
   Form,
-  Navbar,
-  Nav,
   Container,
   Row,
   Col,
@@ -30,17 +28,21 @@ function Edit() {
   } = useForm();
 
   const { id } = useParams();
-  const { get, put, response, loading, error } = useFetch();
+  const { get, put, response } = useFetch();
   const appData = useContext(AppDataContext);
   const navigate = useNavigate();
+
   const [companyData, setCompanyData] = useState({});
   const [country_array, setCountry_array] = useState([]);
-
+  const [imageView, setImageView] = useState("");
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+
   useEffect(() => {
     loadComapny();
+
     async function loadSubscriptionPlans() {
       const api = await get(`/v1/platform_admin/options`);
+
       if (response.ok) {
         setSubscriptionPlans(
           api.subscription_plans.map((element) => ({
@@ -50,12 +52,29 @@ function Edit() {
         );
       }
     }
+
     loadCountry();
     loadSubscriptionPlans();
-  }, [get, response]);
+  }, []);
+
+  const handleFileSelection = (e) => {
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const base64Result = e.target.result;
+        setImageView(base64Result);
+      };
+
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   async function loadCountry() {
     const endpoint = await get(`/v1/platform_admin/countries`);
+
     if (response.ok) {
       formatcountrydata(endpoint);
     }
@@ -66,13 +85,18 @@ function Edit() {
       label: element.name_en,
       value: element.id,
     }));
+
     setCountry_array(temp_array);
   }
 
   async function loadComapny() {
     const api = await get(`/v1/platform_admin/companies/${id}`);
+
     console.log(api);
+
     if (response.ok) {
+      setCompanyData(api.data);
+
       setValue("name", api.data.name);
       setValue("slug", api.data.slug);
       setValue("subscription_id", api.data?.subscription?.id);
@@ -81,19 +105,32 @@ function Edit() {
   }
 
   async function onSubmit(data) {
+    const body = {
+      ...data,
+      logo: {
+        data: imageView,
+      },
+    };
+
     const api = await put(`/v1/platform_admin/companies/${id}`, {
-      company: data,
+      company: body,
     });
+
     if (response.ok) {
       navigate("/companies");
       toast.success("Company edited successfully");
     } else {
       if (response.status === 422 && response.data?.errors) {
-        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
-          if (Array.isArray(fieldErrors) && fieldErrors.length) {
-            setError(field, { type: "server", message: fieldErrors[0] });
+        Object.entries(response.data.errors).forEach(
+          ([field, fieldErrors]) => {
+            if (Array.isArray(fieldErrors) && fieldErrors.length) {
+              setError(field, {
+                type: "server",
+                message: fieldErrors[0],
+              });
+            }
           }
-        });
+        );
       } else {
         toast.error(response.data?.message);
       }
@@ -115,6 +152,7 @@ function Edit() {
                   <Col md="6">
                     <Card.Title as="h4">Edit Company</Card.Title>
                   </Col>
+
                   <Col md="6" className="text-right">
                     <Button variant="info" onClick={handleGoBack}>
                       Go Back
@@ -125,38 +163,86 @@ function Edit() {
 
               <Card.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
+
+                  {/* Logo Preview */}
+                  <Row>
+                    <div className="col text-center mb-4">
+                      <img
+                        alt="Company Logo"
+                        style={{
+                          width: "200px",
+                          height: "200px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                        className="img-circle img-thumbnail"
+                        src={
+                          imageView
+                            ? imageView
+                            : companyData?.logo
+                            ? companyData.logo
+                            : defaultbuilding
+                        }
+                      />
+                    </div>
+                  </Row>
+
+                  {/* Logo Upload */}
+                  <Row>
+                    <Col className="pr-1 mt-3" md="12">
+                      <Form.Group>
+                        <label>Company Logo</label>
+
+                        <Form.Control
+                          type="file"
+                          accept=".jpg, .jpeg, .png"
+                          {...register("logo")}
+                          onChange={(e) => handleFileSelection(e)}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
                         <label>Name</label>
+
                         <Form.Control
                           placeholder="Company Name"
                           type="text"
                           isInvalid={!!errors.name}
                           {...register("name")}
-                        ></Form.Control>
+                        />
+
                         <Form.Control.Feedback type="invalid">
                           {errors.name?.message}
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Row>
                     <Col className="pr-1" md="12">
                       <Form.Group>
-                        <label>Identifier (No space, No special letter)</label>
+                        <label>
+                          Identifier (No space, No special letter)
+                        </label>
+
                         <Form.Control
                           placeholder="Identifier"
                           type="text"
                           isInvalid={!!errors.slug}
                           {...register("slug")}
-                        ></Form.Control>
+                        />
+
                         <Form.Control.Feedback type="invalid">
                           {errors.slug?.message}
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Row>
                     <Col className="pr-1 mt-3" md="12">
                       <Form.Group>
@@ -171,12 +257,15 @@ function Edit() {
                               value={subscriptionPlans.find(
                                 (c) => c.value === field.value
                               )}
-                              onChange={(val) => field.onChange(val.value)}
-                              placeholder=" Select Subscription"
+                              onChange={(val) =>
+                                field.onChange(val.value)
+                              }
+                              placeholder="Select Subscription"
                             />
                           )}
                           control={control}
                         />
+
                         {errors.subscription_id && (
                           <div className="text-danger mt-1">
                             {errors.subscription_id.message}
@@ -185,6 +274,7 @@ function Edit() {
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Row>
                     <Col className="pr-1 mt-3" md="12">
                       <Form.Group>
@@ -199,12 +289,15 @@ function Edit() {
                               value={country_array.find(
                                 (c) => c.value === field.value
                               )}
-                              onChange={(val) => field.onChange(val.value)}
+                              onChange={(val) =>
+                                field.onChange(val.value)
+                              }
                             />
                           )}
                           control={control}
                           placeholder="Role"
                         />
+
                         {errors.country_id && (
                           <div className="text-danger mt-1">
                             {errors.country_id.message}
@@ -213,6 +306,7 @@ function Edit() {
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Button
                     className="btn custom_theme_button"
                     type="submit"
@@ -220,6 +314,7 @@ function Edit() {
                   >
                     Update
                   </Button>
+
                   <div className="clearfix"></div>
                 </Form>
               </Card.Body>
