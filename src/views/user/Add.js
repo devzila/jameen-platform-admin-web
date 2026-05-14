@@ -14,6 +14,7 @@ function Add() {
     handleSubmit,
     control,
     setError,
+    setValue,
     formState: { errors: formErrors },
   } = useForm({
     defaultValues: {
@@ -57,22 +58,21 @@ function Add() {
       return;
     }
 
-    const payload = {
-      user: {
-        name: data.name,
-        email: data.email,
-        
-        password: data.password,
-        mobile_number: data.mobile_number,
-        role_id: Number(data.role_id),
-      },
-    };
+    const formData = new FormData();
 
-    console.log("PAYLOAD:", payload);
+    formData.append("user[name]", data.name);
+    formData.append("user[email]", data.email);
+    formData.append("user[password]", data.password);
+    formData.append("user[mobile_number]", data.mobile_number);
+    formData.append("user[role_id]", Number(data.role_id));
+
+    if (data.avatar) {
+      formData.append("user[avatar]", data.avatar);
+    }
 
     const api = await post(
       `/v1/platform_admin/companies/${companyId}/users`,
-      payload
+      formData
     );
 
     if (response.ok) {
@@ -115,6 +115,27 @@ function Add() {
 
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
+              {/* Avatar */}
+                <Row>
+                  <Col md="12">
+                    <Form.Group>
+                      <Form.Label>
+                        Avatar{" "}
+                        <small className="text-danger">
+                          {formErrors?.avatar?.message}
+                        </small>
+                      </Form.Label>
+
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          setValue("avatar", e.target.files[0]);
+                        }}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
                 {/* Name */}
                 <Row>
                   <Col md="12">
@@ -247,7 +268,6 @@ function Add() {
                     </Form.Group>
                   </Col>
                 </Row>
-
                 {/* Submit */}
                 <Button
                   className="btn custom_theme_button mt-3"
