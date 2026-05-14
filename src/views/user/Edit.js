@@ -14,7 +14,7 @@ function EditUser() {
     setValue,
     control,
     setError,
-    formState: { errors: formErrors },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       role_id: null,
@@ -22,7 +22,11 @@ function EditUser() {
   });
 
   const { get, put, response } = useFetch();
+
   const [rolesData, setRolesData] = useState([]);
+  const [userData, setUserData] = useState({});
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
   const navigate = useNavigate();
   const { companyId, userId } = useParams();
 
@@ -31,11 +35,12 @@ function EditUser() {
     loadUser();
   }, [userId]);
 
-  // ✅ Correct Roles API
+  // FETCH ROLES
   async function fetchRoles() {
     const api = await get(
       `/v1/platform_admin/companies/${companyId}/roles`
     );
+
     if (response.ok) {
       setRolesData(format_react_select(api.data, ["id", "name"]));
     } else {
@@ -43,37 +48,61 @@ function EditUser() {
     }
   }
 
-  // ✅ Load User Data
+  // LOAD USER
   async function loadUser() {
     const api = await get(
       `/v1/platform_admin/companies/${companyId}/users/${userId}`
     );
+
+    console.log("USER API RESPONSE:", api);
+
     if (response.ok) {
+      setUserData(api.data || {});
+
       setValue("name", api.data.name);
       setValue("email", api.data.email);
       setValue("mobile_number", api.data.mobile_number);
       setValue("role_id", api.data.role?.id || null);
+
+      // OLD AVATAR SHOW
+      if (api.data.avatar_url) {
+        setAvatarPreview(api.data.avatar_url);
+      }
     } else {
       toast.error("Failed to load user");
     }
   }
 
-  // ✅ Submit
+  // SUBMIT
   async function onSubmit(data) {
-    console.log("FORM DATA:", data);
+    const { avatar, ...userFields } = data;
 
-    const payload = {
-      user: {
-        name: data.name,
-        email: data.email,
-        mobile_number: data.mobile_number,
-        role_id: Number(data.role_id),
-      },
-    };
+    const hasAvatar = avatar instanceof File;
+
+    const body = hasAvatar
+      ? (() => {
+          const fd = new FormData();
+
+          Object.entries(userFields).forEach(([key, value]) => {
+            if (value != null && value !== "") {
+              fd.append(`user[${key}]`, value);
+            }
+          });
+
+          fd.append("user[avatar]", avatar);
+
+          return fd;
+        })()
+      : {
+          user: {
+            ...userFields,
+            role_id: Number(userFields.role_id),
+          },
+        };
 
     const api = await put(
       `/v1/platform_admin/companies/${companyId}/users/${userId}`,
-      payload
+      body
     );
 
     if (response.ok) {
@@ -81,11 +110,16 @@ function EditUser() {
       navigate(`/companies/${companyId}/users`);
     } else {
       if (response.status === 422 && response.data?.errors) {
-        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
-          if (Array.isArray(fieldErrors) && fieldErrors.length) {
-            setError(field, { type: "server", message: fieldErrors[0] });
+        Object.entries(response.data.errors).forEach(
+          ([field, fieldErrors]) => {
+            if (Array.isArray(fieldErrors) && fieldErrors.length) {
+              setError(field, {
+                type: "server",
+                message: fieldErrors[0],
+              });
+            }
           }
-        });
+        );
       } else {
         toast.error(api?.message || "Update failed");
       }
@@ -106,6 +140,7 @@ function EditUser() {
                 <Col md="6">
                   <Card.Title as="h4">Edit User</Card.Title>
                 </Col>
+
                 <Col md="6" className="d-flex justify-content-end">
                   <Button variant="info" onClick={handleGoBack}>
                     Go Back
@@ -116,34 +151,82 @@ function EditUser() {
 
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
-                {/* Name */}
+                {/* AVATAR */}
+                <Row>
+                  <Col md="12">
+                    <Form.Group className="mb-3">
+                      <Form.Label>Avatar</Form.Label>
+
+                      {/* SHOW OLD OR NEW AVATAR */}
+                      <div className="mb-3">
+                        <img
+                          src={
+                            avatarPreview ||
+                            "https://via.placeholder.com/100"
+                          }
+                          alt="avatar"
+                          width="100"
+                          height="100"
+                          style={{
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                      </div>
+
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+
+                          if (file) {
+                            setValue("avatar", file);
+
+                            // NEW IMAGE PREVIEW
+                            setAvatarPreview(
+                              URL.createObjectURL(file)
+                            );
+                          }
+                        }}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                {/* NAME */}
                 <Row>
                   <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Name{" "}
                         <small className="text-danger">
-                          {formErrors?.name?.message}
+                          {errors?.name?.message}
                         </small>
                       </Form.Label>
+
                       <Form.Control
                         placeholder="Name"
-                        {...register("name", { required: "Name is required" })}
+                        {...register("name", {
+                          required: "Name is required",
+                        })}
                       />
                     </Form.Group>
                   </Col>
                 </Row>
 
-                {/* Email */}
+                {/* EMAIL */}
                 <Row>
                   <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Email{" "}
                         <small className="text-danger">
-                          {formErrors?.email?.message}
+                          {errors?.email?.message}
                         </small>
                       </Form.Label>
+
                       <Form.Control
                         placeholder="Email"
                         type="email"
@@ -155,14 +238,14 @@ function EditUser() {
                   </Col>
                 </Row>
 
-                {/* Role Dropdown */}
+                {/* ROLE */}
                 <Row>
                   <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Role{" "}
                         <small className="text-danger">
-                          {formErrors?.role_id?.message}
+                          {errors?.role_id?.message}
                         </small>
                       </Form.Label>
 
@@ -192,16 +275,17 @@ function EditUser() {
                   </Col>
                 </Row>
 
-                {/* Mobile */}
+                {/* MOBILE */}
                 <Row>
                   <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Mobile Number{" "}
                         <small className="text-danger">
-                          {formErrors?.mobile_number?.message}
+                          {errors?.mobile_number?.message}
                         </small>
                       </Form.Label>
+
                       <Form.Control
                         placeholder="Mobile Number"
                         {...register("mobile_number", {
@@ -212,7 +296,7 @@ function EditUser() {
                   </Col>
                 </Row>
 
-                {/* Submit */}
+                {/* SUBMIT */}
                 <Button className="mt-3" type="submit" variant="info">
                   Update
                 </Button>
