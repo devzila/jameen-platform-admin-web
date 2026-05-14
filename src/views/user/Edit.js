@@ -6,6 +6,7 @@ import useFetch from "use-http";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { format_react_select } from "services/utility_functions";
 import Select from "react-select";
+import defaultAvatar from "assets/img/jameen-logo.png";
 
 function EditUser() {
   const {
@@ -23,6 +24,7 @@ function EditUser() {
 
   const { get, put, response } = useFetch();
   const [rolesData, setRolesData] = useState([]);
+  const [userData, setUserData] = useState({});
   const navigate = useNavigate();
   const { companyId, userId } = useParams();
 
@@ -49,6 +51,7 @@ function EditUser() {
       `/v1/platform_admin/companies/${companyId}/users/${userId}`
     );
     if (response.ok) {
+      setUserData(api.data || {});
       setValue("name", api.data.name);
       setValue("email", api.data.email);
       setValue("mobile_number", api.data.mobile_number);
@@ -62,18 +65,39 @@ function EditUser() {
   async function onSubmit(data) {
     console.log("FORM DATA:", data);
 
-    const payload = {
-      user: {
-        name: data.name,
-        email: data.email,
-        mobile_number: data.mobile_number,
-        role_id: Number(data.role_id),
-      },
-    };
+    const { avatar, ...userFields } = data;
+    const hasAvatar =
+      avatar &&
+      typeof avatar.length === "number" &&
+      avatar.length > 0 &&
+      avatar[0] instanceof File;
+
+    const body = hasAvatar
+      ? (() => {
+          const fd = new FormData();
+          Object.entries(userFields).forEach(([key, value]) => {
+            if (value != null && value !== "") {
+              fd.append(
+                `user[${key}]`,
+                key === "role_id" ? Number(value) : value
+              );
+            }
+          });
+          fd.append("user[avatar]", avatar[0]);
+          return fd;
+        })()
+      : {
+          user: {
+            name: userFields.name,
+            email: userFields.email,
+            mobile_number: userFields.mobile_number,
+            role_id: Number(userFields.role_id),
+          },
+        };
 
     const api = await put(
       `/v1/platform_admin/companies/${companyId}/users/${userId}`,
-      payload
+      body
     );
 
     if (response.ok) {
@@ -116,6 +140,43 @@ function EditUser() {
 
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
+                {/* Avatar */}
+                <Row>
+                  <Col md="12">
+                    <Form.Group>
+                      <Form.Label>Avatar</Form.Label>
+                      <div className="mb-2">
+                        <img
+                          src={userData?.avatar_url || defaultAvatar}
+                          alt={userData?.name || "User avatar"}
+                          style={{
+                            width: "80px",
+                            height: "80px",
+                            objectFit: "cover",
+                            borderRadius: "50%",
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = defaultAvatar;
+                          }}
+                        />
+                      </div>
+                      <Form.Control
+                        type="file"
+                        accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                        isInvalid={!!formErrors.avatar}
+                        {...register("avatar")}
+                      />
+                      <Form.Text className="text-muted">
+                        Upload JPG or PNG to replace avatar.
+                      </Form.Text>
+                      <Form.Control.Feedback type="invalid">
+                        {formErrors.avatar?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
                 {/* Name */}
                 <Row>
                   <Col md="12">
