@@ -8,6 +8,7 @@ import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
 import { NavLink, useNavigate, useParams, Link } from "react-router-dom";
 import Loader from "components/Loader";
+import defaultAvatar from "assets/img/jameen-logo.png";
 
 function Index() {
   const { companyId } = useParams();
@@ -119,6 +120,7 @@ function Index() {
         <table className="table table-striped mb-0">
           <thead>
             <tr>
+              <th>Avatar</th>
               <th>Name</th>
               <th>Email</th>
               <th>Phone Number</th>
@@ -130,6 +132,24 @@ function Index() {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
+                <td>
+                  <img
+                    src={user.avatar_url || defaultAvatar}
+                    alt={user.name || "User"}
+                    width={20}
+                    height={20}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = defaultAvatar;
+                    }}
+                  />
+                </td>
                 <th>{user.name}</th>
                 <td>{user.email}</td>
                 <td>{user.mobile_number}</td>

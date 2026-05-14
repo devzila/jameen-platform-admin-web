@@ -57,22 +57,40 @@ function Add() {
       return;
     }
 
-    const payload = {
-      user: {
-        name: data.name,
-        email: data.email,
-        
-        password: data.password,
-        mobile_number: data.mobile_number,
-        role_id: Number(data.role_id),
-      },
-    };
+    const { avatar, ...userFields } = data;
+    const hasAvatar =
+      avatar &&
+      typeof avatar.length === "number" &&
+      avatar.length > 0 &&
+      avatar[0] instanceof File;
 
-    console.log("PAYLOAD:", payload);
+    const body = hasAvatar
+      ? (() => {
+          const fd = new FormData();
+          Object.entries(userFields).forEach(([key, value]) => {
+            if (value != null && value !== "") {
+              fd.append(
+                `user[${key}]`,
+                key === "role_id" ? Number(value) : value
+              );
+            }
+          });
+          fd.append("user[avatar]", avatar[0]);
+          return fd;
+        })()
+      : {
+          user: {
+            name: userFields.name,
+            email: userFields.email,
+            password: userFields.password,
+            mobile_number: userFields.mobile_number,
+            role_id: Number(userFields.role_id),
+          },
+        };
 
     const api = await post(
       `/v1/platform_admin/companies/${companyId}/users`,
-      payload
+      body
     );
 
     if (response.ok) {
@@ -115,6 +133,27 @@ function Add() {
 
             <Card.Body>
               <Form onSubmit={handleSubmit(onSubmit)}>
+                {/* Avatar */}
+                <Row>
+                  <Col md="12">
+                    <Form.Group>
+                      <Form.Label>Avatar</Form.Label>
+                      <Form.Control
+                        type="file"
+                        accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                        isInvalid={!!formErrors.avatar}
+                        {...register("avatar")}
+                      />
+                      <Form.Text className="text-muted">
+                        Optional. JPG or PNG.
+                      </Form.Text>
+                      <Form.Control.Feedback type="invalid">
+                        {formErrors.avatar?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
                 {/* Name */}
                 <Row>
                   <Col md="12">
