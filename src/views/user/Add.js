@@ -17,7 +17,12 @@ function Add() {
     formState: { errors: formErrors },
   } = useForm({
     defaultValues: {
-      role_id: null,
+    name: "",
+    email: "",
+    password: "",
+    mobile_number: "",
+    role_id: null,
+    avatar: null,
     },
   });
 
@@ -138,7 +143,7 @@ function Add() {
                   <Col md="12">
                     <Form.Group>
                       <Form.Label>Avatar</Form.Label>
-                      <Form.Control
+                      <Form.Control 
                         type="file"
                         accept="image/jpeg,image/png,.jpg,.jpeg,.png"
                         isInvalid={!!formErrors.avatar}
@@ -186,6 +191,7 @@ function Add() {
                         </small>
                       </Form.Label>
                       <Form.Control
+                        autoComplete="off"
                         placeholder="Enter Email"
                         type="email"
                         {...register("email", {
@@ -211,6 +217,7 @@ function Add() {
                         </small>
                       </Form.Label>
                       <Form.Control
+                        autoComplete="new-password"                        
                         placeholder="Enter Password"
                         type="password"
                         {...register("password", {
