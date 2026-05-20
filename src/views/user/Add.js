@@ -14,6 +14,7 @@ function Add() {
     handleSubmit,
     control,
     setError,
+    setValue,
     formState: { errors: formErrors },
   } = useForm({
     defaultValues: {
@@ -34,8 +35,23 @@ function Add() {
   // Fetch Roles
   async function fetchRoles() {
     const api = await get(`/v1/platform_admin/companies/${companyId}/roles`);
+
     if (response.ok) {
-      setRolesData(format_react_select(api.data, ["id", "name"]));
+      const formattedRoles = format_react_select(api.data, [
+        "id",
+        "name",
+      ]);
+
+      setRolesData(formattedRoles);
+
+      // Automatically select Admin role
+      const adminRole = formattedRoles.find(
+        (role) => role.label.toLowerCase() === "admin"
+      );
+
+      if (adminRole) {
+        setValue("role_id", Number(adminRole.value));
+      }
     } else {
       toast.error("Failed to load roles");
     }
@@ -242,17 +258,15 @@ function Add() {
                         rules={{ required: "Role is required" }}
                         render={({ field }) => (
                           <Select
-                            options={rolesData}
+                            options={rolesData.filter(
+                              (role) => role.label.toLowerCase() === "admin"
+                            )}
                             placeholder="Select Role"
-                            isClearable
-                            onChange={(selected) =>
-                              field.onChange(
-                                selected ? Number(selected.value) : null
-                              )
-                            }
+                            isDisabled={true}
+                            isClearable={false}
                             value={
                               rolesData.find(
-                                (r) => r.value === field.value
+                                (r) => r.label.toLowerCase() === "admin"
                               ) || null
                             }
                           />
