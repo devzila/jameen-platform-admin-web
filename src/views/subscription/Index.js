@@ -15,7 +15,7 @@ import dateFormat from "../../utilities/DateFormat";
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [pagination, setPagination] = useState(null);
-  const [searchKeyword, setSearchKeyword] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const { get, response, loading, error } = useFetch();
@@ -27,23 +27,28 @@ function Index() {
     navigate(`/subscriptions/add`);
   };
 
-  async function loadInitialSubscriptions() {
+  const loadInitialSubscriptions = async () => {
     let endpoint = `/v1/platform_admin/subscriptions?page=${currentPage}`;
 
-    if (searchKeyword) {
-      endpoint += `&q[name_cont]=${searchKeyword}`;
+    if (searchKeyword.trim() !== "") {
+      endpoint += `&q[name_i_cont]=${searchKeyword}`;
     }
-    let initialSubscriptions = await get(endpoint);
+    try {
+      const data = await get(endpoint);
 
-    if (response.ok) {
-      setSubscriptions(initialSubscriptions.data);
-      setPagination(initialSubscriptions.pagination);
+      setSubscriptions(data?.data || []);
+      setPagination(data?.pagination || {});
+
+      if (data?.pagination && currentPage > data.pagination.total_pages) {
+        setCurrentPage(1);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
     }
-  }
-
-  function handlePageClick(e) {
+  };
+  const handlePageClick = (e) => {
     setCurrentPage(e.selected + 1);
-  }
+  };
 
   return (
     <>
@@ -58,8 +63,11 @@ function Index() {
                   <div className="d-flex justify-content-end">
                     <div className="d-flex align-items-center" role="search">
                       <input
-                        onChange={(e) => setSearchKeyword(e.target.value)}
-                        onReset={loadInitialSubscriptions}
+                        value={searchKeyword}
+                        onChange={(e) => {
+                          setCurrentPage(1);
+                          setSearchKeyword(e.target.value);
+                        }}
                         className="form-control  custom_input"
                         type="search"
                         placeholder="Search"
@@ -69,7 +77,6 @@ function Index() {
                         <button
                           onClick={loadInitialSubscriptions}
                           className="btn btn-outline-success custom_search_button"
-                          type="submit"
                         >
                           <CIcon icon={freeSet.cilSearch} />
                         </button>
