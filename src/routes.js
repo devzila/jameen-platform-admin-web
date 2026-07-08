@@ -11,6 +11,7 @@ import SubscriptionShow from "views/subscription/Show.js";
 import SubscriptionEdit from "views/subscription/Edit.js";
 import SubscriptionAdd from "views/subscription/Add.js";
 import { Navigate } from "react-router-dom";
+import InvoiceTemplates from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/index.js";
 
 const dashboardRoutes = [
   {
@@ -20,6 +21,14 @@ const dashboardRoutes = [
     component: <CompanyIndex />,
     main: true,
   },
+  {
+    path: "/invoice-templates",
+    name: "Invoice Templates",
+    icon: "nc-icon nc-single-copy-04",
+    component: <InvoiceTemplates />,
+    main: true,
+  },
+
   {
     path: "/subscriptions",
     name: "Subscription",
