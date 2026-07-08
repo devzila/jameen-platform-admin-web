@@ -54,8 +54,8 @@ function Sidebar({ color, image, routes }) {
               );
             return null;
           })}
-
-          <li className="active active-pro" key="99">
+          {/* Logout */}
+          <li className="active active-pro">
             <NavLink to="" className="nav-link" onClick={handleLogout}>
               <i className="nc-icon nc-alien-33" />
               <p>Logout</p>

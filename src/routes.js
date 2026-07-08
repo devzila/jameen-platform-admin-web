@@ -11,7 +11,11 @@ import SubscriptionShow from "views/subscription/Show.js";
 import SubscriptionEdit from "views/subscription/Edit.js";
 import SubscriptionAdd from "views/subscription/Add.js";
 import { Navigate } from "react-router-dom";
-
+import InvoiceTemplates from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/InvoiceTemplates/Index.js";
+import InvoiceTemplateIndex from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/InvoiceTemplates/Index.js";
+import InvoiceTemplateAdd from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/InvoiceTemplates/Add.js";
+import InvoiceTemplateEdit from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/InvoiceTemplates/Edit.js";
+import InvoiceTemplateShow from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/InvoiceTemplates/Show.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -20,6 +24,14 @@ const dashboardRoutes = [
     component: <CompanyIndex />,
     main: true,
   },
+  {
+    path: "/invoice-templates",
+    name: "Invoice Templates",
+    icon: "nc-icon nc-single-copy-04",
+    component: <InvoiceTemplates />,
+    main: true,
+  },
+
   {
     path: "/subscriptions",
     name: "Subscription",
@@ -43,6 +55,20 @@ const dashboardRoutes = [
   {
     path: "/companies/:companyId/users/:userId/edit",
     component: <UserEdit />,
+  },
+  {
+    path: "/invoice-templates/add",
+    component: <InvoiceTemplateAdd />,
+  },
+
+  {
+    path: "/invoice-templates/:id",
+    component: <InvoiceTemplateShow />,
+  },
+
+  {
+    path: "/invoice-templates/:id/edit",
+    component: <InvoiceTemplateEdit />,
   },
   { path: "/subscriptions/add", component: <SubscriptionAdd /> },
   { path: "/subscriptions/:id", component: <SubscriptionShow /> },
