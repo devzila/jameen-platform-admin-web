@@ -163,18 +163,6 @@ const Show = () => {
               <div className="d-flex justify-content-end mt-4">
 
                 <CButton
-                  color="warning"
-                  className="me-2"
-                  onClick={() =>
-                    navigate(
-                      `/invoice-templates/${template.id}/edit`
-                    )
-                  }
-                >
-                  Edit
-                </CButton>
-
-                <CButton
                   color="secondary"
                   onClick={() =>
                     navigate("/invoice-templates")
