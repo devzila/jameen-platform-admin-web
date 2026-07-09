@@ -27,6 +27,8 @@ const Edit = () => {
     name: "",
     description: "",
     processor_class: "",
+    class_level: [],
+    instance_level: [],
     is_default: false,
   });
 
@@ -46,6 +48,8 @@ const Edit = () => {
         name: template.name || "",
         description: template.description || "",
         processor_class: template.processor_class || "",
+        class_level: template.class_level || [],
+        instance_level: template.instance_level || [],
         is_default: template.is_default || false,
       });
     } catch (err) {
@@ -57,10 +61,20 @@ const Edit = () => {
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    if (name === "class_level" || name === "instance_level") {
+        setFormData({
+        ...formData,
+        [name]: value
+            .split(",")
+            .map((item) => item.trim())
+            .filter((item) => item !== ""),
+        });
+    } else {
+        setFormData({
+        ...formData,
+        [name]: type === "checkbox" ? checked : value,
+        });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -114,27 +128,55 @@ const Edit = () => {
 
                   <CCol md={6}>
                     <label className="form-label fw-bold">
-                      Processor Class <span className="text-danger">*</span>
+                        Processor Class <span className="text-danger">*</span>
                     </label>
 
-                    <CFormSelect
-                      name="processor_class"
-                      value={formData.processor_class}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">
-                        Select Processor Class
-                      </option>
+                    <CFormInput
+                        type="text"
+                        name="processor_class"
+                        placeholder="InvoiceProcessors::RentInvoice"
+                        value={formData.processor_class}
+                        onChange={handleChange}
+                        required
+                    />
 
-                      <option value="InvoiceProcessors::RentInvoice">
-                        Rent Invoice
-                      </option>
+                    <small className="text-muted">
+                        Example: InvoiceProcessors::RentInvoice
+                    </small>
+                  </CCol>
 
-                      <option value="InvoiceProcessors::DueReminder">
-                        Due Reminder
-                      </option>
-                    </CFormSelect>
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                        Class Level
+                    </label>
+
+                    <CFormInput
+                        name="class_level"
+                        placeholder="company, property, invoice"
+                        value={formData.class_level.join(", ")}
+                        onChange={handleChange}
+                    />
+
+                    <small className="text-muted">
+                        Enter multiple values separated by commas.
+                    </small>
+                  </CCol>
+
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                        Instance Level
+                    </label>
+
+                    <CFormInput
+                        name="instance_level"
+                        placeholder="contract, invoice"
+                        value={formData.instance_level.join(", ")}
+                        onChange={handleChange}
+                    />
+
+                    <small className="text-muted">
+                        Enter multiple values separated by commas.
+                    </small>
                   </CCol>
 
                   <CCol md={12}>

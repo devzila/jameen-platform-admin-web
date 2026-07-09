@@ -126,6 +126,8 @@ const Index = () => {
                   <CTableHeaderCell>Name</CTableHeaderCell>
                   <CTableHeaderCell>Description</CTableHeaderCell>
                   <CTableHeaderCell>Processor Class</CTableHeaderCell>
+                  <CTableHeaderCell>Class Level</CTableHeaderCell>
+                  <CTableHeaderCell>Instance Level</CTableHeaderCell>
                   <CTableHeaderCell>Default</CTableHeaderCell>
                   <CTableHeaderCell>Created</CTableHeaderCell>
                   <CTableHeaderCell width="250">Actions</CTableHeaderCell>
@@ -135,7 +137,7 @@ const Index = () => {
                 {loading ? (
                   <CTableBody>
                     <CTableRow>
-                      <CTableDataCell colSpan="6" className="text-center">
+                      <CTableDataCell colSpan="8" className="text-center">
                         <Loader />
                       </CTableDataCell>
                     </CTableRow>
@@ -151,6 +153,17 @@ const Index = () => {
 
                           <CTableDataCell>
                             {template.processor_class}
+                          </CTableDataCell>
+
+                          <CTableDataCell>
+                            {template.class_level?.length > 0
+                              ? template.class_level.join(", ")
+                              : "-"}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {template.instance_level?.length > 0
+                              ? template.instance_level.join(", ")
+                              : "-"}
                           </CTableDataCell>
 
                           <CTableDataCell>
@@ -204,7 +217,7 @@ const Index = () => {
                     ) : (
                       <CTableRow>
                         <CTableDataCell
-                          colSpan="6"
+                          colSpan="8"
                           className="text-center"
                         >
                           No invoice templates available.
