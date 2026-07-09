@@ -6,31 +6,28 @@ import { Dropdown, Badge } from "react-bootstrap";
 import { Card, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
-import {
-  CNavbar,
-  CContainer,
-  CNavbarBrand,
-} from "@coreui/react";
+import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
 import dateFormat from "../../utilities/DateFormat";
+import defaultLogo from "assets/img/jameen-logo.png";
 
 function Index() {
-  const [invoiceTemplates, setInvoiceTemplates] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [pagination, setPagination] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { get, del, loading } = useFetch();
-
+  const { get, post, loading } = useFetch();
   const navigate = useNavigate();
 
-  const addTemplate = () => {
-    navigate("/invoice-templates/add");
+  const addCompany = () => {
+    navigate(`/companies/add`);
   };
 
-  const loadInvoiceTemplates = async () => {
-    let endpoint = `/v1/platform_admin/invoice_templates?page=${currentPage}`;
+  // ✅ Load Companies
+  const loadInitialCompanies = async () => {
+    let endpoint = `/v1/platform_admin/companies?page=${currentPage}`;
 
     if (searchKeyword.trim() !== "") {
       endpoint += `&q[name_cont]=${searchKeyword}`;
@@ -39,23 +36,20 @@ function Index() {
     try {
       const data = await get(endpoint);
 
-      setInvoiceTemplates(data?.data || []);
+      setCompanies(data?.data || []);
       setPagination(data?.pagination || {});
 
-      if (
-        data?.pagination &&
-        currentPage > data.pagination.total_pages
-      ) {
+      if (data?.pagination && currentPage > data.pagination.total_pages) {
         setCurrentPage(1);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Fetch error:", err);
     }
   };
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      loadInvoiceTemplates();
+      loadInitialCompanies();
     }, 400);
 
     return () => clearTimeout(delay);
@@ -65,24 +59,27 @@ function Index() {
     setCurrentPage(e.selected + 1);
   };
 
-  const deleteTemplate = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this template?"
-      )
-    ) {
-      return;
-    }
+  // ✅ Toggle Status (FIXED)
+  const toggleCompanyStatus = async (company) => {
+    const action = company.active ? "deactivate" : "activate";
+
+    if (!window.confirm(`Are you sure you want to ${action} this company?`)) return;
+
+    const endpoint = `/v1/platform_admin/companies/${company.id}/${action}`;
 
     try {
-      await del(`/v1/platform_admin/invoice_templates/${id}`);
+      await post(endpoint);
 
-      setInvoiceTemplates((prev) =>
-        prev.filter((item) => item.id !== id)
+      // ✅ Instant UI update (no reload)
+      setCompanies((prev) =>
+        prev.map((c) =>
+          c.id === company.id ? { ...c, active: !c.active } : c
+        )
       );
+
     } catch (err) {
-      console.error(err);
-      alert("Unable to delete template.");
+      console.error("Status update failed:", err);
+      alert("Something went wrong!");
     }
   };
 
@@ -93,41 +90,35 @@ function Index() {
           <Card>
             <CNavbar expand="lg" className="bg-white">
               <CContainer fluid>
-                <CNavbarBrand>
-                  Invoice Templates
-                </CNavbarBrand>
+                <CNavbarBrand>Companies</CNavbarBrand>
 
                 <div className="d-flex justify-content-end">
-
                   <div className="d-flex align-items-center">
-
                     <input
-                      className="form-control"
-                      type="search"
-                      placeholder="Search Template..."
                       value={searchKeyword}
                       onChange={(e) => {
                         setCurrentPage(1);
                         setSearchKeyword(e.target.value);
                       }}
+                      className="form-control"
+                      type="search"
+                      placeholder="Search company..."
                     />
 
                     <button
+                      onClick={loadInitialCompanies}
                       className="btn btn-outline-success"
-                      onClick={loadInvoiceTemplates}
                     >
                       <CIcon icon={freeSet.cilSearch} />
                     </button>
-
                   </div>
 
                   <button
                     className="btn btn-primary mx-2"
-                    onClick={addTemplate}
+                    onClick={addCompany}
                   >
-                    Add Template
+                    Add Company
                   </button>
-
                 </div>
               </CContainer>
             </CNavbar>
@@ -136,10 +127,12 @@ function Index() {
               <table className="table table-striped">
                 <thead>
                   <tr>
+                    <th>Logo</th>
                     <th>Name</th>
-                    <th>Description</th>
-                    <th>Processor Class</th>
-                    <th>Default</th>
+                    <th>Identifier</th>
+                    <th>Country</th>
+                    <th>Subscription</th>
+                    <th>Status</th>
                     <th>Created</th>
                     <th>Action</th>
                   </tr>
@@ -148,106 +141,94 @@ function Index() {
                 {loading ? (
                   <tbody>
                     <tr>
-                      <td colSpan="6">
+                      <td colSpan="8">
                         <Loader />
                       </td>
                     </tr>
                   </tbody>
                 ) : (
                   <tbody>
-
-                    {invoiceTemplates.length > 0 ? (
-
-                      invoiceTemplates.map((template) => (
-
-                        <tr key={template.id}>
-
-                          <td>{template.name}</td>
-
-                          <td>{template.description}</td>
-
-                          <td>{template.processor_class}</td>
-
+                    {companies.length > 0 ? (
+                      companies.map((company) => (
+                        <tr key={company.id}>
                           <td>
-                            {template.is_default ? (
-                              <Badge bg="success">
-                                Yes
-                              </Badge>
+                            <img
+                              src={company.logo_url || defaultLogo}
+                              alt={company.name || "Company logo"}
+                              width={20}
+                              height={20}
+                              style={{
+                                width: "20px",
+                                height: "20px",
+                                objectFit: "cover",
+                                borderRadius: "2px",
+                              }}
+                            />
+                          </td>
+                          <td>{company.name}</td>
+                          <td>{company.slug}</td>
+                          <td>{company.country?.name_en}</td>
+                          <td>{company.subscription?.name}</td>
+
+                          {/* ✅ Status */}
+                          <td>
+                            {company.active ? (
+                              <Badge bg="success">Active</Badge>
                             ) : (
-                              <Badge bg="secondary">
-                                No
-                              </Badge>
+                              <Badge bg="secondary">Inactive</Badge>
                             )}
                           </td>
 
-                          <td>
-                            {dateFormat(
-                              template.created_at?.substring(0, 10)
-                            )}
-                          </td>
+                          <td>{dateFormat(company.created_at?.substring(0, 10))}</td>
 
+                          {/* ✅ Actions */}
                           <td>
-
                             <Dropdown>
-
-                              <Dropdown.Toggle
-                                variant="light"
-                                size="sm"
-                              >
+                              <Dropdown.Toggle variant="light" size="sm">
                                 <BsThreeDots />
                               </Dropdown.Toggle>
 
                               <Dropdown.Menu>
-
                                 <Dropdown.Item
                                   as={NavLink}
-                                  to={`/invoice-templates/${template.id}`}
+                                  to={`/companies/${company.id}/edit`}
                                 >
-                                  Show
+                                  Edit
                                 </Dropdown.Item>
 
                                 <Dropdown.Item
                                   as={NavLink}
-                                  to={`/invoice-templates/${template.id}/edit`}
+                                  to={`/companies/${company.id}/users`}
                                 >
-                                  Edit
+                                  Users
+                                </Dropdown.Item>
+
+                                <Dropdown.Item
+                                  as={NavLink}
+                                  to={`/companies/${company.id}`}
+                                >
+                                  Show
                                 </Dropdown.Item>
 
                                 <Dropdown.Divider />
 
                                 <Dropdown.Item
-                                  onClick={() =>
-                                    deleteTemplate(template.id)
-                                  }
+                                  onClick={() => toggleCompanyStatus(company)}
                                 >
-                                  Delete
+                                  {company.active ? "Deactivate" : "Activate"}
                                 </Dropdown.Item>
-
                               </Dropdown.Menu>
-
                             </Dropdown>
-
                           </td>
-
                         </tr>
-
                       ))
-
                     ) : (
-
                       <tr>
-
-                        <td
-                          colSpan="6"
-                          className="text-center"
-                        >
-                          No Invoice Templates Found
+                        <td colSpan="8" className="text-center">
+                          No companies found
                         </td>
-
                       </tr>
-
                     )}
-
                   </tbody>
                 )}
               </table>
@@ -256,13 +237,14 @@ function Index() {
         </Col>
       </Row>
 
+      {/* ✅ Pagination */}
       {pagination && (
         <Row className="mt-3">
           <Col className="d-flex justify-content-center">
             <Paginate
+              onPageChange={handlePageClick}
               pageCount={pagination.total_pages || 1}
               forcePage={currentPage - 1}
-              onPageChange={handlePageClick}
             />
           </Col>
         </Row>
