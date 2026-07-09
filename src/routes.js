@@ -11,7 +11,10 @@ import SubscriptionShow from "views/subscription/Show.js";
 import SubscriptionEdit from "views/subscription/Edit.js";
 import SubscriptionAdd from "views/subscription/Add.js";
 import { Navigate } from "react-router-dom";
-
+import InvoiceTemplates from "views/invoice_templates/index.js";
+import InvoiceTemplateAdd from "views/invoice_templates/Add.js";
+import InvoiceTemplateEdit from "views/invoice_templates/Edit.js";
+import InvoiceTemplateShow from "views/invoice_templates/show.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -20,6 +23,14 @@ const dashboardRoutes = [
     component: <CompanyIndex />,
     main: true,
   },
+  {
+    path: "/invoice-templates",
+    name: "Invoice Templates",
+    icon: "nc-icon nc-single-copy-04",
+    component: <InvoiceTemplates />,
+    main: true,
+  },
+
   {
     path: "/subscriptions",
     name: "Subscription",
@@ -43,6 +54,18 @@ const dashboardRoutes = [
   {
     path: "/companies/:companyId/users/:userId/edit",
     component: <UserEdit />,
+  },
+  {
+    path: "/invoice-templates/add",
+    component: <InvoiceTemplateAdd />,
+  },
+  {
+    path: "/invoice-templates/:id/edit",
+    component: <InvoiceTemplateEdit />,
+  },
+  {
+    path: "/invoice-templates/:id",
+    component: <InvoiceTemplateShow />,
   },
   { path: "/subscriptions/add", component: <SubscriptionAdd /> },
   { path: "/subscriptions/:id", component: <SubscriptionShow /> },

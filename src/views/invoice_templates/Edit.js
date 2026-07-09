@@ -1,0 +1,255 @@
+import React, { useEffect, useState } from "react";
+import useFetch from "use-http";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  CCard,
+  CCardHeader,
+  CCardBody,
+  CButton,
+  CForm,
+  CFormInput,
+  CFormTextarea,
+  CFormCheck,
+  CFormSelect,
+  CRow,
+  CCol,
+  CContainer,
+  CSpinner,
+} from "@coreui/react";
+
+const Edit = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const { get, put, loading } = useFetch();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    processor_class: "",
+    class_level: [],
+    instance_level: [],
+    is_default: false,
+  });
+
+  useEffect(() => {
+    loadTemplate();
+  }, []);
+
+  const loadTemplate = async () => {
+    try {
+      const response = await get(
+        `/v1/platform_admin/invoice_templates/${id}`
+      );
+
+      const template = response.data || response;
+
+      setFormData({
+        name: template.name || "",
+        description: template.description || "",
+        processor_class: template.processor_class || "",
+        class_level: template.class_level || [],
+        instance_level: template.instance_level || [],
+        is_default: template.is_default || false,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load invoice template.");
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, checked, type } = e.target;
+
+    if (name === "class_level" || name === "instance_level") {
+        setFormData({
+        ...formData,
+        [name]: value
+            .split(",")
+            .map((item) => item.trim())
+            .filter((item) => item !== ""),
+        });
+    } else {
+        setFormData({
+        ...formData,
+        [name]: type === "checkbox" ? checked : value,
+        });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await put(`/v1/platform_admin/invoice_templates/${id}`, {
+        invoice_template: formData,
+      });
+
+      alert("Invoice Template updated successfully.");
+
+      navigate("/invoice-templates");
+    } catch (err) {
+      console.error(err);
+      alert("Unable to update invoice template.");
+    }
+  };
+
+  return (
+    <CContainer className="py-4">
+      <CRow className="justify-content-center">
+        <CCol lg={8} md={10}>
+          <CCard className="shadow border-0">
+
+            <CCardHeader className="bg-primary text-white py-3">
+              <h4 className="mb-0">
+                Edit Invoice Template
+              </h4>
+            </CCardHeader>
+
+            <CCardBody className="p-4">
+
+              <CForm onSubmit={handleSubmit}>
+
+                <CRow className="g-4">
+
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                      Template Name <span className="text-danger">*</span>
+                    </label>
+
+                    <CFormInput
+                      name="name"
+                      placeholder="Enter template name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </CCol>
+
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                        Processor Class <span className="text-danger">*</span>
+                    </label>
+
+                    <CFormInput
+                        type="text"
+                        name="processor_class"
+                        placeholder="InvoiceProcessors::RentInvoice"
+                        value={formData.processor_class}
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <small className="text-muted">
+                        Example: InvoiceProcessors::RentInvoice
+                    </small>
+                  </CCol>
+
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                        Class Level
+                    </label>
+
+                    <CFormInput
+                        name="class_level"
+                        placeholder="company, property, invoice"
+                        value={formData.class_level.join(", ")}
+                        onChange={handleChange}
+                    />
+
+                    <small className="text-muted">
+                        Enter multiple values separated by commas.
+                    </small>
+                  </CCol>
+
+                  <CCol md={6}>
+                    <label className="form-label fw-bold">
+                        Instance Level
+                    </label>
+
+                    <CFormInput
+                        name="instance_level"
+                        placeholder="contract, invoice"
+                        value={formData.instance_level.join(", ")}
+                        onChange={handleChange}
+                    />
+
+                    <small className="text-muted">
+                        Enter multiple values separated by commas.
+                    </small>
+                  </CCol>
+
+                  <CCol md={12}>
+                    <label className="form-label fw-bold">
+                      Description
+                    </label>
+
+                    <CFormTextarea
+                      rows={5}
+                      name="description"
+                      placeholder="Enter description"
+                      value={formData.description}
+                      onChange={handleChange}
+                    />
+                  </CCol>
+
+                  <CCol md={12}>
+                    <CFormCheck
+                      id="default-template"
+                      label="Set as Default Template"
+                      name="is_default"
+                      checked={formData.is_default}
+                      onChange={handleChange}
+                    />
+                  </CCol>
+
+                </CRow>
+
+                <hr className="my-4" />
+
+                <div className="d-flex justify-content-end">
+
+                  <CButton
+                    color="secondary"
+                    variant="outline"
+                    className="me-2 px-4"
+                    onClick={() =>
+                      navigate("/invoice-templates")
+                    }
+                  >
+                    Cancel
+                  </CButton>
+
+                  <CButton
+                    color="primary"
+                    type="submit"
+                    className="px-4"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <CSpinner
+                          size="sm"
+                          className="me-2"
+                        />
+                        Updating...
+                      </>
+                    ) : (
+                      "Update Template"
+                    )}
+                  </CButton>
+
+                </div>
+
+              </CForm>
+
+            </CCardBody>
+
+          </CCard>
+        </CCol>
+      </CRow>
+    </CContainer>
+  );
+};
+
+export default Edit;
