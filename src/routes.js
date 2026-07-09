@@ -14,6 +14,7 @@ import { Navigate } from "react-router-dom";
 import InvoiceTemplates from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/index.js";
 import InvoiceTemplateAdd from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/Add.js";
 import InvoiceTemplateEdit from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/Edit.js";
+import InvoiceTemplateShow from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/show.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -61,6 +62,10 @@ const dashboardRoutes = [
   {
     path: "/invoice-templates/:id/edit",
     component: <InvoiceTemplateEdit />,
+  },
+  {
+    path: "/invoice-templates/:id",
+    component: <InvoiceTemplateShow />,
   },
   { path: "/subscriptions/add", component: <SubscriptionAdd /> },
   { path: "/subscriptions/:id", component: <SubscriptionShow /> },
