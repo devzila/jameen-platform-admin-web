@@ -12,7 +12,7 @@ import SubscriptionEdit from "views/subscription/Edit.js";
 import SubscriptionAdd from "views/subscription/Add.js";
 import { Navigate } from "react-router-dom";
 import InvoiceTemplates from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/index.js";
-
+import InvoiceTemplateAdd from "/Users/devzila/Workspace/jameen/jameen-platform-admin-web/src/views/invoice_templates/Add.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -52,6 +52,10 @@ const dashboardRoutes = [
   {
     path: "/companies/:companyId/users/:userId/edit",
     component: <UserEdit />,
+  },
+  {
+    path: "/invoice-templates/add",
+    component: <InvoiceTemplateAdd />,
   },
   { path: "/subscriptions/add", component: <SubscriptionAdd /> },
   { path: "/subscriptions/:id", component: <SubscriptionShow /> },
