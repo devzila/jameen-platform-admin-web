@@ -268,10 +268,8 @@ function Index() {
                                 }
                               </small>
                             </td>
-
                             <td>
-                              {template.category_id ||
-                                '-'}
+                              {template.category_name || "-"}
                             </td>
                             <td>
                               {template.is_default ? (

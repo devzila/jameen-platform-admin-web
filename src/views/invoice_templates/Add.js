@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import useFetch from 'use-http'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -13,7 +13,12 @@ import { toast } from 'react-toastify'
 
 function Add() {
   const navigate = useNavigate()
-  const { post, response, loading } = useFetch()
+  const { 
+    post, 
+    get,
+    response, 
+    loading 
+  } = useFetch()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -132,6 +137,22 @@ function Add() {
       Object.keys(validationErrors)
         .length === 0
     )
+  }
+
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    const api = await get(
+      '/v1/platform_admin/invoice_categories',
+    )
+
+    if (response.ok) {
+      setCategories(api.data || api)
+    }
   }
 
   const handleSubmit =
@@ -286,28 +307,62 @@ function Add() {
                   <Col md="6">
                     <Form.Group>
                       <Form.Label>
-                        Category Id
+                        Invoice Category
                       </Form.Label>
 
-                      <Form.Control
-                        type="number"
-                        name="category_id"
-                        value={
-                          formData.category_id
-                        }
-                        onChange={
-                          handleChange
-                        }
-                        isInvalid={
-                          !!errors.category_id
-                        }
-                      />
+                      <div
+                        style={{
+                          background: '#ffffff',
+                          border: '1px solid #EAECF0',
+                          borderRadius: '12px',
+                          padding: '6px',
+                          boxShadow:
+                            '0px 1px 3px rgba(16,24,40,0.08)',
+                        }}
+                      >
+                        <Form.Select
+                          name="category_id"
+                          value={formData.category_id || ''}
+                          onChange={handleChange}
+                          isInvalid={!!errors.category_id}
+                          style={{
+                            border: 'none',
+                            boxShadow: 'none',
+                            height: '45px',
+                            fontSize: '15px',
+                            color: '#344054',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                          }}
+                        >
+                          <option value="">
+                            📂 Select Invoice Category
+                          </option>
 
-                      <Form.Control.Feedback type="invalid">
-                        {
-                          errors.category_id
-                        }
-                      </Form.Control.Feedback>
+                          {categories &&
+                            categories.map((category) => (
+                              <option
+                                key={category.id}
+                                value={category.id}
+                              >
+                                {category.name}
+                              </option>
+                            ))}
+                        </Form.Select>
+                      </div>
+
+                      {errors.category_id && (
+                        <div
+                          style={{
+                            color: '#dc3545',
+                            fontSize: '13px',
+                            marginTop: '6px',
+                          }}
+                        >
+                          {errors.category_id}
+                        </div>
+                      )}
+
                     </Form.Group>
                   </Col>
 
@@ -391,7 +446,7 @@ function Add() {
                 </Row>
 
                 <Row className="mt-3">
-                  <Col md="6">
+                  <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Class Level
@@ -421,7 +476,7 @@ function Add() {
                     </Form.Group>
                   </Col>
 
-                  <Col md="6">
+                  <Col md="12">
                     <Form.Group>
                       <Form.Label>
                         Instance Level

@@ -175,7 +175,7 @@ function Show() {
                   </th>
 
                   <td>
-                    {template.category_id ||
+                    {template.category_name ||
                       '-'}
                   </td>
                 </tr>
