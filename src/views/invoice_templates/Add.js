@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import useFetch from "use-http";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react'
+import useFetch from 'use-http'
+import { useNavigate } from 'react-router-dom'
 import {
   Container,
   Row,
@@ -8,260 +8,469 @@ import {
   Card,
   Form,
   Button,
-} from "react-bootstrap";
-import {
-  CNavbar,
-  CContainer,
-  CNavbarBrand,
-} from "@coreui/react";
+} from 'react-bootstrap'
+import { toast } from 'react-toastify'
 
 function Add() {
-  const navigate = useNavigate();
-  const { post, loading } = useFetch();
+  const navigate = useNavigate()
+  const { post, response, loading } = useFetch()
 
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    processor_class: "",
-    class_level: [],
-    instance_level: [],
+    name: '',
+    description: '',
+    processor_class: '',
+    category_id: '',
+    class_level: '{\n\n}',
+    instance_level: '{\n\n}',
     is_default: false,
-  });
+  })
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({})
+  const [jsonErrors, setJsonErrors] =
+    useState({
+      class_level: '',
+      instance_level: '',
+    })
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target
 
-    if (name === "class_level" || name === "instance_level") {
-      setFormData({
-        ...formData,
-        [name]: value
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: type === "checkbox" ? checked : value,
-      });
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === 'checkbox'
+          ? checked
+          : value,
+    }))
+
+    if (
+      name === 'class_level' ||
+      name === 'instance_level'
+    ) {
+      validateJsonField(name, value)
     }
-  };
+  }
+    const validateJsonField = (
+    name,
+    value,
+  ) => {
+    try {
+      JSON.parse(value || '{}')
+
+      setJsonErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }))
+
+      return true
+    } catch {
+      setJsonErrors((prev) => ({
+        ...prev,
+        [name]:
+          'Invalid JSON format',
+      }))
+
+      return false
+    }
+  }
 
   const validate = () => {
-    let validationErrors = {};
+    const validationErrors = {}
 
     if (!formData.name.trim()) {
-      validationErrors.name = "Template Name is required";
+      validationErrors.name =
+        'Template Name is required'
     }
 
-    if (!formData.description.trim()) {
-      validationErrors.description = "Description is required";
+    if (
+      !formData.description.trim()
+    ) {
+      validationErrors.description =
+        'Description is required'
     }
 
-    if (!formData.processor_class.trim()) {
+    if (
+      !formData.processor_class.trim()
+    ) {
       validationErrors.processor_class =
-        "Processor Class is required";
+        'Processor Class is required'
     }
 
-    setErrors(validationErrors);
-
-    return Object.keys(validationErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    try {
-      await post("/v1/platform_admin/invoice_templates", {
-        invoice_template: formData,
-      });
-
-      alert("Invoice Template Created Successfully");
-
-      navigate("/invoice-templates");
-    } catch (err) {
-      console.error(err);
-      alert("Unable to create template.");
+    if (!formData.category_id) {
+      validationErrors.category_id =
+        'Category Id is required'
     }
-  };
 
-  return (
-    <Container fluid className="py-4">
-      <Row className="justify-content-center">
-        <Col lg={9}>
-          <Card className="shadow border-0">
+    if (
+      !validateJsonField(
+        'class_level',
+        formData.class_level,
+      )
+    ) {
+      validationErrors.class_level =
+        'Invalid JSON format'
+    }
 
-            <CNavbar className="bg-white border-bottom">
-              <CContainer fluid>
-                <CNavbarBrand className="fw-bold fs-4">
-                  Add Invoice Template
-                </CNavbarBrand>
-              </CContainer>
-            </CNavbar>
+    if (
+      !validateJsonField(
+        'instance_level',
+        formData.instance_level,
+      )
+    ) {
+      validationErrors.instance_level =
+        'Invalid JSON format'
+    }
 
-            <Card.Body className="p-4">
+    setErrors(validationErrors)
 
-              <Form onSubmit={handleSubmit}>
+    return (
+      Object.keys(validationErrors)
+        .length === 0
+    )
+  }
 
+  const handleSubmit =
+    async (e) => {
+      e.preventDefault()
+
+      if (!validate()) return
+
+      const payload = {
+        invoice_template: {
+          name: formData.name,
+          description:
+            formData.description,
+          processor_class:
+            formData.processor_class,
+          category_id: Number(
+            formData.category_id,
+          ),
+          is_default:
+            formData.is_default,
+          class_level:
+            JSON.parse(
+              formData.class_level ||
+                '{}',
+            ),
+          instance_level:
+            JSON.parse(
+              formData.instance_level ||
+                '{}',
+            ),
+        },
+      }
+
+      const api = await post(
+        '/v1/platform_admin/invoice_templates',
+        payload,
+      )
+
+      if (response.ok) {
+        toast.success(
+          'Invoice Template Created Successfully',
+        )
+
+        navigate(
+          '/invoice-templates',
+        )
+      } else {
+        toast.error(
+          api?.message ||
+            'Unable to create template'
+        )
+      }
+    }
+      return (
+    <Container fluid>
+      <Row className="mt-3">
+        <Col md="12">
+          <Card>
+            <Card.Header>
+              <Row>
+                <Col md="6">
+                  <Card.Title as="h4">
+                    Add Invoice Template
+                  </Card.Title>
+                </Col>
+
+                <Col
+                  md="6"
+                  className="text-right"
+                >
+                  <Button
+                    variant="info"
+                    className="rounded-0"
+                    onClick={() =>
+                      navigate(
+                        '/invoice-templates',
+                      )
+                    }
+                  >
+                    Go Back
+                  </Button>
+                </Col>
+              </Row>
+            </Card.Header>
+
+            <Card.Body>
+              <Form
+                onSubmit={
+                  handleSubmit
+                }
+              >
                 <Row>
-
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
+                  <Col md="6">
+                    <Form.Group>
                       <Form.Label>
-                        Template Name <span className="text-danger">*</span>
+                        Template Name
                       </Form.Label>
 
                       <Form.Control
-                        type="text"
                         name="name"
+                        value={
+                          formData.name
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!errors.name
+                        }
                         placeholder="Enter template name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        isInvalid={!!errors.name}
                       />
 
                       <Form.Control.Feedback type="invalid">
-                        {errors.name}
+                        {
+                          errors.name
+                        }
                       </Form.Control.Feedback>
-
                     </Form.Group>
                   </Col>
 
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
+                  <Col md="6">
+                    <Form.Group>
                       <Form.Label>
-                        Processor Class <span className="text-danger">*</span>
+                        Processor
+                        Class
                       </Form.Label>
 
                       <Form.Control
-                        type="text"
                         name="processor_class"
-                        placeholder="InvoiceProcessors::RentInvoice"
-                        value={formData.processor_class}
-                        onChange={handleChange}
-                        isInvalid={!!errors.processor_class}
+                        value={
+                          formData.processor_class
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!errors.processor_class
+                        }
+                        placeholder="InvoiceProcessors::DueReminder"
                       />
 
                       <Form.Control.Feedback type="invalid">
-                        {errors.processor_class}
+                        {
+                          errors.processor_class
+                        }
                       </Form.Control.Feedback>
-
                     </Form.Group>
                   </Col>
-
                 </Row>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>
-                    Description <span className="text-danger">*</span>
-                  </Form.Label>
+                <Row className="mt-3">
+                  <Col md="6">
+                    <Form.Group>
+                      <Form.Label>
+                        Category Id
+                      </Form.Label>
 
-                  <Form.Control
-                    as="textarea"
-                    rows={4}
-                    name="description"
-                    placeholder="Enter description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    isInvalid={!!errors.description}
-                  />
+                      <Form.Control
+                        type="number"
+                        name="category_id"
+                        value={
+                          formData.category_id
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!errors.category_id
+                        }
+                      />
 
-                  <Form.Control.Feedback type="invalid">
-                    {errors.description}
-                  </Form.Control.Feedback>
-
-                </Form.Group>
-
-                <Row>
+                      <Form.Control.Feedback type="invalid">
+                        {
+                          errors.category_id
+                        }
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
                   <Col md={6}>
-                    <Form.Group className="mb-3">
+                    <Form.Group>
+                      <Form.Label>
+                        Is default
+                      </Form.Label>
+                      <div
+                        style={{
+                          border: '1px solid #EAECF0',
+                          borderRadius: '12px',
+                          padding: '18px',
+                          background: '#fff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          id="is_default"
+                          name="is_default"
+                          checked={formData.is_default}
+                          onChange={handleChange}
+                          style={{
+                            width: '22px',
+                            height: '22px',
+                            cursor: 'pointer',
+                            accentColor: '#1570EF',
+                            display: 'block',
+                          }}
+                        />
+
+                        <label
+                          htmlFor="is_default"
+                          style={{
+                            margin: 0,
+                            fontSize: '16px',
+                            fontWeight: 500,
+                            color: '#344054',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Mark This Template As Default
+                        </label>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row className="mt-3">
+                  <Col md="12">
+                    <Form.Group>
+                      <Form.Label>
+                        Description
+                      </Form.Label>
+
+                      <Form.Control
+                        as="textarea"
+                        rows={4}
+                        name="description"
+                        value={
+                          formData.description
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!errors.description
+                        }
+                      />
+
+                      <Form.Control.Feedback type="invalid">
+                        {
+                          errors.description
+                        }
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row className="mt-3">
+                  <Col md="6">
+                    <Form.Group>
                       <Form.Label>
                         Class Level
+                        JSON
                       </Form.Label>
 
                       <Form.Control
-                        type="text"
+                        as="textarea"
+                        rows={6}
                         name="class_level"
-                        placeholder="company, property, invoice"
-                        value={formData.class_level.join(", ")}
-                        onChange={handleChange}
+                        value={
+                          formData.class_level
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!jsonErrors.class_level
+                        }
                       />
 
-                      <Form.Text className="text-muted">
-                        Enter multiple values separated by commas.
-                      </Form.Text>
-
+                      <Form.Control.Feedback type="invalid">
+                        {
+                          jsonErrors.class_level
+                        }
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
 
-                  <Col md={6}>
-                    <Form.Group className="mb-3">
+                  <Col md="6">
+                    <Form.Group>
                       <Form.Label>
                         Instance Level
+                        JSON
                       </Form.Label>
 
                       <Form.Control
-                        type="text"
+                        as="textarea"
+                        rows={6}
                         name="instance_level"
-                        placeholder="contract, invoice"
-                        value={formData.instance_level.join(", ")}
-                        onChange={handleChange}
+                        value={
+                          formData.instance_level
+                        }
+                        onChange={
+                          handleChange
+                        }
+                        isInvalid={
+                          !!jsonErrors.instance_level
+                        }
                       />
 
-                      <Form.Text className="text-muted">
-                        Enter multiple values separated by commas.
-                      </Form.Text>
-
+                      <Form.Control.Feedback type="invalid">
+                        {
+                          jsonErrors.instance_level
+                        }
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-
                 </Row>
 
-                <Form.Group className="mb-4">
-                  <Form.Check
-                    type="switch"
-                    id="default-template"
-                    label="Set as Default Template"
-                    name="is_default"
-                    checked={formData.is_default}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
-
-                <div className="d-flex justify-content-end">
-
-                  <Button
-                    variant="secondary"
-                    className="me-2 px-4"
-                    onClick={() => navigate("/invoice-templates")}
-                  >
-                    Cancel
-                  </Button>
-
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    disabled={loading}
-                    className="px-4"
-                  >
-                    {loading ? "Saving..." : "Save Template"}
-                  </Button>
-
-                </div>
-
+                <Button
+                  className="rounded-0 btn-fill mt-4"
+                  variant="info"
+                  type="submit"
+                  disabled={
+                    loading
+                  }
+                >
+                  {loading
+                    ? 'Saving...'
+                    : 'Add Invoice Template'}
+                </Button>
               </Form>
-
             </Card.Body>
           </Card>
         </Col>
       </Row>
     </Container>
-  );
+  )
 }
 
-export default Add;
+export default Add
