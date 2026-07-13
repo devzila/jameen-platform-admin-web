@@ -973,7 +973,7 @@ function Edit() {
                 <Row className="mt-3">
 
 
-                  <Col md="6">
+                  <Col md="12">
 
 
                     <Form.Group>
@@ -1025,7 +1025,7 @@ function Edit() {
 
 
                   </Col>
-                  <Col md="6">
+                  <Col md="12">
 
 
                     <Form.Group>
