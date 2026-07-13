@@ -1,185 +1,272 @@
-import React, { useEffect, useState } from "react";
-import useFetch from "use-http";
-import { useNavigate, useParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+} from 'react'
+
+import useFetch from 'use-http'
+
 import {
-  CContainer,
-  CRow,
-  CCol,
-  CCard,
-  CCardHeader,
-  CCardBody,
-  CButton,
-  CBadge,
-  CSpinner,
-} from "@coreui/react";
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 
-import dateFormat from "../../utilities/DateFormat";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Badge,
+  Spinner,
+} from 'react-bootstrap'
 
-const Show = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+import dateFormat from '../../utilities/DateFormat'
+function Show() {
+  const { id } = useParams()
 
-  const { get, loading } = useFetch();
+  const navigate =
+    useNavigate()
 
-  const [template, setTemplate] = useState(null);
+  const { get, loading } =
+    useFetch()
+
+  const [template, setTemplate] =
+    useState(null)
 
   useEffect(() => {
-    loadTemplate();
-  }, []);
+    loadTemplate()
+  }, [])
 
-  const loadTemplate = async () => {
-    try {
-      const response = await get(
-        `/v1/platform_admin/invoice_templates/${id}`
-      );
+  const loadTemplate =
+    async () => {
+      try {
+        const response =
+          await get(
+            `/v1/platform_admin/invoice_templates/${id}`,
+          )
 
-      setTemplate(response.data || response);
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load Invoice Template.");
+        setTemplate(
+          response?.data ||
+            response,
+        )
+      } catch (err) {
+        console.log(err)
+      }
     }
-  };
 
-  if (loading || !template) {
+  const renderJson = (
+    data,
+  ) => {
+    if (
+      !data ||
+      Object.keys(data)
+        .length === 0
+    ) {
+      return '-'
+    }
+
     return (
-      <CContainer className="py-5">
-        <div className="text-center">
-          <CSpinner color="primary" />
-          <div className="mt-2">Loading...</div>
-        </div>
-      </CContainer>
-    );
+      <pre
+        style={{
+          marginBottom: 0,
+          fontSize: '13px',
+          whiteSpace:
+            'pre-wrap',
+        }}
+      >
+        {JSON.stringify(
+          data,
+          null,
+          2,
+        )}
+      </pre>
+    )
   }
 
+  if (
+    loading ||
+    !template
+  ) {
+    return (
+      <Container className="py-5">
+        <div className="text-center">
+          <Spinner animation="border" />
+
+          <div className="mt-2">
+            Loading...
+          </div>
+        </div>
+      </Container>
+    )
+  }
   return (
-    <CContainer className="py-4">
-      <CRow className="justify-content-center">
-        <CCol lg={8}>
-          <CCard className="shadow border-0">
+  <Container fluid>
+    <Row className="mt-3">
+      <Col md="12">
+        <Card>
 
-            <CCardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
-              <h4 className="mb-0">
+          <Card.Header>
+            <div className="d-flex justify-content-between align-items-center">
+              <Card.Title as="h4" className="mb-0">
                 Invoice Template Details
-              </h4>
+              </Card.Title>
 
-              <CButton
-                color="light"
-                size="sm"
-                onClick={() => navigate("/invoice-templates")}
+              <Button
+                variant="info"
+                className="rounded-0"
+                onClick={() =>
+                  navigate('/invoice-templates')
+                }
               >
-                Back
-              </CButton>
-            </CCardHeader>
+                Go Back
+              </Button>
+            </div>
+          </Card.Header>
 
-            <CCardBody className="p-4">
+          <Card.Body>
+            <table className="table table-bordered">
 
-              <table className="table table-bordered">
+              <tbody>
 
-                <tbody>
+                <tr>
+                  <th width="30%">
+                    ID
+                  </th>
 
-                  <tr>
-                    <th width="30%">ID</th>
-                    <td>{template.id}</td>
-                  </tr>
+                  <td>
+                    {template.id}
+                  </td>
+                </tr>
 
-                  <tr>
-                    <th>Name</th>
-                    <td>{template.name}</td>
-                  </tr>
+                <tr>
+                  <th>Name</th>
 
-                  <tr>
-                    <th>Description</th>
-                    <td>
-                      {template.description || "-"}
-                    </td>
-                  </tr>
+                  <td>
+                    {template.name}
+                  </td>
+                </tr>
 
-                  <tr>
-                    <th>Processor Class</th>
-                    <td>{template.processor_class}</td>
-                  </tr>
+                <tr>
+                  <th>
+                    Description
+                  </th>
 
-                  <tr>
-                    <th>Default Template</th>
-                    <td>
-                      {template.is_default ? (
-                        <CBadge color="success">
-                          Yes
-                        </CBadge>
-                      ) : (
-                        <CBadge color="secondary">
-                          No
-                        </CBadge>
-                      )}
-                    </td>
-                  </tr>
+                  <td>
+                    {template.description ||
+                      '-'}
+                  </td>
+                </tr>
 
-                  <tr>
-                    <th>Class Level</th>
-                    <td>
-                      {template.class_level &&
-                      template.class_level.length > 0
-                        ? template.class_level.join(", ")
-                        : "-"}
-                    </td>
-                  </tr>
+                <tr>
+                  <th>
+                    Processor Class
+                  </th>
 
-                  <tr>
-                    <th>Instance Level</th>
-                    <td>
-                      {template.instance_level &&
-                      template.instance_level.length > 0
-                        ? template.instance_level.join(", ")
-                        : "-"}
-                    </td>
-                  </tr>
+                  <td>
+                    {
+                      template.processor_class
+                    }
+                  </td>
+                </tr>
 
-                  <tr>
-                    <th>Created At</th>
-                    <td>
-                      {template.created_at
-                        ? dateFormat(
-                            template.created_at.substring(0, 10)
-                          )
-                        : "-"}
-                    </td>
-                  </tr>
+                <tr>
+                  <th>
+                    Category Id
+                  </th>
 
-                  <tr>
-                    <th>Updated At</th>
-                    <td>
-                      {template.updated_at
-                        ? dateFormat(
-                            template.updated_at.substring(0, 10)
-                          )
-                        : "-"}
-                    </td>
-                  </tr>
+                  <td>
+                    {template.category_name ||
+                      '-'}
+                  </td>
+                </tr>
 
-                </tbody>
+                <tr>
+                  <th>
+                    Is Default
+                  </th>
 
-              </table>
+                  <td>
+                    {template.is_default ? (
+                      <Badge bg="success">
+                        Yes
+                      </Badge>
+                    ) : (
+                      <Badge bg="secondary">
+                        No
+                      </Badge>
+                    )}
+                  </td>
+                </tr>
 
-              <div className="d-flex justify-content-end mt-4">
+                <tr>
+                  <th>
+                    Class Level
+                  </th>
 
-                <CButton
-                  color="secondary"
-                  onClick={() =>
-                    navigate("/invoice-templates")
-                  }
-                >
-                  Back to List
-                </CButton>
+                  <td>
+                    {renderJson(
+                      template.class_level,
+                    )}
+                  </td>
+                </tr>
 
-              </div>
+                <tr>
+                  <th>
+                    Instance Level
+                  </th>
 
-            </CCardBody>
+                  <td>
+                    {renderJson(
+                      template.instance_level,
+                    )}
+                  </td>
+                </tr>
 
-          </CCard>
-        </CCol>
-      </CRow>
-    </CContainer>
-  );
-};
+                <tr>
+                  <th>
+                    Created At
+                  </th>
 
-export default Show;
+                  <td>
+                    {template.created_at
+                      ? dateFormat(
+                          template.created_at.substring(
+                            0,
+                            10,
+                          ),
+                        )
+                      : '-'}
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>
+                    Updated At
+                  </th>
+
+                  <td>
+                    {template.updated_at
+                      ? dateFormat(
+                          template.updated_at.substring(
+                            0,
+                            10,
+                          ),
+                        )
+                      : '-'}
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </Card.Body>
+
+        </Card>
+      </Col>
+    </Row>
+  </Container>
+)
+}
+
+export default Show

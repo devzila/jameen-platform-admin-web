@@ -1,255 +1,1105 @@
-import React, { useEffect, useState } from "react";
-import useFetch from "use-http";
-import { useNavigate, useParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+} from 'react'
+
+import useFetch from 'use-http'
+
 import {
-  CCard,
-  CCardHeader,
-  CCardBody,
-  CButton,
-  CForm,
-  CFormInput,
-  CFormTextarea,
-  CFormCheck,
-  CFormSelect,
-  CRow,
-  CCol,
-  CContainer,
-  CSpinner,
-} from "@coreui/react";
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 
-const Edit = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+} from 'react-bootstrap'
 
-  const { get, put, loading } = useFetch();
+import { toast } from 'react-toastify'
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    processor_class: "",
-    class_level: [],
-    instance_level: [],
-    is_default: false,
-  });
+
+function Edit() {
+
+  const { id } = useParams()
+
+  const navigate = useNavigate()
+
+
+  const {
+    get,
+    put,
+    loading,
+  } = useFetch()
+
+
+  const [categories, setCategories] =
+    useState([])
+
+
+  const [formData, setFormData] =
+    useState({
+
+      name: '',
+
+      description: '',
+
+      processor_class: '',
+
+      category_id: '',
+
+      class_level:
+        '{\n\n}',
+
+      instance_level:
+        '{\n\n}',
+
+      is_default: false,
+
+    })
+
+
+  const [errors, setErrors] =
+    useState({})
+
+
+  const [jsonErrors, setJsonErrors] =
+    useState({
+
+      class_level: '',
+
+      instance_level: '',
+
+    })
+
+
 
   useEffect(() => {
-    loadTemplate();
-  }, []);
 
-  const loadTemplate = async () => {
-    try {
-      const response = await get(
-        `/v1/platform_admin/invoice_templates/${id}`
-      );
+    loadTemplate()
 
-      const template = response.data || response;
+    loadCategories()
 
-      setFormData({
-        name: template.name || "",
-        description: template.description || "",
-        processor_class: template.processor_class || "",
-        class_level: template.class_level || [],
-        instance_level: template.instance_level || [],
-        is_default: template.is_default || false,
-      });
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load invoice template.");
-    }
-  };
+  }, [])
 
-  const handleChange = (e) => {
-    const { name, value, checked, type } = e.target;
 
-    if (name === "class_level" || name === "instance_level") {
+
+  const loadTemplate =
+    async () => {
+
+      try {
+
+
+        const response =
+          await get(
+            `/v1/platform_admin/invoice_templates/${id}`,
+          )
+
+
+        const template =
+          response?.data ||
+          response
+
+
+
         setFormData({
-        ...formData,
-        [name]: value
-            .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item !== ""),
-        });
-    } else {
-        setFormData({
-        ...formData,
-        [name]: type === "checkbox" ? checked : value,
-        });
+
+          name:
+            template.name || '',
+
+
+          description:
+            template.description || '',
+
+
+          processor_class:
+            template.processor_class || '',
+
+
+          category_id:
+            template.category_id || '',
+
+
+          class_level:
+            JSON.stringify(
+              template.class_level || {},
+              null,
+              2,
+            ),
+
+
+          instance_level:
+            JSON.stringify(
+              template.instance_level || {},
+              null,
+              2,
+            ),
+
+
+          is_default:
+            template.is_default || false,
+
+        })
+
+
+      } catch(error) {
+
+        console.log(error)
+
+        toast.error(
+          'Unable to load template'
+        )
+
+      }
+
     }
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    try {
-      await put(`/v1/platform_admin/invoice_templates/${id}`, {
-        invoice_template: formData,
-      });
 
-      alert("Invoice Template updated successfully.");
 
-      navigate("/invoice-templates");
-    } catch (err) {
-      console.error(err);
-      alert("Unable to update invoice template.");
+  const loadCategories =
+    async () => {
+
+
+      try {
+
+
+        const response =
+          await get(
+            '/v1/platform_admin/invoice_categories',
+          )
+
+
+        const data =
+          response?.data ||
+          response ||
+          []
+
+
+        setCategories(
+          Array.isArray(data)
+            ? data
+            : []
+        )
+
+
+      } catch(error) {
+
+
+        console.log(error)
+
+
+      }
+
     }
-  };
+
+
+
+
+  const handleChange =
+    (e) => {
+
+
+      const {
+        name,
+        value,
+        checked,
+        type,
+
+      } = e.target
+
+
+
+      setFormData(
+        (prev) => ({
+
+          ...prev,
+
+
+          [name]:
+            type === 'checkbox'
+              ? checked
+              : value,
+
+        })
+      )
+
+
+
+      if(
+        name === 'class_level' ||
+        name === 'instance_level'
+      ){
+
+        validateJsonField(
+          name,
+          value,
+        )
+
+      }
+
+
+    }
+
+
+
+
+  const validateJsonField =
+    (
+      name,
+      value,
+    ) => {
+
+
+      try {
+
+
+        JSON.parse(
+          value || '{}'
+        )
+
+
+        setJsonErrors(
+          (prev)=>({
+
+            ...prev,
+
+            [name]: ''
+
+          })
+        )
+
+
+        return true
+
+
+      } catch {
+
+
+        setJsonErrors(
+          (prev)=>({
+
+            ...prev,
+
+            [name]:
+              'Invalid JSON format'
+
+          })
+        )
+
+
+        return false
+
+      }
+
+
+    }
+
+
+
+
+  const validate =
+    () => {
+
+
+      const validationErrors = {}
+
+
+
+      if(
+        !formData.name.trim()
+      ){
+
+        validationErrors.name =
+          'Template Name is required'
+
+      }
+
+
+
+      if(
+        !formData.description.trim()
+      ){
+
+        validationErrors.description =
+          'Description is required'
+
+      }
+
+
+
+      if(
+        !formData.processor_class.trim()
+      ){
+
+        validationErrors.processor_class =
+          'Processor Class is required'
+
+      }
+
+
+
+      if(
+        !formData.category_id
+      ){
+
+        validationErrors.category_id =
+          'Category is required'
+
+      }
+
+
+
+
+      if(
+        !validateJsonField(
+          'class_level',
+          formData.class_level
+        )
+      ){
+
+        validationErrors.class_level =
+          'Invalid JSON format'
+
+      }
+
+
+
+
+      if(
+        !validateJsonField(
+          'instance_level',
+          formData.instance_level
+        )
+      ){
+
+        validationErrors.instance_level =
+          'Invalid JSON format'
+
+      }
+
+
+
+      setErrors(
+        validationErrors
+      )
+
+
+
+      return (
+        Object.keys(validationErrors)
+        .length === 0
+      )
+
+    }
+      const handleSubmit =
+    async (e) => {
+
+      e.preventDefault()
+
+
+      if(!validate()) return
+
+
+
+      const payload = {
+
+        invoice_template: {
+
+          name:
+            formData.name,
+
+
+          description:
+            formData.description,
+
+
+          processor_class:
+            formData.processor_class,
+
+
+          category_id:
+            Number(
+              formData.category_id
+            ),
+
+
+          is_default:
+            formData.is_default,
+
+
+          class_level:
+            JSON.parse(
+              formData.class_level || '{}'
+            ),
+
+
+          instance_level:
+            JSON.parse(
+              formData.instance_level || '{}'
+            ),
+
+        },
+
+      }
+
+
+
+      try {
+
+
+        await put(
+          `/v1/platform_admin/invoice_templates/${id}`,
+          payload,
+        )
+
+
+        toast.success(
+          'Invoice Template Updated Successfully'
+        )
+
+
+        navigate(
+          '/invoice-templates'
+        )
+
+
+      } catch(error) {
+
+
+        console.log(error)
+
+
+        toast.error(
+          'Unable to update template'
+        )
+
+      }
+
+    }
+
+
+
 
   return (
-    <CContainer className="py-4">
-      <CRow className="justify-content-center">
-        <CCol lg={8} md={10}>
-          <CCard className="shadow border-0">
 
-            <CCardHeader className="bg-primary text-white py-3">
-              <h4 className="mb-0">
-                Edit Invoice Template
-              </h4>
-            </CCardHeader>
+    <Container fluid>
 
-            <CCardBody className="p-4">
+      <Row className="mt-3">
 
-              <CForm onSubmit={handleSubmit}>
+        <Col md="12">
 
-                <CRow className="g-4">
 
-                  <CCol md={6}>
-                    <label className="form-label fw-bold">
-                      Template Name <span className="text-danger">*</span>
-                    </label>
+          <Card>
 
-                    <CFormInput
-                      name="name"
-                      placeholder="Enter template name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </CCol>
 
-                  <CCol md={6}>
-                    <label className="form-label fw-bold">
-                        Processor Class <span className="text-danger">*</span>
-                    </label>
+            <Card.Header>
 
-                    <CFormInput
-                        type="text"
-                        name="processor_class"
-                        placeholder="InvoiceProcessors::RentInvoice"
-                        value={formData.processor_class}
-                        onChange={handleChange}
-                        required
-                    />
 
-                    <small className="text-muted">
-                        Example: InvoiceProcessors::RentInvoice
-                    </small>
-                  </CCol>
+              <Row>
 
-                  <CCol md={6}>
-                    <label className="form-label fw-bold">
-                        Class Level
-                    </label>
+                <Col md="6">
 
-                    <CFormInput
-                        name="class_level"
-                        placeholder="company, property, invoice"
-                        value={formData.class_level.join(", ")}
-                        onChange={handleChange}
-                    />
+                  <Card.Title as="h4">
 
-                    <small className="text-muted">
-                        Enter multiple values separated by commas.
-                    </small>
-                  </CCol>
+                    Edit Invoice Template
 
-                  <CCol md={6}>
-                    <label className="form-label fw-bold">
-                        Instance Level
-                    </label>
+                  </Card.Title>
 
-                    <CFormInput
-                        name="instance_level"
-                        placeholder="contract, invoice"
-                        value={formData.instance_level.join(", ")}
-                        onChange={handleChange}
-                    />
+                </Col>
 
-                    <small className="text-muted">
-                        Enter multiple values separated by commas.
-                    </small>
-                  </CCol>
 
-                  <CCol md={12}>
-                    <label className="form-label fw-bold">
-                      Description
-                    </label>
 
-                    <CFormTextarea
-                      rows={5}
-                      name="description"
-                      placeholder="Enter description"
-                      value={formData.description}
-                      onChange={handleChange}
-                    />
-                  </CCol>
+                <Col
+                  md="6"
+                  className="text-right"
+                >
 
-                  <CCol md={12}>
-                    <CFormCheck
-                      id="default-template"
-                      label="Set as Default Template"
-                      name="is_default"
-                      checked={formData.is_default}
-                      onChange={handleChange}
-                    />
-                  </CCol>
+                  <Button
 
-                </CRow>
+                    variant="info"
 
-                <hr className="my-4" />
+                    className="rounded-0"
 
-                <div className="d-flex justify-content-end">
-
-                  <CButton
-                    color="secondary"
-                    variant="outline"
-                    className="me-2 px-4"
                     onClick={() =>
-                      navigate("/invoice-templates")
+                      navigate(
+                        '/invoice-templates'
+                      )
+                    }
+
+                  >
+
+                    Go Back
+
+                  </Button>
+
+
+                </Col>
+
+
+              </Row>
+
+
+            </Card.Header>
+
+
+
+            <Card.Body>
+
+
+              <Form
+                onSubmit={handleSubmit}
+              >
+
+
+
+                <Row>
+
+
+                  <Col md="6">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Template Name
+
+                      </Form.Label>
+
+
+
+                      <Form.Control
+
+                        name="name"
+
+                        value={
+                          formData.name
+                        }
+
+                        onChange={
+                          handleChange
+                        }
+
+                        isInvalid={
+                          !!errors.name
+                        }
+
+                      />
+
+
+
+                      <Form.Control.Feedback type="invalid">
+
+                        {errors.name}
+
+                      </Form.Control.Feedback>
+
+
+
+                    </Form.Group>
+
+
+                  </Col>
+
+
+
+
+                  <Col md="6">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Processor Class
+
+                      </Form.Label>
+
+
+
+                      <Form.Control
+
+                        name="processor_class"
+
+                        value={
+                          formData.processor_class
+                        }
+
+                        onChange={
+                          handleChange
+                        }
+
+                        isInvalid={
+                          !!errors.processor_class
+                        }
+
+                      />
+
+
+
+                      <Form.Control.Feedback type="invalid">
+
+                        {errors.processor_class}
+
+                      </Form.Control.Feedback>
+
+
+
+                    </Form.Group>
+
+
+                  </Col>
+
+
+                </Row>
+
+
+
+
+
+                <Row className="mt-3">
+
+
+                  <Col md="6">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Category
+
+                      </Form.Label>
+
+
+
+                      <div
+
+                        style={{
+
+                          background:'#fff',
+
+                          border:'1px solid #EAECF0',
+
+                          borderRadius:'12px',
+
+                          padding:'8px',
+
+                          boxShadow:
+                            '0 2px 8px rgba(0,0,0,0.05)'
+
+                        }}
+
+                      >
+
+
+
+                        <Form.Select
+
+                          name="category_id"
+
+                          value={
+                            formData.category_id || ''
+                          }
+
+                          onChange={
+                            handleChange
+                          }
+
+                          style={{
+
+                            border:'none',
+
+                            outline:'none',
+
+                            boxShadow:'none',
+
+                            fontSize:'15px',
+
+                            cursor:'pointer'
+
+                          }}
+
+                          isInvalid={
+                            !!errors.category_id
+                          }
+
+                        >
+
+
+
+                          <option value="">
+
+                            Select Invoice Category
+
+                          </option>
+
+
+
+
+                          {
+                            categories.map(
+                              (category)=>(
+                                
+                                <option
+
+                                  key={
+                                    category.id
+                                  }
+
+                                  value={
+                                    category.id
+                                  }
+
+                                >
+
+                                  {category.name}
+
+                                </option>
+
+
+                              )
+                            )
+                          }
+
+
+
+                        </Form.Select>
+
+
+
+                      </div>
+
+
+
+                      <Form.Control.Feedback type="invalid">
+
+                        {errors.category_id}
+
+                      </Form.Control.Feedback>
+
+
+
+                    </Form.Group>
+
+
+
+                  </Col>
+
+
+
+
+
+                  <Col md="6">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Is Default
+
+                      </Form.Label>
+
+
+
+                      <div
+
+                        style={{
+
+                          border:
+                            '1px solid #EAECF0',
+
+                          borderRadius:'12px',
+
+                          padding:'18px',
+
+                          background:'#fff',
+
+                          display:'flex',
+
+                          alignItems:'center',
+
+                          gap:'12px'
+
+                        }}
+
+                      >
+
+
+
+                        <input
+
+                          type="checkbox"
+
+                          id="is_default"
+
+                          name="is_default"
+
+                          checked={
+                            formData.is_default
+                          }
+
+                          onChange={
+                            handleChange
+                          }
+
+                          style={{
+
+                            width:'22px',
+
+                            height:'22px',
+
+                            cursor:'pointer',
+
+                            accentColor:'#1570EF'
+
+                          }}
+
+                        />
+
+
+
+                        <label
+
+                          htmlFor="is_default"
+
+                          style={{
+
+                            margin:0,
+
+                            fontSize:'16px',
+
+                            fontWeight:500,
+
+                            cursor:'pointer'
+
+                          }}
+
+                        >
+
+                          Mark This Template As Default
+
+                        </label>
+
+
+
+                      </div>
+
+
+
+                    </Form.Group>
+
+
+                  </Col>
+
+
+
+                </Row>
+
+
+
+
+
+                <Row className="mt-3">
+
+
+                  <Col md="12">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Description
+
+                      </Form.Label>
+
+
+
+                      <Form.Control
+
+                        as="textarea"
+
+                        rows={4}
+
+                        name="description"
+
+                        value={
+                          formData.description
+                        }
+
+                        onChange={
+                          handleChange
+                        }
+
+                        isInvalid={
+                          !!errors.description
+                        }
+
+                      />
+
+
+
+                      <Form.Control.Feedback type="invalid">
+
+                        {errors.description}
+
+                      </Form.Control.Feedback>
+
+
+
+                    </Form.Group>
+
+
+                  </Col>
+
+
+                </Row>
+
+
+
+
+
+                <Row className="mt-3">
+
+
+                  <Col md="12">
+
+
+                    <Form.Group>
+
+
+                      <Form.Label>
+
+                        Class Level JSON
+
+                      </Form.Label>
+
+
+
+                      <Form.Control
+
+                        as="textarea"
+
+                        rows={7}
+
+                        name="class_level"
+
+                        value={
+                          formData.class_level
+                        }
+
+                        onChange={
+                          handleChange
+                        }
+
+                        isInvalid={
+                          !!jsonErrors.class_level
+                        }
+
+                      />
+
+
+
+                      <Form.Control.Feedback type="invalid">
+
+                        {
+                          jsonErrors.class_level
+                        }
+
+                      </Form.Control.Feedback>
+
+
+
+                    </Form.Group>
+
+
+                  </Col>
+                  <Col md="12">
+
+
+                    <Form.Group>
+                      <Form.Label>
+
+                        Instance Level JSON
+
+                      </Form.Label>
+                      <Form.Control
+
+                        as="textarea"
+
+                        rows={7}
+
+                        name="instance_level"
+
+                        value={
+                          formData.instance_level
+                        }
+
+                        onChange={
+                          handleChange
+                        }
+
+                        isInvalid={
+                          !!jsonErrors.instance_level
+                        }
+
+                      />
+                      <Form.Control.Feedback type="invalid">
+
+                        {
+                          jsonErrors.instance_level
+                        }
+
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <div className="d-flex justify-content-end mt-4">
+                  <Button
+                    variant="secondary"
+                    className="me-2 rounded-0"
+                    onClick={() =>
+                      navigate(
+                        '/invoice-templates'
+                      )
                     }
                   >
                     Cancel
-                  </CButton>
-
-                  <CButton
-                    color="primary"
+                  </Button><br></br>
+                  <Button
                     type="submit"
-                    className="px-4"
+                    variant="info"
+                    className="rounded-0"
                     disabled={loading}
                   >
-                    {loading ? (
-                      <>
-                        <CSpinner
-                          size="sm"
-                          className="me-2"
-                        />
-                        Updating...
-                      </>
-                    ) : (
-                      "Update Template"
-                    )}
-                  </CButton>
-
+                    {
+                      loading
+                      ? 'Updating...'
+                      : 'Update Template'
+                    }
+                  </Button>
                 </div>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
 
-              </CForm>
+  )
 
-            </CCardBody>
+}
 
-          </CCard>
-        </CCol>
-      </CRow>
-    </CContainer>
-  );
-};
 
-export default Edit;
+export default Edit

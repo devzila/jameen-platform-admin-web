@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import useFetch from "use-http";
-import Paginate from "../../components/Paginate";
-import Loader from "components/Loader";
-import { BsThreeDots } from "react-icons/bs";
+import React, { useState, useEffect } from 'react'
+import useFetch from 'use-http'
+import Paginate from '../../components/Paginate'
+import Loader from 'components/Loader'
+import { BsThreeDots } from 'react-icons/bs'
 import {
   Dropdown,
   Badge,
@@ -10,298 +10,362 @@ import {
   Container,
   Row,
   Col,
-} from "react-bootstrap";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+} from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   CNavbar,
   CContainer,
   CNavbarBrand,
-} from "@coreui/react";
+} from '@coreui/react'
 
-import CIcon from "@coreui/icons-react";
-import { freeSet } from "@coreui/icons";
+import CIcon from '@coreui/icons-react'
+import { freeSet } from '@coreui/icons'
 
-import dateFormat from "../../utilities/DateFormat";
+import dateFormat from '../../utilities/DateFormat'
 
 function Index() {
-  const [invoiceTemplates, setInvoiceTemplates] = useState([]);
-  const [pagination, setPagination] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [invoiceTemplates, setInvoiceTemplates] =
+    useState([])
+  const [pagination, setPagination] = useState({})
+  const [currentPage, setCurrentPage] =
+    useState(1)
+  const [searchKeyword, setSearchKeyword] =
+    useState('')
 
-  const { get, del, loading } = useFetch();
-
-  const navigate = useNavigate();
+  const { get, del, loading } = useFetch()
+  const navigate = useNavigate()
 
   const addTemplate = () => {
-    navigate("/invoice-templates/add");
-  };
+    navigate('/invoice-templates/add')
+  }
 
   const loadInvoiceTemplates = async () => {
-    let endpoint = `/v1/platform_admin/invoice_templates?page=${currentPage}`;
+    let endpoint = `/v1/platform_admin/invoice_templates?page=${currentPage}`
 
-    if (searchKeyword.trim() !== "") {
-      endpoint += `&q[name_cont]=${encodeURIComponent(searchKeyword)}`;
+    if (searchKeyword.trim() !== '') {
+      endpoint += `&q[name_cont]=${encodeURIComponent(
+        searchKeyword,
+      )}`
     }
 
     try {
-      const data = await get(endpoint);
+      const response = await get(endpoint)
 
-      setInvoiceTemplates(data?.data || []);
-      setPagination(data?.pagination || {});
+      console.log(
+        'Invoice Templates Response:',
+        response,
+      )
+
+      const templates =
+        response?.data ||
+        response?.invoice_templates ||
+        response ||
+        []
+
+      setInvoiceTemplates(
+        Array.isArray(templates)
+          ? templates
+          : [],
+      )
+
+      setPagination(
+        response?.pagination || {},
+      )
 
       if (
-        data?.pagination &&
-        currentPage > data.pagination.total_pages &&
-        data.pagination.total_pages > 0
+        response?.pagination &&
+        currentPage >
+          response.pagination.total_pages &&
+        response.pagination.total_pages > 0
       ) {
-        setCurrentPage(1);
+        setCurrentPage(1)
       }
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadInvoiceTemplates();
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [currentPage, searchKeyword]);
+    loadInvoiceTemplates()
+  }, [currentPage, searchKeyword])
 
   const handlePageClick = (e) => {
-    setCurrentPage(e.selected + 1);
-  };
+    setCurrentPage(e.selected + 1)
+  }
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this template?")) {
-      return;
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this template?',
+      )
+    ) {
+      return
     }
 
     try {
-      await del(`/v1/platform_admin/invoice_templates/${id}`);
+      await del(
+        `/v1/platform_admin/invoice_templates/${id}`,
+      )
 
-      loadInvoiceTemplates();
+      loadInvoiceTemplates()
     } catch (err) {
-      console.error(err);
-      alert("Unable to delete template.");
+      console.error(err)
+      alert(
+        'Unable to delete template.',
+      )
     }
-  };
+  }
+
+  const renderJson = (data) => {
+    if (
+      !data ||
+      Object.keys(data).length === 0
+    ) {
+      return '-'
+    }
+
+    return (
+      <pre
+        className="mb-0"
+        style={{
+          fontSize: '12px',
+          whiteSpace: 'pre-wrap',
+          maxWidth: '250px',
+        }}
+      >
+        {JSON.stringify(
+          data,
+          null,
+          2,
+        )}
+      </pre>
+    )
+  }
 
   return (
     <Container fluid>
       <Row>
         <Col md="12">
           <Card>
-
-            <CNavbar expand="lg" className="bg-white">
+            <CNavbar
+              expand="lg"
+              className="bg-white"
+            >
               <CContainer fluid>
-
                 <CNavbarBrand>
                   Invoice Templates
                 </CNavbarBrand>
 
                 <div className="d-flex justify-content-end">
-
                   <div className="d-flex align-items-center">
-
                     <input
                       className="form-control"
                       type="search"
                       placeholder="Search by template name..."
-                      value={searchKeyword}
+                      value={
+                        searchKeyword
+                      }
                       onChange={(e) => {
-                        setCurrentPage(1);
-                        setSearchKeyword(e.target.value);
+                        setCurrentPage(
+                          1,
+                        )
+                        setSearchKeyword(
+                          e.target.value,
+                        )
                       }}
                     />
 
                     <button
-                      className="btn btn-outline-success"
-                      onClick={loadInvoiceTemplates}
+                      className="btn btn-outline-success ms-2"
+                      onClick={
+                        loadInvoiceTemplates
+                      }
                     >
-                      <CIcon icon={freeSet.cilSearch} />
+                      <CIcon
+                        icon={
+                          freeSet.cilSearch
+                        }
+                      />
                     </button>
-
                   </div>
 
                   <button
                     className="btn btn-primary mx-2"
-                    onClick={addTemplate}
+                    onClick={
+                      addTemplate
+                    }
                   >
                     Add Template
                   </button>
-
                 </div>
-
               </CContainer>
             </CNavbar>
 
             <Card.Body className="table-responsive">
-
               <table className="table table-striped align-middle">
-
                 <thead>
-
                   <tr>
-
                     <th>Name</th>
-
                     <th>Description</th>
-
-                    <th>Processor Class</th>
-
-                    <th>Class Level</th>
-
-                    <th>Instance Level</th>
-
-                    <th>Default</th>
-
-                    <th>Created</th>
-
+                    <th>
+                      Processor Class
+                    </th>
+                    <th>
+                      Category Id
+                    </th>
+                    <th>
+                      Default
+                    </th>
+                    <th>
+                      Created
+                    </th>
                     <th width="60">
                       Action
                     </th>
-
                   </tr>
-
                 </thead>
 
                 {loading ? (
                   <tbody>
                     <tr>
-                      <td colSpan="8" className="text-center py-5">
+                      <td
+                        colSpan="9"
+                        className="text-center py-5"
+                      >
                         <Loader />
                       </td>
                     </tr>
                   </tbody>
                 ) : (
                   <tbody>
-                    {invoiceTemplates.length > 0 ? (
-                      invoiceTemplates.map((template) => (
-                        <tr key={template.id}>
-                          <td className="fw-semibold">
-                            {template.name}
-                          </td>
+                    {invoiceTemplates.length >
+                    0 ? (
+                      invoiceTemplates.map(
+                        (
+                          template,
+                        ) => (
+                          <tr
+                            key={
+                              template.id
+                            }
+                          >
+                            <td className="fw-semibold">
+                              {
+                                template.name
+                              }
+                            </td>
 
-                          <td>
-                            {template.description || "-"}
-                          </td>
+                            <td>
+                              {template.description ||
+                                '-'}
+                            </td>
 
-                          <td>
-                            <small className="text-muted">
-                              {template.processor_class}
-                            </small>
-                          </td>
-
-                          <td>
-                            {template.class_level?.length > 0 ? (
-                              template.class_level.map((item, index) => (
-                                <Badge
-                                  bg="info"
-                                  key={index}
-                                  className="me-1"
-                                >
-                                  {item}
+                            <td>
+                              <small className="text-muted">
+                                {
+                                  template.processor_class
+                                }
+                              </small>
+                            </td>
+                            <td>
+                              {template.category_name || "-"}
+                            </td>
+                            <td>
+                              {template.is_default ? (
+                                <Badge bg="success">
+                                  Yes
                                 </Badge>
-                              ))
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {template.instance_level?.length > 0 ? (
-                              template.instance_level.map((item, index) => (
-                                <Badge
-                                  bg="secondary"
-                                  key={index}
-                                  className="me-1"
-                                >
-                                  {item}
+                              ) : (
+                                <Badge bg="secondary">
+                                  No
                                 </Badge>
-                              ))
-                            ) : (
-                              "-"
-                            )}
-                          </td>
+                              )}
+                            </td>
 
-                          <td>
-                            {template.is_default ? (
-                              <Badge bg="success">
-                                Yes
-                              </Badge>
-                            ) : (
-                              <Badge bg="secondary">
-                                No
-                              </Badge>
-                            )}
-                          </td>
+                            <td>
+                              {template.created_at
+                                ? dateFormat(
+                                    template.created_at.substring(
+                                      0,
+                                      10,
+                                    ),
+                                  )
+                                : '-'}
+                            </td>
 
-                          <td>
-                            {dateFormat(
-                              template.created_at?.substring(0, 10)
-                            )}
-                          </td>
-
-                          <td className="text-center">
-                            <Dropdown align="end">
-
-                              <Dropdown.Toggle
-                                variant="light"
-                                size="sm"
-                                className="border-0 shadow-none"
-                              >
-                                <BsThreeDots size={18} />
-                              </Dropdown.Toggle>
-
-                              <Dropdown.Menu>
-
-                                <Dropdown.Item
-                                  as={Link}
-                                  to={`/invoice-templates/${template.id}`}
+                            <td className="text-center">
+                              <Dropdown align="end">
+                                <Dropdown.Toggle
+                                  variant="light"
+                                  size="sm"
+                                  className="border-0 shadow-none"
                                 >
-                                  👁 View
-                                </Dropdown.Item>
+                                  <BsThreeDots
+                                    size={
+                                      18
+                                    }
+                                  />
+                                </Dropdown.Toggle>
 
-                                <Dropdown.Item
-                                  as={Link}
-                                  to={`/invoice-templates/${template.id}/edit`}
-                                >
-                                  ✏ Edit
-                                </Dropdown.Item>
+                                <Dropdown.Menu>
+                                  <Dropdown.Item
+                                    as={
+                                      Link
+                                    }
+                                    to={`/invoice-templates/${template.id}`}
+                                  >
+                                    👁
+                                    View
+                                  </Dropdown.Item>
 
-                                <Dropdown.Divider />
+                                  <Dropdown.Item
+                                    as={
+                                      Link
+                                    }
+                                    to={`/invoice-templates/${template.id}/edit`}
+                                  >
+                                    ✏
+                                    Edit
+                                  </Dropdown.Item>
 
-                                <Dropdown.Item
-                                  className="text-danger"
-                                  onClick={() =>
-                                    handleDelete(template.id)
-                                  }
-                                >
-                                  🗑 Delete
-                                </Dropdown.Item>
+                                  <Dropdown.Divider />
 
-                              </Dropdown.Menu>
-
-                            </Dropdown>
-                          </td>
-                        </tr>
-                      ))
+                                  <Dropdown.Item
+                                    className="text-danger"
+                                    onClick={() =>
+                                      handleDelete(
+                                        template.id,
+                                      )
+                                    }
+                                  >
+                                    🗑
+                                    Delete
+                                  </Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </td>
+                          </tr>
+                        ),
+                      )
                     ) : (
                       <tr>
                         <td
-                          colSpan="8"
+                          colSpan="9"
                           className="text-center py-5"
                         >
                           <h6 className="mb-1">
-                            No Invoice Templates Found
+                            No Invoice
+                            Templates
+                            Found
                           </h6>
 
                           <small className="text-muted">
-                            Click "Add Template" to create your first invoice template.
+                            Click "Add
+                            Template" to
+                            create your
+                            first invoice
+                            template.
                           </small>
                         </td>
                       </tr>
@@ -309,26 +373,31 @@ function Index() {
                   </tbody>
                 )}
               </table>
-
             </Card.Body>
-
           </Card>
         </Col>
       </Row>
 
-      {pagination?.total_pages > 1 && (
+      {pagination?.total_pages >
+        1 && (
         <Row className="mt-3">
           <Col className="d-flex justify-content-center">
             <Paginate
-              pageCount={pagination.total_pages}
-              forcePage={currentPage - 1}
-              onPageChange={handlePageClick}
+              pageCount={
+                pagination.total_pages
+              }
+              forcePage={
+                currentPage - 1
+              }
+              onPageChange={
+                handlePageClick
+              }
             />
           </Col>
         </Row>
       )}
     </Container>
-  );
+  )
 }
 
-export default Index;
+export default Index
