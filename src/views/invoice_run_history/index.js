@@ -128,10 +128,6 @@ function InvoiceRunHistory() {
             {/* COMPANY FILTER */}
 
             <div className="company-filter">
-              <label className="company-label">
-                Company
-              </label>
-
               <select
                 className="form-select form-select-sm"
                 value={
