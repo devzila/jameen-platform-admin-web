@@ -54,10 +54,6 @@ function TemplatedInvoiceRunHistory() {
 
         <Card.Body className="p-4">
           <div className="d-flex align-items-center">
-            <div className="invoice-icon-box">
-              <FaHistory />
-            </div>
-
             <div className="ms-3">
               <h4 className="mb-1 fw-bold">
                 Template Invoice Run

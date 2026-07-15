@@ -57,10 +57,6 @@ function CustomInvoiceRunHistory() {
           {/* HEADER */}
 
           <div className="d-flex align-items-center mb-4">
-            <div className="invoice-icon-box">
-              <FaHistory />
-            </div>
-
             <div className="ms-3">
               <h4 className="mb-1 fw-bold">
                 Custom Invoice Run
