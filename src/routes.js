@@ -15,6 +15,9 @@ import InvoiceTemplates from "views/invoice_templates/index.js";
 import InvoiceTemplateAdd from "views/invoice_templates/Add.js";
 import InvoiceTemplateEdit from "views/invoice_templates/Edit.js";
 import InvoiceTemplateShow from "views/invoice_templates/show.js";
+import InvoiceRunHistory from "views/invoice_run_history/index.js";
+import TemplatedInvoiceRunHistory from "views/invoice_run_history/template.js";
+import CustomInvoiceRunHistory from "views/invoice_run_history/custom.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -37,6 +40,21 @@ const dashboardRoutes = [
     icon: "nc-icon nc-notes",
     component: <SubscriptionIndex />,
     main: true,
+  },
+  {
+    path: "/invoice-run-history",
+    name: "Invoice Run History",
+    icon: "nc-icon nc-time-alarm",
+    component: <InvoiceRunHistory />,
+    main: true,
+  },
+  {
+    path: "/templated-invoice-run-history",
+    component: <TemplatedInvoiceRunHistory />,
+  },
+  {
+    path: "/custom-invoice-run-history",
+    component: <CustomInvoiceRunHistory />,
   },
   { path: "/", component: <Navigate to="/companies" /> },
   { path: "/companies/add", component: <CompanyAdd /> },

@@ -1,0 +1,129 @@
+/* ===========================
+   NAVBAR
+=========================== */
+
+.invoice-tabs {
+  padding: 12px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.invoice-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.invoice-tabs::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.invoice-tabs .nav-link {
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin-right: 10px;
+  padding: 10px 16px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+
+.invoice-tabs .nav-link:hover {
+  background: #212529;
+  color: #69cdc8 !important;
+  transform: translateY(-2px);
+}
+
+/* Active Tab */
+
+.invoice-tabs .nav-link.active {
+  background: #1d8cf8;
+  color: #7ce0cc !important;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+.card-category {
+  margin-top: 5px;
+  color: #9a9a9a;
+  font-size: 14px;
+}
+
+.company-filter {
+  width: 250px;
+  margin-left: auto;
+}
+
+/* ===========================
+   TABLE SCROLL
+=========================== */
+
+.table-responsive-custom {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.table-responsive-custom table {
+  min-width: 1500px;
+}
+
+.table-responsive-custom::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive-custom::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.table-responsive-custom::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 10px;
+}
+
+.table-responsive-custom::-webkit-scrollbar-thumb:hover {
+  background: #8f8f8f;
+}
+
+/* ===========================
+   TABLE
+=========================== */
+
+.table th,
+.table td {
+  vertical-align: middle !important;
+  white-space: nowrap;
+}
+
+.table thead th {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 768px) {
+  .text-right {
+    text-align: left !important;
+    margin-top: 15px;
+  }
+
+  .company-filter {
+    width: 100%;
+  }
+}
