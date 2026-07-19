@@ -18,6 +18,7 @@ import InvoiceTemplateShow from "views/invoice_templates/show.js";
 import InvoiceRunHistory from "views/invoice_run_history/index.js";
 import TemplatedInvoiceRunHistory from "views/invoice_run_history/template.js";
 import CustomInvoiceRunHistory from "views/invoice_run_history/custom.js";
+import SessionsIndex from "views/sessions/Index.js";
 const dashboardRoutes = [
   {
     path: "/companies",
@@ -46,6 +47,13 @@ const dashboardRoutes = [
     name: "Invoice Run History",
     icon: "nc-icon nc-time-alarm",
     component: <InvoiceRunHistory />,
+    main: true,
+  },
+  {
+    path: "/sessions",
+    name: "Login/Sessions",
+    icon: "nc-icon nc-key-25",
+    component: <SessionsIndex />,
     main: true,
   },
   {
