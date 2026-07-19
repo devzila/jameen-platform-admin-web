@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import useFetch from "use-http";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { format_react_select } from "services/utility_functions";
 import Select from "react-select";
 import defaultAvatar from "assets/img/jameen-logo.png";
+import { FormShell, AdminButton } from "components/ui";
 
 function EditUser() {
   const {
@@ -33,11 +34,8 @@ function EditUser() {
     loadUser();
   }, [userId]);
 
-  // ✅ Correct Roles API
   async function fetchRoles() {
-    const api = await get(
-      `/v1/platform_admin/companies/${companyId}/roles`
-    );
+    const api = await get(`/v1/platform_admin/companies/${companyId}/roles`);
     if (response.ok) {
       setRolesData(format_react_select(api.data, ["id", "name"]));
     } else {
@@ -45,7 +43,6 @@ function EditUser() {
     }
   }
 
-  // ✅ Load User Data
   async function loadUser() {
     const api = await get(
       `/v1/platform_admin/companies/${companyId}/users/${userId}`
@@ -61,10 +58,7 @@ function EditUser() {
     }
   }
 
-  // ✅ Submit
   async function onSubmit(data) {
-    console.log("FORM DATA:", data);
-
     const { avatar, ...userFields } = data;
     const hasAvatar =
       avatar &&
@@ -103,186 +97,117 @@ function EditUser() {
     if (response.ok) {
       toast.success("User updated successfully");
       navigate(`/companies/${companyId}/users`);
+    } else if (response.status === 422 && response.data?.errors) {
+      Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+        if (Array.isArray(fieldErrors) && fieldErrors.length) {
+          setError(field, { type: "server", message: fieldErrors[0] });
+        }
+      });
     } else {
-      if (response.status === 422 && response.data?.errors) {
-        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
-          if (Array.isArray(fieldErrors) && fieldErrors.length) {
-            setError(field, { type: "server", message: fieldErrors[0] });
-          }
-        });
-      } else {
-        toast.error(api?.message || "Update failed");
-      }
+      toast.error(api?.message || "Update failed");
     }
   }
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <Container fluid>
-      <Row>
-        <Col md="12">
-          <Card>
-            <Card.Header>
-              <Row>
-                <Col md="6">
-                  <Card.Title as="h4">Edit User</Card.Title>
-                </Col>
-                <Col md="6" className="d-flex justify-content-end">
-                  <Button variant="info" onClick={handleGoBack}>
-                    Go Back
-                  </Button>
-                </Col>
-              </Row>
-            </Card.Header>
+    <FormShell
+      title="Edit User"
+      subtitle="Update profile details and replace the avatar if needed."
+      onBack={() => navigate(-1)}
+    >
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Group className="mb-field">
+          <Form.Label>Avatar</Form.Label>
+          <div className="admin-form-preview">
+            <img
+              className="is-round"
+              src={userData?.avatar_url || defaultAvatar}
+              alt={userData?.name || "User avatar"}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = defaultAvatar;
+              }}
+            />
+          </div>
+          <Form.Control
+            type="file"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+            isInvalid={!!formErrors.avatar}
+            {...register("avatar")}
+          />
+          <Form.Text>Upload JPG or PNG to replace avatar.</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {formErrors.avatar?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-            <Card.Body>
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                {/* Avatar */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>Avatar</Form.Label>
-                      <div className="mb-2">
-                        <img
-                          src={userData?.avatar_url || defaultAvatar}
-                          alt={userData?.name || "User avatar"}
-                          style={{
-                            width: "80px",
-                            height: "80px",
-                            objectFit: "cover",
-                            borderRadius: "50%",
-                          }}
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = defaultAvatar;
-                          }}
-                        />
-                      </div>
-                      <Form.Control
-                        type="file"
-                        accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-                        isInvalid={!!formErrors.avatar}
-                        {...register("avatar")}
-                      />
-                      <Form.Text className="text-muted">
-                        Upload JPG or PNG to replace avatar.
-                      </Form.Text>
-                      <Form.Control.Feedback type="invalid">
-                        {formErrors.avatar?.message}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>
+        <Form.Group className="mb-field">
+          <Form.Label>
+            Name{" "}
+            <small className="text-danger">{formErrors?.name?.message}</small>
+          </Form.Label>
+          <Form.Control
+            placeholder="Name"
+            {...register("name", { required: "Name is required" })}
+          />
+        </Form.Group>
 
-                {/* Name */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Name{" "}
-                        <small className="text-danger">
-                          {formErrors?.name?.message}
-                        </small>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="Name"
-                        {...register("name", { required: "Name is required" })}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+        <Form.Group className="mb-field">
+          <Form.Label>
+            Email{" "}
+            <small className="text-danger">{formErrors?.email?.message}</small>
+          </Form.Label>
+          <Form.Control
+            placeholder="Email"
+            type="email"
+            {...register("email", { required: "Email is required" })}
+          />
+        </Form.Group>
 
-                {/* Email */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Email{" "}
-                        <small className="text-danger">
-                          {formErrors?.email?.message}
-                        </small>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="Email"
-                        type="email"
-                        {...register("email", {
-                          required: "Email is required",
-                        })}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+        <Form.Group className="mb-field">
+          <Form.Label>
+            Role{" "}
+            <small className="text-danger">
+              {formErrors?.role_id?.message}
+            </small>
+          </Form.Label>
+          <Controller
+            name="role_id"
+            control={control}
+            rules={{ required: "Role is required" }}
+            render={({ field }) => (
+              <Select
+                options={rolesData}
+                placeholder="Select Role"
+                isClearable
+                onChange={(selected) =>
+                  field.onChange(selected ? Number(selected.value) : null)
+                }
+                value={
+                  rolesData.find((r) => r.value === field.value) || null
+                }
+              />
+            )}
+          />
+        </Form.Group>
 
-                {/* Role Dropdown */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Role{" "}
-                        <small className="text-danger">
-                          {formErrors?.role_id?.message}
-                        </small>
-                      </Form.Label>
+        <Form.Group className="mb-field">
+          <Form.Label>
+            Mobile Number{" "}
+            <small className="text-danger">
+              {formErrors?.mobile_number?.message}
+            </small>
+          </Form.Label>
+          <Form.Control
+            placeholder="Mobile Number"
+            {...register("mobile_number", {
+              required: "Mobile number is required",
+            })}
+          />
+        </Form.Group>
 
-                      <Controller
-                        name="role_id"
-                        control={control}
-                        rules={{ required: "Role is required" }}
-                        render={({ field }) => (
-                          <Select
-                            options={rolesData}
-                            placeholder="Select Role"
-                            isClearable
-                            onChange={(selected) =>
-                              field.onChange(
-                                selected ? Number(selected.value) : null
-                              )
-                            }
-                            value={
-                              rolesData.find(
-                                (r) => r.value === field.value
-                              ) || null
-                            }
-                          />
-                        )}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Mobile */}
-                <Row>
-                  <Col md="12">
-                    <Form.Group>
-                      <Form.Label>
-                        Mobile Number{" "}
-                        <small className="text-danger">
-                          {formErrors?.mobile_number?.message}
-                        </small>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="Mobile Number"
-                        {...register("mobile_number", {
-                          required: "Mobile number is required",
-                        })}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                {/* Submit */}
-                <Button className="mt-3" type="submit" variant="info">
-                  Update
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+        <AdminButton type="submit">Update</AdminButton>
+      </Form>
+    </FormShell>
   );
 }
 

@@ -8,25 +8,27 @@ export default function Paginate({
   onPageChange,
 }) {
   return (
-    <ReactPaginate
-      breakLabel="..."
-      nextLabel="►"
-      breakClassName="btn"
-      breakLinkClassName="btn mx-1 "
-      containerClassName=" pagination justify-content-center d-flex list-unstyled "
-      pageClassName=" mx-1 "
-      pageLinkClassName="btn mx-1 text-dark rounded-1 shadow-lg border-0 "
-      previousClassName="  border-0"
-      previousLinkClassName="btn text-dark border-0 "
-      nextClassName=""
-      nextLinkClassName="btn border-0  text-dark "
-      activeClassName=" custom_background_color rounded-1 text-white border-0"
-      onPageChange={onPageChange}
-      pageRangeDisplayed={pageRangeDisplayed}
-      pageCount={pageCount}
-      previousLabel="◄"
-      renderOnZeroPageCount={null}
-      forcePage={forcePage}
-    />
+    <div className="admin-pagination">
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="›"
+        previousLabel="‹"
+        breakClassName="page-item"
+        breakLinkClassName="page-link"
+        containerClassName="pagination justify-content-center d-flex list-unstyled mb-0"
+        pageClassName="page-item mx-1"
+        pageLinkClassName="page-link"
+        previousClassName="page-item"
+        previousLinkClassName="page-link"
+        nextClassName="page-item"
+        nextLinkClassName="page-link"
+        activeClassName="active"
+        onPageChange={onPageChange}
+        pageRangeDisplayed={pageRangeDisplayed}
+        pageCount={pageCount}
+        renderOnZeroPageCount={null}
+        forcePage={forcePage}
+      />
+    </div>
   );
 }

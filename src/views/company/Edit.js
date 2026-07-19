@@ -1,24 +1,12 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm, Controller } from "react-hook-form";
 import useFetch from "use-http";
-import AppDataContext from "contexts/AppDataContext";
 import Select from "react-select";
 import defaultLogo from "assets/img/jameen-logo.png";
-
-// react-bootstrap components
-import {
-  Badge,
-  Button,
-  Card,
-  Form,
-  Navbar,
-  Nav,
-  Container,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import { FormShell, AdminButton } from "components/ui";
 
 function Edit() {
   const {
@@ -31,13 +19,12 @@ function Edit() {
   } = useForm();
 
   const { id } = useParams();
-  const { get, put, response, loading, error } = useFetch();
-  const appData = useContext(AppDataContext);
+  const { get, put, response } = useFetch();
   const navigate = useNavigate();
   const [companyData, setCompanyData] = useState({});
   const [country_array, setCountry_array] = useState([]);
-
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+
   useEffect(() => {
     loadComapny();
     async function loadSubscriptionPlans() {
@@ -72,7 +59,6 @@ function Edit() {
 
   async function loadComapny() {
     const api = await get(`/v1/platform_admin/companies/${id}`);
-    console.log(api);
     if (response.ok) {
       setCompanyData(api.data || {});
       setValue("name", api.data.name);
@@ -103,182 +89,119 @@ function Edit() {
         })()
       : { company: companyFields };
 
-    const api = await put(`/v1/platform_admin/companies/${id}`, body);
+    await put(`/v1/platform_admin/companies/${id}`, body);
     if (response.ok) {
       navigate("/companies");
       toast.success("Company edited successfully");
+    } else if (response.status === 422 && response.data?.errors) {
+      Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+        if (Array.isArray(fieldErrors) && fieldErrors.length) {
+          setError(field, { type: "server", message: fieldErrors[0] });
+        }
+      });
     } else {
-      if (response.status === 422 && response.data?.errors) {
-        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
-          if (Array.isArray(fieldErrors) && fieldErrors.length) {
-            setError(field, { type: "server", message: fieldErrors[0] });
-          }
-        });
-      } else {
-        toast.error(response.data?.message);
-      }
+      toast.error(response.data?.message);
     }
   }
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col md="12">
-            <Card>
-              <Card.Header>
-                <Row>
-                  <Col md="6">
-                    <Card.Title as="h4">Edit Company</Card.Title>
-                  </Col>
-                  <Col md="6" className="text-right">
-                    <Button variant="info" onClick={handleGoBack}>
-                      Go Back
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Header>
+    <FormShell
+      title="Edit Company"
+      subtitle="Update company details, branding, and plan assignment."
+      onBack={() => navigate(-1)}
+    >
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Group className="mb-field">
+          <Form.Label>Company Logo</Form.Label>
+          <div className="admin-form-preview">
+            <img
+              src={companyData?.logo_url || defaultLogo}
+              alt={companyData?.name || "Company logo"}
+            />
+          </div>
+          <Form.Control
+            type="file"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+            isInvalid={!!errors.logo}
+            {...register("logo")}
+          />
+          <Form.Text>Upload JPG or PNG to replace logo.</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {errors.logo?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-              <Card.Body>
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Company Logo</label>
-                        <div className="mb-2">
-                          <img
-                            src={companyData?.logo_url || defaultLogo}
-                            alt={companyData?.name || "Company logo"}
-                            style={{
-                              width: "80px",
-                              height: "80px",
-                              objectFit: "cover",
-                              borderRadius: "6px",
-                            }}
-                          />
-                        </div>
-                        <Form.Control
-                          type="file"
-                          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-                          isInvalid={!!errors.logo}
-                          {...register("logo")}
-                        />
-                        <Form.Text className="text-muted">
-                          Upload JPG or PNG to replace logo.
-                        </Form.Text>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.logo?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Name</label>
-                        <Form.Control
-                          placeholder="Company Name"
-                          type="text"
-                          isInvalid={!!errors.name}
-                          {...register("name")}
-                        ></Form.Control>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.name?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Identifier (No space, No special letter)</label>
-                        <Form.Control
-                          placeholder="Identifier"
-                          type="text"
-                          isInvalid={!!errors.slug}
-                          {...register("slug")}
-                        ></Form.Control>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.slug?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1 mt-3" md="12">
-                      <Form.Group>
-                        <label>Subscription</label>
+        <Form.Group className="mb-field">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            placeholder="Company Name"
+            type="text"
+            isInvalid={!!errors.name}
+            {...register("name")}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.name?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-                        <Controller
-                          name="subscription_id"
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={subscriptionPlans}
-                              value={subscriptionPlans.find(
-                                (c) => c.value === field.value
-                              )}
-                              onChange={(val) => field.onChange(val.value)}
-                              placeholder=" Select Subscription"
-                            />
-                          )}
-                          control={control}
-                        />
-                        {errors.subscription_id && (
-                          <div className="text-danger mt-1">
-                            {errors.subscription_id.message}
-                          </div>
-                        )}
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1 mt-3" md="12">
-                      <Form.Group>
-                        <label>Country</label>
+        <Form.Group className="mb-field">
+          <Form.Label>Identifier</Form.Label>
+          <Form.Control
+            placeholder="Identifier"
+            type="text"
+            isInvalid={!!errors.slug}
+            {...register("slug")}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.slug?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-                        <Controller
-                          name="country_id"
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={country_array}
-                              value={country_array.find(
-                                (c) => c.value === field.value
-                              )}
-                              onChange={(val) => field.onChange(val.value)}
-                            />
-                          )}
-                          control={control}
-                          placeholder="Role"
-                        />
-                        {errors.country_id && (
-                          <div className="text-danger mt-1">
-                            {errors.country_id.message}
-                          </div>
-                        )}
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Button
-                    className="btn custom_theme_button"
-                    type="submit"
-                    variant="info"
-                  >
-                    Update
-                  </Button>
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+        <Form.Group className="mb-field">
+          <Form.Label>Subscription</Form.Label>
+          <Controller
+            name="subscription_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={subscriptionPlans}
+                value={subscriptionPlans.find((c) => c.value === field.value)}
+                onChange={(val) => field.onChange(val.value)}
+                placeholder="Select subscription"
+              />
+            )}
+          />
+          {errors.subscription_id ? (
+            <div className="text-danger mt-1">
+              {errors.subscription_id.message}
+            </div>
+          ) : null}
+        </Form.Group>
+
+        <Form.Group className="mb-field">
+          <Form.Label>Country</Form.Label>
+          <Controller
+            name="country_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={country_array}
+                value={country_array.find((c) => c.value === field.value)}
+                onChange={(val) => field.onChange(val.value)}
+                placeholder="Select country"
+              />
+            )}
+          />
+          {errors.country_id ? (
+            <div className="text-danger mt-1">{errors.country_id.message}</div>
+          ) : null}
+        </Form.Group>
+
+        <AdminButton type="submit">Update</AdminButton>
+      </Form>
+    </FormShell>
   );
 }
 

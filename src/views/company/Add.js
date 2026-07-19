@@ -4,22 +4,19 @@ import useFetch from "use-http";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import Select from "react-select";
-
-import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import { FormShell, AdminButton } from "components/ui";
 
 function Add() {
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     control,
     setError,
     formState: { errors },
   } = useForm();
 
   const { get, post, response } = useFetch();
-  const [companyData, setCompanyData] = useState({});
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [country_array, setCountry_array] = useState([]);
   const navigate = useNavigate();
@@ -37,7 +34,6 @@ function Add() {
       }
     }
     loadCountry();
-
     loadSubscriptionPlans();
   }, [get, response]);
 
@@ -77,176 +73,113 @@ function Add() {
         })()
       : { company: companyFields };
 
-    const api = await post(`/v1/platform_admin/companies`, body);
+    await post(`/v1/platform_admin/companies`, body);
     if (response.ok) {
       navigate("/companies");
       toast.success("Successfully Created");
+    } else if (response.status === 422 && response.data?.errors) {
+      Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
+        if (Array.isArray(fieldErrors) && fieldErrors.length) {
+          setError(field, { type: "server", message: fieldErrors[0] });
+        }
+      });
     } else {
-      if (response.status === 422 && response.data?.errors) {
-        Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
-          if (Array.isArray(fieldErrors) && fieldErrors.length) {
-            setError(field, { type: "server", message: fieldErrors[0] });
-          }
-        });
-      } else {
-        toast.error(response.data?.message);
-      }
+      toast.error(response.data?.message);
     }
   }
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   return (
-    <>
-      <Container fluid>
-        <Row className="mt-3 ">
-          <Col md="12">
-            <Card>
-              <Card.Header>
-                <Row>
-                  <Col md="6">
-                    <Card.Title as="h4">Add Company</Card.Title>
-                  </Col>
-                  <Col md="6" className="text-right ">
-                    <Button
-                      variant="info"
-                      className="rounded-0"
-                      onClick={handleGoBack}
-                    >
-                      Go Back
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Header>
-              <Card.Body>
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <Form.Label>Logo</Form.Label>
-                        <Form.Control
-                          type="file"
-                          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-                          isInvalid={!!errors.logo}
-                          {...register("logo")}
-                        />
-                        <Form.Text className="text-muted">
-                          JPG or PNG
-                        </Form.Text>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.logo?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Name</label>
-                        <Form.Control
-                          defaultValue={companyData.name}
-                          placeholder="User Name"
-                          type="text"
-                          isInvalid={!!errors.name}
-                          {...register("name")}
-                        ></Form.Control>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.name?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Identifier</label>
-                        <Form.Control
-                          defaultValue={companyData.slug}
-                          placeholder="slug"
-                          type="text"
-                          isInvalid={!!errors.slug}
-                          {...register("slug")}
-                        ></Form.Control>
-                        <Form.Control.Feedback type="invalid">
-                          {errors.slug?.message}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+    <FormShell
+      title="Add Company"
+      subtitle="Create a new tenant company with plan and country settings."
+      onBack={() => navigate(-1)}
+    >
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Group className="mb-field">
+          <Form.Label>Logo</Form.Label>
+          <Form.Control
+            type="file"
+            accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+            isInvalid={!!errors.logo}
+            {...register("logo")}
+          />
+          <Form.Text>JPG or PNG</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {errors.logo?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-                  <Row>
-                    <Col className="pr-1 mt-3" md="12">
-                      <Form.Group>
-                        <label>Subscription</label>
+        <Form.Group className="mb-field">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            placeholder="Company name"
+            type="text"
+            isInvalid={!!errors.name}
+            {...register("name")}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.name?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-                        <Controller
-                          name="subscription_id"
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={subscriptionPlans}
-                              value={subscriptionPlans.find(
-                                (c) => c.value === field.value
-                              )}
-                              onChange={(val) => field.onChange(val.value)}
-                              placeholder=" Select Subscription"
-                            />
-                          )}
-                          control={control}
-                        />
-                        {errors.subscription_id && (
-                          <div className="text-danger mt-1">
-                            {errors.subscription_id.message}
-                          </div>
-                        )}
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1 mt-3" md="12">
-                      <Form.Group>
-                        <label>Country</label>
+        <Form.Group className="mb-field">
+          <Form.Label>Identifier</Form.Label>
+          <Form.Control
+            placeholder="slug"
+            type="text"
+            isInvalid={!!errors.slug}
+            {...register("slug")}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.slug?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-                        <Controller
-                          name="country_id"
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={country_array}
-                              value={country_array.find(
-                                (c) => c.value === field.value
-                              )}
-                              onChange={(val) => field.onChange(val.value)}
-                            />
-                          )}
-                          control={control}
-                          placeholder="Role"
-                        />
-                        {errors.country_id && (
-                          <div className="text-danger mt-1">
-                            {errors.country_id.message}
-                          </div>
-                        )}
-                      </Form.Group>
-                    </Col>
-                  </Row>
+        <Form.Group className="mb-field">
+          <Form.Label>Subscription</Form.Label>
+          <Controller
+            name="subscription_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={subscriptionPlans}
+                value={subscriptionPlans.find((c) => c.value === field.value)}
+                onChange={(val) => field.onChange(val.value)}
+                placeholder="Select subscription"
+              />
+            )}
+          />
+          {errors.subscription_id ? (
+            <div className="text-danger mt-1">
+              {errors.subscription_id.message}
+            </div>
+          ) : null}
+        </Form.Group>
 
-                  <Button
-                    className="rounded-0 btn-fill mt-3"
-                    type="submit"
-                    variant="info"
-                  >
-                    Add Company
-                  </Button>
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+        <Form.Group className="mb-field">
+          <Form.Label>Country</Form.Label>
+          <Controller
+            name="country_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={country_array}
+                value={country_array.find((c) => c.value === field.value)}
+                onChange={(val) => field.onChange(val.value)}
+                placeholder="Select country"
+              />
+            )}
+          />
+          {errors.country_id ? (
+            <div className="text-danger mt-1">{errors.country_id.message}</div>
+          ) : null}
+        </Form.Group>
+
+        <AdminButton type="submit">Add Company</AdminButton>
+      </Form>
+    </FormShell>
   );
 }
 

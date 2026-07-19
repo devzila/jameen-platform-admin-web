@@ -2,15 +2,32 @@ import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
-import { Dropdown, Badge } from "react-bootstrap";
-import { Card, Container, Row, Col } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
-import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
-import CIcon from "@coreui/icons-react";
-import { freeSet } from "@coreui/icons";
 import dateFormat from "../../utilities/DateFormat";
 import defaultLogo from "assets/img/jameen-logo.png";
+import {
+  PageShell,
+  PageHeader,
+  ContentCard,
+  SearchInput,
+  AdminButton,
+  DataTable,
+  EmptyState,
+  StatusBadge,
+  EntityCell,
+} from "components/ui";
+
+const COLUMNS = [
+  { key: "company", label: "Company" },
+  { key: "identifier", label: "Identifier" },
+  { key: "country", label: "Country" },
+  { key: "subscription", label: "Subscription" },
+  { key: "status", label: "Status" },
+  { key: "created", label: "Created" },
+  { key: "action", label: "Action" },
+];
 
 function Index() {
   const [companies, setCompanies] = useState([]);
@@ -21,11 +38,6 @@ function Index() {
   const { get, post, loading } = useFetch();
   const navigate = useNavigate();
 
-  const addCompany = () => {
-    navigate(`/companies/add`);
-  };
-
-  // ✅ Load Companies
   const loadInitialCompanies = async () => {
     let endpoint = `/v1/platform_admin/companies?page=${currentPage}`;
 
@@ -35,7 +47,6 @@ function Index() {
 
     try {
       const data = await get(endpoint);
-
       setCompanies(data?.data || []);
       setPagination(data?.pagination || {});
 
@@ -59,24 +70,20 @@ function Index() {
     setCurrentPage(e.selected + 1);
   };
 
-  // ✅ Toggle Status (FIXED)
   const toggleCompanyStatus = async (company) => {
     const action = company.active ? "deactivate" : "activate";
 
-    if (!window.confirm(`Are you sure you want to ${action} this company?`)) return;
-
-    const endpoint = `/v1/platform_admin/companies/${company.id}/${action}`;
+    if (!window.confirm(`Are you sure you want to ${action} this company?`)) {
+      return;
+    }
 
     try {
-      await post(endpoint);
-
-      // ✅ Instant UI update (no reload)
+      await post(`/v1/platform_admin/companies/${company.id}/${action}`);
       setCompanies((prev) =>
         prev.map((c) =>
           c.id === company.id ? { ...c, active: !c.active } : c
         )
       );
-
     } catch (err) {
       console.error("Status update failed:", err);
       alert("Something went wrong!");
@@ -84,172 +91,112 @@ function Index() {
   };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col md="12">
-          <Card>
-            <CNavbar expand="lg" className="bg-white">
-              <CContainer fluid>
-                <CNavbarBrand>Companies</CNavbarBrand>
-
-                <div className="d-flex justify-content-end">
-                  <div className="d-flex align-items-center">
-                    <input
-                      value={searchKeyword}
-                      onChange={(e) => {
-                        setCurrentPage(1);
-                        setSearchKeyword(e.target.value);
-                      }}
-                      className="form-control"
-                      type="search"
-                      placeholder="Search company..."
-                    />
-
-                    <button
-                      onClick={loadInitialCompanies}
-                      className="btn btn-outline-success"
-                    >
-                      <CIcon icon={freeSet.cilSearch} />
-                    </button>
-                  </div>
-
-                  <button
-                    className="btn btn-primary mx-2"
-                    onClick={addCompany}
-                  >
-                    Add Company
-                  </button>
-                </div>
-              </CContainer>
-            </CNavbar>
-
-            <Card.Body className="table-responsive">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Logo</th>
-                    <th>Name</th>
-                    <th>Identifier</th>
-                    <th>Country</th>
-                    <th>Subscription</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-
-                {loading ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan="8">
-                        <Loader />
-                      </td>
-                    </tr>
-                  </tbody>
-                ) : (
-                  <tbody>
-                    {companies.length > 0 ? (
-                      companies.map((company) => (
-                        <tr key={company.id}>
-                          <td>
-                            <img
-                              src={company.logo_url || defaultLogo}
-                              alt={company.name || "Company logo"}
-                              width={20}
-                              height={20}
-                              style={{
-                                width: "20px",
-                                height: "20px",
-                                objectFit: "cover",
-                                borderRadius: "2px",
-                              }}
-                            />
-                          </td>
-                          <td>{company.name}</td>
-                          <td>{company.slug}</td>
-                          <td>{company.country?.name_en}</td>
-                          <td>{company.subscription?.name}</td>
-
-                          {/* ✅ Status */}
-                          <td>
-                            {company.active ? (
-                              <Badge bg="success">Active</Badge>
-                            ) : (
-                              <Badge bg="secondary">Inactive</Badge>
-                            )}
-                          </td>
-
-                          <td>{dateFormat(company.created_at?.substring(0, 10))}</td>
-
-                          {/* ✅ Actions */}
-                          <td>
-                            <Dropdown>
-                              <Dropdown.Toggle variant="light" size="sm">
-                                <BsThreeDots />
-                              </Dropdown.Toggle>
-
-                              <Dropdown.Menu>
-                                <Dropdown.Item
-                                  as={NavLink}
-                                  to={`/companies/${company.id}/edit`}
-                                >
-                                  Edit
-                                </Dropdown.Item>
-
-                                <Dropdown.Item
-                                  as={NavLink}
-                                  to={`/companies/${company.id}/users`}
-                                >
-                                  Users
-                                </Dropdown.Item>
-
-                                <Dropdown.Item
-                                  as={NavLink}
-                                  to={`/companies/${company.id}`}
-                                >
-                                  Show
-                                </Dropdown.Item>
-
-                                <Dropdown.Divider />
-
-                                <Dropdown.Item
-                                  onClick={() => toggleCompanyStatus(company)}
-                                >
-                                  {company.active ? "Deactivate" : "Activate"}
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="8" className="text-center">
-                          No companies found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                )}
-              </table>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* ✅ Pagination */}
-      {pagination && (
-        <Row className="mt-3">
-          <Col className="d-flex justify-content-center">
-            <Paginate
-              onPageChange={handlePageClick}
-              pageCount={pagination.total_pages || 1}
-              forcePage={currentPage - 1}
+    <PageShell>
+      <PageHeader
+        title="Companies"
+        subtitle="Manage tenant companies, subscriptions, and access."
+        actions={
+          <>
+            <SearchInput
+              value={searchKeyword}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setSearchKeyword(e.target.value);
+              }}
+              onSearch={loadInitialCompanies}
+              placeholder="Search company..."
             />
-          </Col>
-        </Row>
-      )}
-    </Container>
+            <AdminButton onClick={() => navigate("/companies/add")}>
+              Add Company
+            </AdminButton>
+          </>
+        }
+      />
+
+      <ContentCard flush>
+        <DataTable
+          columns={COLUMNS}
+          loading={loading ? <Loader /> : null}
+          colSpan={COLUMNS.length}
+          empty={
+            <EmptyState
+              colSpan={COLUMNS.length}
+              title="No companies found"
+              text="Create a company or refine your search."
+            />
+          }
+        >
+          {companies.length > 0
+            ? companies.map((company) => (
+                <tr key={company.id}>
+                  <td>
+                    <EntityCell
+                      image={company.logo_url || defaultLogo}
+                      title={company.name}
+                      subtitle={company.slug}
+                    />
+                  </td>
+                  <td className="cell-muted">{company.slug}</td>
+                  <td>{company.country?.name_en || "-"}</td>
+                  <td>{company.subscription?.name || "-"}</td>
+                  <td>
+                    <StatusBadge
+                      active={!!company.active}
+                      label={company.active ? "Active" : "Inactive"}
+                    />
+                  </td>
+                  <td className="cell-muted">
+                    {company.created_at
+                      ? dateFormat(company.created_at.substring(0, 10))
+                      : "-"}
+                  </td>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="light" size="sm">
+                        <BsThreeDots />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/companies/${company.id}/edit`}
+                        >
+                          Edit
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/companies/${company.id}/users`}
+                        >
+                          Users
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/companies/${company.id}`}
+                        >
+                          Show
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item
+                          onClick={() => toggleCompanyStatus(company)}
+                        >
+                          {company.active ? "Deactivate" : "Activate"}
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            : null}
+        </DataTable>
+      </ContentCard>
+
+      {pagination?.total_pages > 0 ? (
+        <Paginate
+          onPageChange={handlePageClick}
+          pageCount={pagination.total_pages || 1}
+          forcePage={currentPage - 1}
+        />
+      ) : null}
+    </PageShell>
   );
 }
 

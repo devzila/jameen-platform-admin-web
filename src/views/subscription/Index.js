@@ -4,28 +4,41 @@ import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
-import { Button, Card, Table, Container, Row, Col } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
-import { CNavbar, CContainer, CNavbarBrand, CCard } from "@coreui/react";
-import CIcon from "@coreui/icons-react";
-import { freeSet } from "@coreui/icons";
 import dateFormat from "../../utilities/DateFormat";
+import {
+  PageShell,
+  PageHeader,
+  ContentCard,
+  SearchInput,
+  AdminButton,
+  DataTable,
+  EmptyState,
+} from "components/ui";
+
+const COLUMNS = [
+  { key: "name", label: "Name" },
+  { key: "units", label: "Max units" },
+  { key: "compounds", label: "Max compounds" },
+  { key: "created", label: "Created" },
+  { key: "action", label: "Action" },
+];
 
 function Index() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [pagination, setPagination] = useState(null);
-  const [searchKeyword, setSearchKeyword] = useState(null);
-
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const { get, response, loading, error } = useFetch();
-  useEffect(() => {
-    loadInitialSubscriptions();
-  }, [currentPage]);
+  const { get, response, loading } = useFetch();
   const navigate = useNavigate();
-  const addSubscription = () => {
-    navigate(`/subscriptions/add`);
-  };
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      loadInitialSubscriptions();
+    }, 300);
+    return () => clearTimeout(delay);
+  }, [currentPage, searchKeyword]);
 
   async function loadInitialSubscriptions() {
     let endpoint = `/v1/platform_admin/subscriptions?page=${currentPage}`;
@@ -33,11 +46,11 @@ function Index() {
     if (searchKeyword) {
       endpoint += `&q[name_cont]=${searchKeyword}`;
     }
-    let initialSubscriptions = await get(endpoint);
+    const initialSubscriptions = await get(endpoint);
 
     if (response.ok) {
-      setSubscriptions(initialSubscriptions.data);
-      setPagination(initialSubscriptions.pagination);
+      setSubscriptions(initialSubscriptions.data || []);
+      setPagination(initialSubscriptions.pagination || null);
     }
   }
 
@@ -46,121 +59,97 @@ function Index() {
   }
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col md="12">
-            <Card className="strpied-tabled-with-hover">
-              <CNavbar expand="lg" colorScheme="light" className="bg-white">
-                <CContainer fluid>
-                  <CNavbarBrand href="#">Subscriptions </CNavbarBrand>
+    <PageShell>
+      <PageHeader
+        title="Subscriptions"
+        subtitle="Define plans and capacity limits for tenant companies."
+        actions={
+          <>
+            <SearchInput
+              value={searchKeyword}
+              onChange={(e) => {
+                setSearchKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              onSearch={loadInitialSubscriptions}
+              placeholder="Search subscriptions..."
+            />
+            <AdminButton onClick={() => navigate("/subscriptions/add")}>
+              Add Subscription
+            </AdminButton>
+          </>
+        }
+      />
 
-                  <div className="d-flex justify-content-end">
-                    <div className="d-flex align-items-center" role="search">
-                      <input
-                        onChange={(e) => setSearchKeyword(e.target.value)}
-                        onReset={loadInitialSubscriptions}
-                        className="form-control  custom_input"
-                        type="search"
-                        placeholder="Search"
-                        aria-label="Search"
-                      />
-                      <div>
-                        <button
-                          onClick={loadInitialSubscriptions}
-                          className="btn btn-outline-success custom_search_button"
-                          type="submit"
+      <ContentCard flush>
+        <DataTable
+          columns={COLUMNS}
+          loading={loading && !subscriptions.length ? <Loader /> : null}
+          colSpan={COLUMNS.length}
+          empty={
+            <EmptyState
+              colSpan={COLUMNS.length}
+              title="No subscriptions found"
+              text="Create a subscription plan to get started."
+            />
+          }
+        >
+          {subscriptions.length > 0
+            ? subscriptions.map((subscription) => (
+                <tr key={subscription.id}>
+                  <td>
+                    <div className="cell-title">{subscription.name}</div>
+                  </td>
+                  <td className="cell-muted">
+                    {subscription.max_no_of_units}
+                  </td>
+                  <td className="cell-muted">
+                    {subscription.max_no_of_compounds}
+                  </td>
+                  <td className="cell-muted">
+                    {subscription.created_at
+                      ? dateFormat(subscription.created_at.substring(0, 10))
+                      : "-"}
+                  </td>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        as={CustomDivToggle}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <BsThreeDots />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/subscriptions/${subscription.id}/edit`}
                         >
-                          <CIcon icon={freeSet.cilSearch} />
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      className="custom_theme_button btn"
-                      onClick={addSubscription}
-                    >
-                      Add Subscription
-                    </button>
-                  </div>
-                </CContainer>
-              </CNavbar>
+                          Edit
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/subscriptions/${subscription.id}`}
+                        >
+                          Show
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            : null}
+        </DataTable>
+      </ContentCard>
 
-              <Card.Body className="table-full-width table-responsive px-0">
-                <Table className="table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="border-0">Name</th>
-                      <th className="border-0"> Max no of units</th>
-                      <th className="border-0"> Max Compounds</th>
-                      <th className="border-0">Crated At</th>
-                      <th className="border-0">Action</th>
-                    </tr>
-                  </thead>
-                  {loading ? (
-                    <Loader />
-                  ) : (
-                    <tbody>
-                      {subscriptions?.map((subscription) => {
-                          console.log(subscription.created_at.substring(0, 10));
-                      return (
-                        <tr key={subscription.id}>
-                          <td>{subscription.name}</td>
-                          <td>{subscription.max_no_of_units}</td>
-                          <td>{subscription.max_no_of_compounds}</td>
-                          <td>{dateFormat(subscription.created_at.substring(0, 10))}</td>
-                          <td>
-                            <Dropdown key={subscription.id}>
-                              <Dropdown.Toggle
-                                as={CustomDivToggle}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <BsThreeDots />
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item>
-                                  <NavLink
-                                    key={`edit-${subscription.id}`}
-                                    to={`/subscriptions/${subscription.id}/edit`}
-                                  >
-                                    Edit
-                                  </NavLink>
-                                </Dropdown.Item>
-                                <Dropdown.Item>
-                                  <NavLink
-                                    key={`show-${subscription.id}`}
-                                    to={`/subscriptions/${subscription.id}`}
-                                  >
-                                    Show
-                                  </NavLink>
-                                </Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </td>
-                        </tr>
-                      )})}
-                    </tbody>
-                  )}
-                </Table>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col md="12">
-            {pagination?.total_pages > 1 ? (
-              <Paginate
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={pagination.per_page}
-                pageCount={pagination.total_pages}
-                forcePage={currentPage - 1}
-              />
-            ) : (
-              <br />
-            )}
-          </Col>
-        </Row>
-      </Container>
-    </>
+      {pagination?.total_pages > 1 ? (
+        <Paginate
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={pagination.per_page}
+          pageCount={pagination.total_pages}
+          forcePage={currentPage - 1}
+        />
+      ) : null}
+    </PageShell>
   );
 }
 

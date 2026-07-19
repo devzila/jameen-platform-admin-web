@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "use-http";
-
-// react-bootstrap components
-import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 import { formatdate } from "services/utility_functions";
+import { FormShell, DetailList } from "components/ui";
 
 function Show() {
   const { companyId, userId } = useParams();
   const [user, setUser] = useState({});
-  const { get, response, loading, error } = useFetch();
+  const { get, response } = useFetch();
   const navigate = useNavigate();
+
   useEffect(() => {
     loadUser();
   }, []);
@@ -24,72 +23,21 @@ function Show() {
     }
   }
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col md="12">
-            <Card>
-              <Card.Header>
-                <Row>
-                  <Col md="6">
-                    <Card.Title as="h4">User Show</Card.Title>
-                  </Col>
-                  <Col md="6" className="text-right">
-                    <Button variant="info" onClick={handleGoBack}>
-                      Go Back
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Header>
-              <Card.Body>
-                <Form>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label className="col-2 fw-bold">Name</label>
-                        <span >:{user.name}</span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label className="col-2 fw-bold">Email</label>
-                        <span>:{user.email} </span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label className="col-2 fw-bold">PhoneNumber</label>
-                        <span>:{user.mobile_number} </span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-              
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label className="col-2 fw-bold">Created At</label>
-                        <span>:{formatdate(user.created_at)} </span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <FormShell
+      title="User details"
+      subtitle="Read-only view of the selected user."
+      onBack={() => navigate(-1)}
+    >
+      <DetailList
+        items={[
+          { label: "Name", value: user.name },
+          { label: "Email", value: user.email },
+          { label: "Phone", value: user.mobile_number },
+          { label: "Created at", value: formatdate(user.created_at) },
+        ]}
+      />
+    </FormShell>
   );
 }
 

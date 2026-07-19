@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "use-http";
-
-// react-bootstrap components
-import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 import { formatdate } from "services/utility_functions";
+import { FormShell, DetailList } from "components/ui";
 
 function Show() {
   const { id } = useParams();
   const [subscription, setSubscription] = useState({});
-  const { get, response, loading, error } = useFetch();
+  const { get, response } = useFetch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,62 +21,21 @@ function Show() {
     }
   }
 
-  const goBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col md="12">
-            <Card>
-              <Card.Body>
-                <Form>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Name:</label>
-                        <span>{subscription.name}</span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>max_no_of_units </label>
-                        <span>{subscription.max_no_of_units}</span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>max_no_of_compounds </label>
-                        <span>{subscription.max_no_of_compounds}</span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="12">
-                      <Form.Group>
-                        <label>Created_at:</label>
-                        <span>{formatdate(subscription.created_at)}</span>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Button className="btn-fill pull-right" variant="info" onClick={goBack}>
-          Go Back
-        </Button>
-      </Container>
-    </>
+    <FormShell
+      title="Subscription details"
+      subtitle="Read-only view of the selected subscription plan."
+      onBack={() => navigate(-1)}
+    >
+      <DetailList
+        items={[
+          { label: "Name", value: subscription.name },
+          { label: "Max units", value: subscription.max_no_of_units },
+          { label: "Max compounds", value: subscription.max_no_of_compounds },
+          { label: "Created at", value: formatdate(subscription.created_at) },
+        ]}
+      />
+    </FormShell>
   );
 }
 

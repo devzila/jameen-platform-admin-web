@@ -61,10 +61,10 @@ function InvoiceRunHistory() {
   };
 
   return (
-    <Container fluid>
+    <Container fluid className="admin-page">
       <Row>
         <Col md="12">
-          <Card>
+          <Card className="admin-card border-0">
             {/* NAVBAR */}
             <Nav className="invoice-tabs">
               <Nav.Item>
@@ -102,11 +102,11 @@ function InvoiceRunHistory() {
             <Card.Header>
               <Row className="align-items-center">
                 <Col md="6">
-                  <Card.Title as="h4">
+                  <Card.Title as="h4" className="mb-1">
                     Scheduled Invoice Run
                   </Card.Title>
 
-                  <p className="card-category">
+                  <p className="card-category mb-0" style={{ color: 'var(--admin-text-muted)' }}>
                     {runs.length} total records
                   </p>
                 </Col>
@@ -116,7 +116,7 @@ function InvoiceRunHistory() {
                   className="text-right"
                 >
                   <Form.Group
-                    className="company-filter"
+                    className="company-filter admin-field mb-0"
                   >
                     <Form.Control
                       as="select"

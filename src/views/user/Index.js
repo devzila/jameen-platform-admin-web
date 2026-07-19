@@ -2,13 +2,31 @@ import React, { useState, useEffect } from "react";
 import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
-import { Dropdown, Modal, Button } from "react-bootstrap";
+import { Dropdown, Modal } from "react-bootstrap";
 import CustomDivToggle from "components/CustomDivToggle";
 import CIcon from "@coreui/icons-react";
 import { freeSet } from "@coreui/icons";
 import { NavLink, useNavigate, useParams, Link } from "react-router-dom";
 import Loader from "components/Loader";
 import defaultAvatar from "assets/img/jameen-logo.png";
+import {
+  PageShell,
+  PageHeader,
+  ContentCard,
+  SearchInput,
+  AdminButton,
+  DataTable,
+  EmptyState,
+  EntityCell,
+} from "components/ui";
+
+const COLUMNS = [
+  { key: "user", label: "User" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "role", label: "Role" },
+  { key: "action", label: "Action" },
+];
 
 function Index() {
   const { companyId } = useParams();
@@ -27,12 +45,11 @@ function Index() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadInitialusers();
+    const delay = setTimeout(() => {
+      loadInitialusers();
+    }, 300);
+    return () => clearTimeout(delay);
   }, [currentPage, searchKeyword]);
-
-  const addUser = () => {
-    navigate(`/companies/${companyId}/users/add`);
-  };
 
   async function loadInitialusers() {
     let endpoint = `/v1/platform_admin/companies/${companyId}/users?page=${currentPage}`;
@@ -44,8 +61,10 @@ function Index() {
     const initialusers = await get(endpoint);
 
     if (response.ok) {
-      setusers(initialusers.data);
-      setPagination(initialusers.data.pagination);
+      setusers(initialusers.data || []);
+      setPagination(
+        initialusers.pagination || initialusers.data?.pagination || null
+      );
     }
   }
 
@@ -75,136 +94,104 @@ function Index() {
   };
 
   return (
-    <div className="p-3">
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb mb-0 bg-transparent p-0">
-            <li className="breadcrumb-item">
-              <Link to="/companies" className="text-dark text-decoration-none">
-                Companies
-              </Link>
-            </li>
-            <li className="breadcrumb-item active text-dark">Users</li>
-          </ol>
-        </nav>
+    <PageShell>
+      <PageHeader
+        eyebrow={
+          <span>
+            <Link to="/companies" className="theme_color">
+              Companies
+            </Link>
+            {" / Users"}
+          </span>
+        }
+        title="Users"
+        subtitle="Manage company users, roles, and password resets."
+        actions={
+          <>
+            <SearchInput
+              value={searchKeyword}
+              onChange={(e) => {
+                setSearchKeyword(e.target.value);
+                setCurrentPage(1);
+              }}
+              onSearch={loadInitialusers}
+              placeholder="Search users..."
+            />
+            <AdminButton
+              onClick={() => navigate(`/companies/${companyId}/users/add`)}
+            >
+              Add User
+            </AdminButton>
+          </>
+        }
+      />
 
-        <div className="d-flex align-items-center gap-2">
-          <input
-            onChange={(e) => {
-              setSearchKeyword(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="form-control custom_input"
-            type="search"
-            placeholder="Search"
-          />
+      <ContentCard flush>
+        <DataTable
+          columns={COLUMNS}
+          loading={loading && !users.length ? <Loader /> : null}
+          colSpan={COLUMNS.length}
+          empty={
+            <EmptyState
+              colSpan={COLUMNS.length}
+              title="No users found"
+              text="Add a user or try a different search."
+            />
+          }
+        >
+          {users.length > 0
+            ? users.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <EntityCell
+                      round
+                      image={user.avatar_url || user.avatar || defaultAvatar}
+                      title={user.name}
+                      subtitle={user.role?.name}
+                    />
+                  </td>
+                  <td className="cell-muted">{user.email}</td>
+                  <td className="cell-muted">{user.mobile_number || "-"}</td>
+                  <td>{user.role?.name || "-"}</td>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle as={CustomDivToggle}>
+                        <BsThreeDots />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/companies/${companyId}/users/${user.id}/edit`}
+                        >
+                          Edit
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as={NavLink}
+                          to={`/companies/${companyId}/users/${user.id}`}
+                        >
+                          User Show
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => openResetModal(user.id)}>
+                          Reset Password
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            : null}
+        </DataTable>
+      </ContentCard>
 
-          <button
-            onClick={loadInitialusers}
-            className="btn btn-outline-success custom_search_button"
-          >
-            <CIcon icon={freeSet.cilSearch} />
-          </button>
+      {pagination?.total_pages > 1 ? (
+        <Paginate
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={pagination.per_page}
+          pageCount={pagination.total_pages}
+          forcePage={currentPage - 1}
+        />
+      ) : null}
 
-          <button className="custom_theme_button btn" onClick={addUser}>
-            Add User
-          </button>
-        </div>
-      </div>
-
-      <hr className="my-2" />
-
-      {/* TABLE */}
-      <div className="table-responsive bg-white">
-        <table className="table table-striped mb-0">
-          <thead>
-            <tr>
-              <th>Avatar</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone Number</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>
-                  <img
-                    src={user.avatar_url || defaultAvatar}
-                    alt={user.name || "User"}
-                    width={20}
-                    height={20}
-                    style={{
-                      width: "20px",
-                      height: "20px",
-                      objectFit: "cover",
-                      borderRadius: "50%",
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = defaultAvatar;
-                    }}
-                  />
-                </td>
-                <th>{user.name}</th>
-                <td>{user.email}</td>
-                <td>{user.mobile_number}</td>
-                <td>{user.role?.name}</td>
-
-                <td>
-                  <Dropdown>
-                    <Dropdown.Toggle as={CustomDivToggle}>
-                      <BsThreeDots />
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                      <Dropdown.Item
-                        as={NavLink}
-                        to={`/companies/${companyId}/users/${user.id}/edit`}
-                      >
-                        Edit
-                      </Dropdown.Item>
-
-                      <Dropdown.Item
-                        as={NavLink}
-                        to={`/companies/${companyId}/users/${user.id}`}
-                      >
-                        User Show
-                      </Dropdown.Item>
-
-                      <Dropdown.Item
-                        onClick={() => openResetModal(user.id)}
-                      >
-                        Reset Password
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {loading && <Loader />}
-      </div>
-
-      {/* PAGINATION */}
-      <div className="d-flex justify-content-center mt-3">
-        {pagination?.total_pages > 1 && (
-          <Paginate
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={pagination.per_page}
-            pageCount={pagination.total_pages}
-            forcePage={currentPage - 1}
-          />
-        )}
-      </div>
-
-      {/* MODAL */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -220,20 +207,20 @@ function Index() {
                     width: "60px",
                     height: "60px",
                     borderRadius: "50%",
-                    backgroundColor: "#fff3cd",
+                    backgroundColor: "var(--admin-warning-soft)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "0 auto",
+                    color: "var(--admin-warning)",
                   }}
                 >
                   <CIcon icon={freeSet.cilWarning} size="xl" />
                 </div>
               </div>
-
               <h5 className="fw-bold">Confirm Password Reset</h5>
-              <p className="text-muted mt-2">
-                Are you sure you want to reset this user's password?
+              <p className="text-muted mt-2 mb-0">
+                Are you sure you want to reset this user&apos;s password?
               </p>
             </>
           ) : (
@@ -244,21 +231,23 @@ function Index() {
                     width: "60px",
                     height: "60px",
                     borderRadius: "50%",
-                    backgroundColor: "#d1e7dd",
+                    backgroundColor: "var(--admin-success-soft)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "0 auto",
+                    color: "var(--admin-success)",
                   }}
                 >
                   <CIcon icon={freeSet.cilCheckCircle} size="xl" />
                 </div>
               </div>
-
-              <h5 className="fw-bold text-success">Success</h5>
+              <h5 className="fw-bold" style={{ color: "var(--admin-success)" }}>
+                Success
+              </h5>
               <p className="text-muted mt-2">{apiMessage}</p>
               <small className="text-muted">
-                A new password has been sent to the user's email.
+                A new password has been sent to the user&apos;s email.
               </small>
             </>
           )}
@@ -267,35 +256,26 @@ function Index() {
         <Modal.Footer className="border-0 justify-content-center">
           {!resetSuccess ? (
             <>
-              <Button
-                variant="light"
+              <AdminButton
+                variant="secondary"
                 onClick={() => setShowModal(false)}
-                className="px-4"
               >
                 Cancel
-              </Button>
-
-              <Button
+              </AdminButton>
+              <AdminButton
                 variant="danger"
                 onClick={handleResetPassword}
                 disabled={loading}
-                className="px-4"
               >
                 {loading ? "Processing..." : "Yes, Reset"}
-              </Button>
+              </AdminButton>
             </>
           ) : (
-            <Button
-              variant="success"
-              onClick={() => setShowModal(false)}
-              className="px-5"
-            >
-              Close
-            </Button>
+            <AdminButton onClick={() => setShowModal(false)}>Close</AdminButton>
           )}
         </Modal.Footer>
       </Modal>
-    </div>
+    </PageShell>
   );
 }
 

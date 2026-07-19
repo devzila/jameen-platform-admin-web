@@ -3,16 +3,18 @@ import useFetch from "use-http";
 import Paginate from "../../components/Paginate";
 import Loader from "components/Loader";
 import { toast } from "react-toastify";
+import { Form } from "react-bootstrap";
 import {
-  Badge,
-  Button,
-  Card,
-  Container,
-  Row,
-  Col,
-  Form,
-} from "react-bootstrap";
-import { CNavbar, CContainer, CNavbarBrand } from "@coreui/react";
+  PageShell,
+  PageHeader,
+  ContentCard,
+  FilterBar,
+  FilterField,
+  AdminButton,
+  DataTable,
+  EmptyState,
+  StatusBadge,
+} from "components/ui";
 
 const ENTITY_OPTIONS = [
   { value: "", label: "All entities" },
@@ -23,6 +25,17 @@ const ACTIVE_OPTIONS = [
   { value: "true", label: "Active" },
   { value: "false", label: "Revoked" },
   { value: "all", label: "All" },
+];
+
+const COLUMNS = [
+  { key: "user", label: "User" },
+  { key: "company", label: "Company" },
+  { key: "device", label: "Device" },
+  { key: "ip", label: "IP" },
+  { key: "last_used", label: "Last used" },
+  { key: "expires", label: "Expires" },
+  { key: "status", label: "Status" },
+  { key: "action", label: "Action" },
 ];
 
 function formatDateTime(value) {
@@ -73,24 +86,15 @@ function Index() {
     params.set("page", String(currentPage));
     params.set("limit", "20");
 
-    if (companySlug) {
-      params.set("company_slug", companySlug);
-    }
-    if (userId.trim()) {
-      params.set("user_id", userId.trim());
-    }
-    if (entity) {
-      params.set("entity", entity);
-    }
-    if (active) {
-      params.set("active", active);
-    }
+    if (companySlug) params.set("company_slug", companySlug);
+    if (userId.trim()) params.set("user_id", userId.trim());
+    if (entity) params.set("entity", entity);
+    if (active) params.set("active", active);
 
     try {
       const data = await get(
         `/v1/platform_admin/sessions?${params.toString()}`
       );
-
       setSessions(Array.isArray(data?.data) ? data.data : []);
       setPagination(data?.pagination || {});
 
@@ -107,9 +111,7 @@ function Index() {
     }
   }
 
-  const handlePageClick = (e) => {
-    setCurrentPage(e.selected + 1);
-  };
+  const handlePageClick = (e) => setCurrentPage(e.selected + 1);
 
   const resetFilters = () => {
     setCompanySlug("");
@@ -148,225 +150,174 @@ function Index() {
   };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col md="12">
-          <Card>
-            <CNavbar expand="lg" className="bg-white">
-              <CContainer fluid>
-                <CNavbarBrand>Login / Sessions</CNavbarBrand>
-              </CContainer>
-            </CNavbar>
+    <PageShell>
+      <PageHeader
+        title="Login / Sessions"
+        subtitle="Monitor and revoke tenant login sessions across companies."
+      />
 
-            <Card.Body>
-              <Row className="mb-3 align-items-end">
-                <Col md="3" className="mb-2">
-                  <Form.Group>
-                    <Form.Label>Company</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={companySlug}
-                      onChange={(e) => {
-                        setCurrentPage(1);
-                        setCompanySlug(e.target.value);
-                      }}
-                    >
-                      <option value="">All companies</option>
-                      {companies.map((company) => (
-                        <option key={company.id} value={company.slug}>
-                          {company.name} ({company.slug})
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
+      <ContentCard flush>
+        <FilterBar
+          actions={
+            <AdminButton variant="secondary" onClick={resetFilters}>
+              Reset
+            </AdminButton>
+          }
+        >
+          <FilterField label="Company">
+            <Form.Control
+              as="select"
+              value={companySlug}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setCompanySlug(e.target.value);
+              }}
+            >
+              <option value="">All companies</option>
+              {companies.map((company) => (
+                <option key={company.id} value={company.slug}>
+                  {company.name}
+                </option>
+              ))}
+            </Form.Control>
+          </FilterField>
 
-                <Col md="2" className="mb-2">
-                  <Form.Group>
-                    <Form.Label>User ID</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Filter by user id"
-                      value={userId}
-                      onChange={(e) => {
-                        setCurrentPage(1);
-                        setUserId(e.target.value);
-                      }}
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md="3" className="mb-2">
-                  <Form.Group>
-                    <Form.Label>Entity</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={entity}
-                      onChange={(e) => {
-                        setCurrentPage(1);
-                        setEntity(e.target.value);
-                      }}
-                    >
-                      {ENTITY_OPTIONS.map((opt) => (
-                        <option key={opt.value || "all"} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
-
-                <Col md="2" className="mb-2">
-                  <Form.Group>
-                    <Form.Label>Status</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={active}
-                      onChange={(e) => {
-                        setCurrentPage(1);
-                        setActive(e.target.value);
-                      }}
-                    >
-                      {ACTIVE_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
-
-                <Col md="2" className="mb-2">
-                  <Button
-                    variant="outline-secondary"
-                    className="w-100"
-                    onClick={resetFilters}
-                  >
-                    Reset
-                  </Button>
-                </Col>
-              </Row>
-
-              <div className="table-responsive">
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Company</th>
-                      <th>Device</th>
-                      <th>IP</th>
-                      <th>Last used</th>
-                      <th>Expires</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-
-                  {loading && !sessions.length ? (
-                    <tbody>
-                      <tr>
-                        <td colSpan="8">
-                          <Loader />
-                        </td>
-                      </tr>
-                    </tbody>
-                  ) : (
-                    <tbody>
-                      {sessions.length > 0 ? (
-                        sessions.map((session) => (
-                          <tr key={session.id}>
-                            <td>
-                              <div>{session.user?.name || "-"}</div>
-                              <small className="text-muted">
-                                {session.user?.email || "-"}
-                              </small>
-                              {session.user?.id != null && (
-                                <div>
-                                  <small className="text-muted">
-                                    ID: {session.user.id}
-                                  </small>
-                                </div>
-                              )}
-                            </td>
-                            <td>
-                              <div>{session.company?.name || "-"}</div>
-                              <small className="text-muted">
-                                {session.company?.slug || "-"}
-                              </small>
-                            </td>
-                            <td>
-                              <div>{session.device_name || "-"}</div>
-                              <small
-                                className="text-muted d-inline-block text-truncate"
-                                style={{ maxWidth: "220px" }}
-                                title={session.user_agent || ""}
-                              >
-                                {session.user_agent || "-"}
-                              </small>
-                            </td>
-                            <td>{session.ip_address || "-"}</td>
-                            <td>{formatDateTime(session.last_used_at)}</td>
-                            <td>{formatDateTime(session.expires_at)}</td>
-                            <td>
-                              {session.active ? (
-                                <Badge bg="success">Active</Badge>
-                              ) : (
-                                <Badge bg="secondary">Revoked</Badge>
-                              )}
-                              {session.revoked_at && (
-                                <div>
-                                  <small className="text-muted">
-                                    {formatDateTime(session.revoked_at)}
-                                  </small>
-                                </div>
-                              )}
-                            </td>
-                            <td>
-                              {session.active ? (
-                                <Button
-                                  variant="outline-danger"
-                                  size="sm"
-                                  disabled={revokingId === session.id}
-                                  onClick={() => handleRevoke(session)}
-                                >
-                                  {revokingId === session.id
-                                    ? "Revoking..."
-                                    : "Revoke"}
-                                </Button>
-                              ) : (
-                                <span className="text-muted">—</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="8" className="text-center">
-                            No sessions found
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  )}
-                </table>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {pagination?.total_pages > 0 && (
-        <Row className="mt-3">
-          <Col className="d-flex justify-content-center">
-            <Paginate
-              onPageChange={handlePageClick}
-              pageCount={pagination.total_pages || 1}
-              forcePage={currentPage - 1}
+          <FilterField label="User ID">
+            <Form.Control
+              type="text"
+              placeholder="Filter by user id"
+              value={userId}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setUserId(e.target.value);
+              }}
             />
-          </Col>
-        </Row>
-      )}
-    </Container>
+          </FilterField>
+
+          <FilterField label="Entity">
+            <Form.Control
+              as="select"
+              value={entity}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setEntity(e.target.value);
+              }}
+            >
+              {ENTITY_OPTIONS.map((opt) => (
+                <option key={opt.value || "all"} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </Form.Control>
+          </FilterField>
+
+          <FilterField label="Status">
+            <Form.Control
+              as="select"
+              value={active}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setActive(e.target.value);
+              }}
+            >
+              {ACTIVE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </Form.Control>
+          </FilterField>
+        </FilterBar>
+
+        <DataTable
+          columns={COLUMNS}
+          loading={loading && !sessions.length ? <Loader /> : null}
+          colSpan={COLUMNS.length}
+          empty={
+            <EmptyState
+              colSpan={COLUMNS.length}
+              title="No sessions found"
+              text="Try a different company, user, or status filter."
+            />
+          }
+        >
+          {sessions.length > 0
+            ? sessions.map((session) => (
+                <tr key={session.id}>
+                  <td>
+                    <div className="cell-title">{session.user?.name || "-"}</div>
+                    <span className="cell-sub">{session.user?.email || "-"}</span>
+                    {session.user?.id != null ? (
+                      <span className="cell-sub">ID: {session.user.id}</span>
+                    ) : null}
+                  </td>
+                  <td>
+                    <div className="cell-title">
+                      {session.company?.name || "-"}
+                    </div>
+                    <span className="cell-sub">
+                      {session.company?.slug || "-"}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="cell-title">
+                      {session.device_name || "-"}
+                    </div>
+                    <span
+                      className="cell-sub d-inline-block text-truncate"
+                      style={{ maxWidth: 220 }}
+                      title={session.user_agent || ""}
+                    >
+                      {session.user_agent || "-"}
+                    </span>
+                  </td>
+                  <td className="cell-muted">{session.ip_address || "-"}</td>
+                  <td className="cell-muted">
+                    {formatDateTime(session.last_used_at)}
+                  </td>
+                  <td className="cell-muted">
+                    {formatDateTime(session.expires_at)}
+                  </td>
+                  <td>
+                    <StatusBadge
+                      active={!!session.active}
+                      label={session.active ? "Active" : "Revoked"}
+                      tone={session.active ? "success" : "muted"}
+                    />
+                    {session.revoked_at ? (
+                      <span className="cell-sub">
+                        {formatDateTime(session.revoked_at)}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td>
+                    {session.active ? (
+                      <AdminButton
+                        variant="danger"
+                        size="sm"
+                        disabled={revokingId === session.id}
+                        onClick={() => handleRevoke(session)}
+                      >
+                        {revokingId === session.id ? "Revoking..." : "Revoke"}
+                      </AdminButton>
+                    ) : (
+                      <span className="cell-muted">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            : null}
+        </DataTable>
+      </ContentCard>
+
+      {pagination?.total_pages > 0 ? (
+        <Paginate
+          onPageChange={handlePageClick}
+          pageCount={pagination.total_pages || 1}
+          forcePage={currentPage - 1}
+        />
+      ) : null}
+    </PageShell>
   );
 }
 
