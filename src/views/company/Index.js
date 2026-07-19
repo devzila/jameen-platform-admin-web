@@ -1,9 +1,12 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
 import dateFormat from "../../utilities/DateFormat";
 import defaultLogo from "assets/img/jameen-logo.png";
@@ -35,8 +38,8 @@ function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const { get, post, loading } = useFetch();
-  const navigate = useNavigate();
+  const { get, post, loading } = useApi();
+  const router = useRouter();
 
   const loadInitialCompanies = async () => {
     let endpoint = `/v1/platform_admin/companies?page=${currentPage}`;
@@ -106,7 +109,7 @@ function Index() {
               onSearch={loadInitialCompanies}
               placeholder="Search company..."
             />
-            <AdminButton onClick={() => navigate("/companies/add")}>
+            <AdminButton onClick={() => router.push("/companies/add")}>
               Add Company
             </AdminButton>
           </>
@@ -157,20 +160,20 @@ function Index() {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         <Dropdown.Item
-                          as={NavLink}
-                          to={`/companies/${company.id}/edit`}
+                          as={Link}
+                          href={`/companies/${company.id}/edit`}
                         >
                           Edit
                         </Dropdown.Item>
                         <Dropdown.Item
-                          as={NavLink}
-                          to={`/companies/${company.id}/users`}
+                          as={Link}
+                          href={`/companies/${company.id}/users`}
                         >
                           Users
                         </Dropdown.Item>
                         <Dropdown.Item
-                          as={NavLink}
-                          to={`/companies/${company.id}`}
+                          as={Link}
+                          href={`/companies/${company.id}`}
                         >
                           Show
                         </Dropdown.Item>

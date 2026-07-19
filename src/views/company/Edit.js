@@ -1,8 +1,10 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm, Controller } from "react-hook-form";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import Select from "react-select";
 import defaultLogo from "assets/img/jameen-logo.png";
 import { Form } from "react-bootstrap";
@@ -18,9 +20,9 @@ function Edit() {
     formState: { errors },
   } = useForm();
 
-  const { id } = useParams();
-  const { get, put, response } = useFetch();
-  const navigate = useNavigate();
+  const { companyId } = useParams();
+  const { get, put, response } = useApi();
+  const router = useRouter();
   const [companyData, setCompanyData] = useState({});
   const [country_array, setCountry_array] = useState([]);
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
@@ -58,7 +60,7 @@ function Edit() {
   }
 
   async function loadComapny() {
-    const api = await get(`/v1/platform_admin/companies/${id}`);
+    const api = await get(`/v1/platform_admin/companies/${companyId}`);
     if (response.ok) {
       setCompanyData(api.data || {});
       setValue("name", api.data.name);
@@ -89,9 +91,9 @@ function Edit() {
         })()
       : { company: companyFields };
 
-    await put(`/v1/platform_admin/companies/${id}`, body);
+    await put(`/v1/platform_admin/companies/${companyId}`, body);
     if (response.ok) {
-      navigate("/companies");
+      router.push("/companies");
       toast.success("Company edited successfully");
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
@@ -108,7 +110,7 @@ function Edit() {
     <FormShell
       title="Edit Company"
       subtitle="Update company details, branding, and plan assignment."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

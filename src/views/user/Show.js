@@ -1,14 +1,16 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { formatdate } from "services/utility_functions";
 import { FormShell, DetailList } from "components/ui";
 
 function Show() {
   const { companyId, userId } = useParams();
   const [user, setUser] = useState({});
-  const { get, response } = useFetch();
-  const navigate = useNavigate();
+  const { get, response } = useApi();
+  const router = useRouter();
 
   useEffect(() => {
     loadUser();
@@ -27,7 +29,7 @@ function Show() {
     <FormShell
       title="User details"
       subtitle="Read-only view of the selected user."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <DetailList
         items={[

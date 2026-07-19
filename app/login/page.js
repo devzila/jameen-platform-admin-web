@@ -1,10 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "contexts/AuthContext";
 import logo from "assets/img/jameen-logo.png";
 
-const Login = () => {
-  const { dispatch } = React.useContext(AuthContext);
+export default function LoginPage() {
+  const { state, dispatch } = React.useContext(AuthContext);
+  const router = useRouter();
 
   const initialState = {
     email: "",
@@ -13,6 +17,12 @@ const Login = () => {
     errorMessage: null,
   };
   const [data, setData] = React.useState(initialState);
+
+  useEffect(() => {
+    if (state?.isAutheticated) {
+      router.replace("/companies");
+    }
+  }, [state?.isAutheticated, router]);
 
   const handleInputChange = (event) => {
     setData({
@@ -28,7 +38,8 @@ const Login = () => {
       isSubmitting: true,
       errorMessage: null,
     });
-    fetch(`${process.env.REACT_APP_API_URL}/v1/platform_admin/auth/session`, {
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/platform_admin/auth/session`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -49,6 +60,7 @@ const Login = () => {
           type: "LOGIN",
           payload: resJson,
         });
+        router.replace("/companies");
       })
       .catch((error) => {
         if (!("json" in error) || error.status == 404) {
@@ -75,8 +87,9 @@ const Login = () => {
       <form method="post" className="Auth-form" onSubmit={handleFormSubmit}>
         <div className="Auth-form-content">
           <div className="d-flex align-items-center mb-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={logo}
+              src={logo.src || logo}
               alt="Jameen"
               style={{
                 width: 42,
@@ -138,6 +151,4 @@ const Login = () => {
       </form>
     </div>
   );
-};
-
-export default Login;
+}

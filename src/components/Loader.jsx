@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import "../assets/css/loader.css";
 export default function Loader() {

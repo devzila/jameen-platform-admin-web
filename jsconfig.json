@@ -1,8 +1,18 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "*": ["src/*"]
+      "@/*": ["./src/*"],
+      "assets/*": ["./src/assets/*"],
+      "components/*": ["./src/components/*"],
+      "contexts/*": ["./src/contexts/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "lib/*": ["./src/lib/*"],
+      "layouts/*": ["./src/layouts/*"],
+      "services/*": ["./src/services/*"],
+      "utilities/*": ["./src/utilities/*"],
+      "views/*": ["./src/views/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", ".next"]
 }

@@ -1,5 +1,8 @@
+"use client";
+
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import {
   Container,
   Card,
@@ -16,11 +19,10 @@ import {
   FaFileAlt,
   FaPen,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
 import "./invoiceRunHistory.css";
 
 function InvoiceRunHistory() {
-  const { get, loading } = useFetch();
+  const { get, loading } = useApi();
 
   const [runs, setRuns] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -69,8 +71,8 @@ function InvoiceRunHistory() {
             <Nav className="invoice-tabs">
               <Nav.Item>
                 <Nav.Link
-                  as={NavLink}
-                  to="/invoice-run-history"
+                  as={Link}
+                  href="/invoice-run-history"
                 >
                   <FaCalendarAlt className="mr-2" />
                   Scheduled Invoice Run
@@ -79,8 +81,8 @@ function InvoiceRunHistory() {
 
               <Nav.Item>
                 <Nav.Link
-                  as={NavLink}
-                  to="/templated-invoice-run-history"
+                  as={Link}
+                  href="/templated-invoice-run-history"
                 >
                   <FaFileAlt className="mr-2" />
                   Templated Invoice Run
@@ -89,8 +91,8 @@ function InvoiceRunHistory() {
 
               <Nav.Item>
                 <Nav.Link
-                  as={NavLink}
-                  to="/custom-invoice-run-history"
+                  as={Link}
+                  href="/custom-invoice-run-history"
                 >
                   <FaPen className="mr-2" />
                   Custom Invoice Run

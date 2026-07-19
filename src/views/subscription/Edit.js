@@ -1,7 +1,9 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { toast } from "react-toastify";
 import { Form } from "react-bootstrap";
 import { FormShell, AdminButton } from "components/ui";
@@ -16,8 +18,8 @@ function Edit() {
   } = useForm();
 
   const { id } = useParams();
-  const { get, put, response } = useFetch();
-  const navigate = useNavigate();
+  const { get, put, response } = useApi();
+  const router = useRouter();
 
   useEffect(() => {
     loadSubscription();
@@ -37,7 +39,7 @@ function Edit() {
       subscription: data,
     });
     if (response.ok) {
-      navigate("/subscriptions");
+      router.push("/subscriptions");
       toast.success("Subscription updated successfully");
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
@@ -54,7 +56,7 @@ function Edit() {
     <FormShell
       title="Edit Subscription"
       subtitle="Update plan name and capacity limits."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

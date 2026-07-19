@@ -1,6 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -16,10 +18,10 @@ function Add() {
     formState: { errors },
   } = useForm();
 
-  const { get, post, response } = useFetch();
+  const { get, post, response } = useApi();
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [country_array, setCountry_array] = useState([]);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     async function loadSubscriptionPlans() {
@@ -75,7 +77,7 @@ function Add() {
 
     await post(`/v1/platform_admin/companies`, body);
     if (response.ok) {
-      navigate("/companies");
+      router.push("/companies");
       toast.success("Successfully Created");
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
@@ -92,7 +94,7 @@ function Add() {
     <FormShell
       title="Add Company"
       subtitle="Create a new tenant company with plan and country settings."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

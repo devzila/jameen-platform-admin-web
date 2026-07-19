@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import Paginate from "../../components/Paginate";
 import Loader from "components/Loader";
 import { toast } from "react-toastify";
@@ -58,7 +60,7 @@ function Index() {
   const [active, setActive] = useState("true");
   const [revokingId, setRevokingId] = useState(null);
 
-  const { get, del, response, loading } = useFetch();
+  const { get, del, response, loading } = useApi();
 
   useEffect(() => {
     loadCompanies();

@@ -1,6 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Form } from "react-bootstrap";
@@ -14,15 +16,15 @@ function Add() {
     formState: { errors },
   } = useForm();
 
-  const { post, response } = useFetch();
-  const navigate = useNavigate();
+  const { post, response } = useApi();
+  const router = useRouter();
 
   async function onSubmit(data) {
     await post(`/v1/platform_admin/subscriptions`, {
       subscription: data,
     });
     if (response.ok) {
-      navigate("/subscriptions");
+      router.push("/subscriptions");
       toast.success("Successfully Created");
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
@@ -39,7 +41,7 @@ function Add() {
     <FormShell
       title="Add Subscription"
       subtitle="Create a plan with unit and compound limits."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

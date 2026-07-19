@@ -1,5 +1,9 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from 'react'
-import useFetch from 'use-http'
+import useApi from "hooks/useApi";
 import Paginate from '../../components/Paginate'
 import Loader from 'components/Loader'
 import { BsThreeDots } from 'react-icons/bs'
@@ -11,7 +15,6 @@ import {
   Row,
   Col,
 } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
 
 import {
   CNavbar,
@@ -33,11 +36,11 @@ function Index() {
   const [searchKeyword, setSearchKeyword] =
     useState('')
 
-  const { get, del, loading } = useFetch()
-  const navigate = useNavigate()
+  const { get, del, loading } = useApi()
+  const router = useRouter()
 
   const addTemplate = () => {
-    navigate('/invoice-templates/add')
+    router.push('/invoice-templates/add')
   }
 
   const loadInvoiceTemplates = async () => {
@@ -313,7 +316,7 @@ function Index() {
                                     as={
                                       Link
                                     }
-                                    to={`/invoice-templates/${template.id}`}
+                                    href={`/invoice-templates/${template.id}`}
                                   >
                                     👁
                                     View
@@ -323,7 +326,7 @@ function Index() {
                                     as={
                                       Link
                                     }
-                                    to={`/invoice-templates/${template.id}/edit`}
+                                    href={`/invoice-templates/${template.id}/edit`}
                                   >
                                     ✏
                                     Edit

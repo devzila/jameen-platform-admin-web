@@ -1,14 +1,13 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, {
   useEffect,
   useState,
 } from 'react'
 
-import useFetch from 'use-http'
+import useApi from "hooks/useApi";
 
-import {
-  useNavigate,
-  useParams,
-} from 'react-router-dom'
 
 import {
   Container,
@@ -24,11 +23,10 @@ import dateFormat from '../../utilities/DateFormat'
 function Show() {
   const { id } = useParams()
 
-  const navigate =
-    useNavigate()
+  const router = useRouter()
 
   const { get, loading } =
-    useFetch()
+    useApi()
 
   const [template, setTemplate] =
     useState(null)
@@ -115,7 +113,7 @@ function Show() {
                 variant="info"
                 className="rounded-0"
                 onClick={() =>
-                  navigate('/invoice-templates')
+                  router.push('/invoice-templates')
                 }
               >
                 Go Back

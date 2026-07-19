@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export function PageShell({ children, className = "" }) {
@@ -224,11 +226,12 @@ export function DetailList({ items = [] }) {
 }
 
 export function EntityCell({ image, title, subtitle, round = false }) {
+  const src = image && typeof image === "object" ? image.src : image;
   return (
     <div className="admin-entity">
-      {image ? (
+      {src ? (
         <img
-          src={image}
+          src={src}
           alt=""
           className={`admin-thumb ${round ? "admin-thumb--round" : ""}`.trim()}
         />

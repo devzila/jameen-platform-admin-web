@@ -1,6 +1,8 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from 'react'
-import useFetch from 'use-http'
-import { useNavigate } from 'react-router-dom'
+import useApi from "hooks/useApi";
 import {
   Container,
   Row,
@@ -12,13 +14,13 @@ import {
 import { toast } from 'react-toastify'
 
 function Add() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { 
     post, 
     get,
     response, 
     loading 
-  } = useFetch()
+  } = useApi()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -196,7 +198,7 @@ function Add() {
           'Invoice Template Created Successfully',
         )
 
-        navigate(
+        router.push(
           '/invoice-templates',
         )
       } else {
@@ -227,7 +229,7 @@ function Add() {
                     variant="info"
                     className="rounded-0"
                     onClick={() =>
-                      navigate(
+                      router.push(
                         '/invoice-templates',
                       )
                     }

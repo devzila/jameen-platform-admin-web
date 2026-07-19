@@ -1,14 +1,13 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, {
   useEffect,
   useState,
 } from 'react'
 
-import useFetch from 'use-http'
+import useApi from "hooks/useApi";
 
-import {
-  useNavigate,
-  useParams,
-} from 'react-router-dom'
 
 import {
   Container,
@@ -26,14 +25,14 @@ function Edit() {
 
   const { id } = useParams()
 
-  const navigate = useNavigate()
+  const router = useRouter()
 
 
   const {
     get,
     put,
     loading,
-  } = useFetch()
+  } = useApi()
 
 
   const [categories, setCategories] =
@@ -462,7 +461,7 @@ function Edit() {
         )
 
 
-        navigate(
+        router.push(
           '/invoice-templates'
         )
 
@@ -525,7 +524,7 @@ function Edit() {
                     className="rounded-0"
 
                     onClick={() =>
-                      navigate(
+                      router.push(
                         '/invoice-templates'
                       )
                     }
@@ -1070,7 +1069,7 @@ function Edit() {
                     variant="secondary"
                     className="me-2 rounded-0"
                     onClick={() =>
-                      navigate(
+                      router.push(
                         '/invoice-templates'
                       )
                     }

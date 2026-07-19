@@ -1,14 +1,16 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { formatdate } from "services/utility_functions";
 import { FormShell, DetailList } from "components/ui";
 
 function Show() {
   const { id } = useParams();
   const [subscription, setSubscription] = useState({});
-  const { get, response } = useFetch();
-  const navigate = useNavigate();
+  const { get, response } = useApi();
+  const router = useRouter();
 
   useEffect(() => {
     loadSubscription();
@@ -25,7 +27,7 @@ function Show() {
     <FormShell
       title="Subscription details"
       subtitle="Read-only view of the selected subscription plan."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <DetailList
         items={[

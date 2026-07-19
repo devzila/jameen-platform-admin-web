@@ -1,10 +1,13 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import Paginate from "../../components/Paginate";
 import { BsThreeDots } from "react-icons/bs";
 import { Dropdown } from "react-bootstrap";
 import CustomDivToggle from "../../components/CustomDivToggle";
-import { NavLink, useNavigate } from "react-router-dom";
 import Loader from "components/Loader";
 import dateFormat from "../../utilities/DateFormat";
 import {
@@ -30,8 +33,8 @@ function Index() {
   const [pagination, setPagination] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const { get, response, loading } = useFetch();
-  const navigate = useNavigate();
+  const { get, response, loading } = useApi();
+  const router = useRouter();
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -74,7 +77,7 @@ function Index() {
               onSearch={loadInitialSubscriptions}
               placeholder="Search subscriptions..."
             />
-            <AdminButton onClick={() => navigate("/subscriptions/add")}>
+            <AdminButton onClick={() => router.push("/subscriptions/add")}>
               Add Subscription
             </AdminButton>
           </>
@@ -121,14 +124,14 @@ function Index() {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         <Dropdown.Item
-                          as={NavLink}
-                          to={`/subscriptions/${subscription.id}/edit`}
+                          as={Link}
+                          href={`/subscriptions/${subscription.id}/edit`}
                         >
                           Edit
                         </Dropdown.Item>
                         <Dropdown.Item
-                          as={NavLink}
-                          to={`/subscriptions/${subscription.id}`}
+                          as={Link}
+                          href={`/subscriptions/${subscription.id}`}
                         >
                           Show
                         </Dropdown.Item>

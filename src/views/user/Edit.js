@@ -1,8 +1,10 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { Form } from "react-bootstrap";
 import { format_react_select } from "services/utility_functions";
 import Select from "react-select";
@@ -23,10 +25,10 @@ function EditUser() {
     },
   });
 
-  const { get, put, response } = useFetch();
+  const { get, put, response } = useApi();
   const [rolesData, setRolesData] = useState([]);
   const [userData, setUserData] = useState({});
-  const navigate = useNavigate();
+  const router = useRouter();
   const { companyId, userId } = useParams();
 
   useEffect(() => {
@@ -96,7 +98,7 @@ function EditUser() {
 
     if (response.ok) {
       toast.success("User updated successfully");
-      navigate(`/companies/${companyId}/users`);
+      router.push(`/companies/${companyId}/users`);
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
         if (Array.isArray(fieldErrors) && fieldErrors.length) {
@@ -112,7 +114,7 @@ function EditUser() {
     <FormShell
       title="Edit User"
       subtitle="Update profile details and replace the avatar if needed."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

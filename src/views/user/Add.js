@@ -1,10 +1,12 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import useFetch from "use-http";
+import useApi from "hooks/useApi";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 import { format_react_select } from "services/utility_functions";
 import { Form } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { FormShell, AdminButton } from "components/ui";
 
@@ -28,9 +30,9 @@ function Add() {
   });
 
   const { companyId } = useParams();
-  const { get, post, response } = useFetch();
+  const { get, post, response } = useApi();
   const [rolesData, setRolesData] = useState([]);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     fetchRoles();
@@ -105,7 +107,7 @@ function Add() {
 
     if (response.ok) {
       toast.success("User added Successfully");
-      navigate(`/companies/${companyId}/users`);
+      router.push(`/companies/${companyId}/users`);
     } else if (response.status === 422 && response.data?.errors) {
       Object.entries(response.data.errors).forEach(([field, fieldErrors]) => {
         if (Array.isArray(fieldErrors) && fieldErrors.length) {
@@ -121,7 +123,7 @@ function Add() {
     <FormShell
       title="Add User"
       subtitle="Invite a new company user with role and profile details."
-      onBack={() => navigate(-1)}
+      onBack={() => router.back()}
     >
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-field">

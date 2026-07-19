@@ -1,3 +1,6 @@
+"use client";
+
+import Link from "next/link";
 import React from "react";
 import {
   Container,
@@ -10,7 +13,6 @@ import {
   FaPen,
   FaHistory,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
 import "./invoiceRunHistory.css";
 
 function TemplatedInvoiceRunHistory() {
@@ -23,8 +25,8 @@ function TemplatedInvoiceRunHistory() {
         <Nav className="invoice-tabs">
           <Nav.Item>
             <Nav.Link
-              as={NavLink}
-              to="/invoice-run-history"
+              as={Link}
+              href="/invoice-run-history"
             >
               <FaCalendarAlt className="me-2" />
               Scheduled Invoice Run
@@ -33,8 +35,8 @@ function TemplatedInvoiceRunHistory() {
 
           <Nav.Item>
             <Nav.Link
-              as={NavLink}
-              to="/templated-invoice-run-history"
+              as={Link}
+              href="/templated-invoice-run-history"
             >
               <FaFileAlt className="me-2" />
               Templated Invoice Run
@@ -43,8 +45,8 @@ function TemplatedInvoiceRunHistory() {
 
           <Nav.Item>
             <Nav.Link
-              as={NavLink}
-              to="/custom-invoice-run-history"
+              as={Link}
+              href="/custom-invoice-run-history"
             >
               <FaPen className="me-2" />
               Custom Invoice Run
