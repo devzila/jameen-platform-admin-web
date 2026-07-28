@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  # Do NOT use CRA's "build" folder. The Next.js plugin manages publish output.
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Prefer NEXT_PUBLIC_API_URL in Netlify UI → Site configuration → Environment variables
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

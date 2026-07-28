@@ -27,7 +27,7 @@ Edit `.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Use the base URL of your API (no trailing slash). The browser calls this origin directly, so the API must allow CORS from the Next.js origin (default `http://localhost:3001` if you run `next dev -p 3001`, or `http://localhost:3000` if the API is elsewhere and you run Next on another port).
+Use the base URL of your API (no trailing slash). The browser calls this origin directly, so the API must allow CORS from your Next.js origin.
 
 > Tip: if the API already uses port `3000`, run the admin UI on another port:
 >
@@ -55,81 +55,103 @@ Open [http://localhost:3000](http://localhost:3000) (or the port you chose).
 | `npm start` | Serve the production build (`next start`) |
 | `npm run lint` | ESLint |
 
-## Production deployment
+## Production deployment (Netlify)
 
-This app is configured with **`output: 'standalone'`** in [`next.config.js`](next.config.js), which produces a minimal Node server under `.next/standalone`.
+This app is deployed from **GitHub `main`** to **[Netlify](https://app.netlify.com)** using Next.js (not Create React App).
 
-### 1. Build
+After the CRA → Next.js migration, Netlify must **not** publish the old CRA `build/` folder. That is why deploys fail with:
+
+`Deploy directory 'build' does not exist`
+
+### One-time Netlify site settings
+
+In [app.netlify.com](https://app.netlify.com) → your site → **Site configuration**:
+
+#### 1. Build & deploy
+
+| Setting | Value |
+|---|---|
+| **Build command** | `npm run build` |
+| **Publish directory** | `.next` (or clear the UI field and rely on [`netlify.toml`](netlify.toml)) |
+| **Base directory** | *(leave empty / repo root)* |
+
+Do **not** use:
+
+- Publish directory: `build` (CRA)
+- Build command: `CI= npm run build` with CRA assumptions
+
+This repo includes [`netlify.toml`](netlify.toml) with:
+
+- `command = "npm run build"`
+- `publish = ".next"`
+- `@netlify/plugin-nextjs` (required for Next.js App Router on Netlify)
+- `NODE_VERSION = "20"`
+
+If UI settings conflict with `netlify.toml`, prefer the file (or clear the outdated UI publish path).
+
+#### 2. Environment variables
+
+Under **Environment variables**, set for **Production** (and Preview if needed):
+
+| Key | Example | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `https://api.jameen.com` | **Required.** No trailing slash. Inlined at build time. |
+| `NODE_VERSION` | `20` | Optional if already set in `netlify.toml` |
+
+Remove or stop using the old CRA variables:
+
+- `REACT_APP_API_URL` → replace with `NEXT_PUBLIC_API_URL`
+- `GENERATE_SOURCEMAP` → optional / unused by Next
+
+After changing env vars, **trigger a new deploy** (Clear cache and deploy site is safest).
+
+#### 3. Node version
+
+Use Node **20** (set in `netlify.toml`). In UI: **Build settings** → **Dependency management** → Node version `20` if needed.
+
+### Auto deploy from GitHub
+
+1. Site is linked to the GitHub repo.
+2. **Production branch**: `main`.
+3. Push to `main` → Netlify runs `npm run build` + Next.js plugin → deploy.
 
 ```bash
-npm ci
-npm run build
+git add .
+git commit -m "Configure Netlify for Next.js"
+git push origin main
 ```
 
-Ensure `NEXT_PUBLIC_API_URL` is set at **build time** (it is inlined into the client bundle):
+### Fix checklist for the current error
+
+1. Publish directory is still `build` → change to `.next` (or clear UI and use `netlify.toml`).
+2. Install deps so the plugin is present: `npm install` (includes `@netlify/plugin-nextjs`).
+3. Set `NEXT_PUBLIC_API_URL` in Netlify (not `REACT_APP_API_URL`).
+4. Redeploy with cleared cache.
+
+### Verify a successful Netlify build log
+
+You should see the Next.js plugin run and **no** message about missing `build/`. The site should serve routes like `/login` and `/companies`.
+
+---
+
+## Optional: Docker / self-hosted Node
+
+For non-Netlify hosts, builds outside Netlify still use `output: "standalone"` (see [`next.config.js`](next.config.js)).
 
 ```bash
 NEXT_PUBLIC_API_URL=https://api.example.com npm run build
-```
-
-### 2. Run with Node (standalone)
-
-After build, copy static assets next to the standalone server (Next does not always copy them automatically depending on version/setup):
-
-```bash
 cp -r public .next/standalone/public
 cp -r .next/static .next/standalone/.next/static
-
-cd .next/standalone
-PORT=3000 NODE_ENV=production node server.js
+cd .next/standalone && PORT=3000 node server.js
 ```
 
-### 3. Docker (example)
-
-```dockerfile
-FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-RUN npm run build
-
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
-
-Build & run:
-
-```bash
-docker build --build-arg NEXT_PUBLIC_API_URL=https://api.example.com -t platform-admin-web .
-docker run -p 3000:3000 platform-admin-web
-```
-
-### 4. Vercel
-
-1. Import the repo into Vercel.
-2. Set environment variable `NEXT_PUBLIC_API_URL` to your API base URL.
-3. Deploy. Framework preset: **Next.js**.
-
-`standalone` output is fine on Vercel; Vercel uses its own Next runtime and ignores the local `server.js` packaging.
+A sample [`Dockerfile`](Dockerfile) is included for container deploys.
 
 ## Project structure (high level)
 
 ```
 app/                  # Next.js App Router pages & layouts
+netlify.toml          # Netlify build + Next.js plugin
 src/
   components/         # Shared UI, Sidebar, AdminShell
   contexts/           # Auth provider
@@ -147,4 +169,4 @@ src/
 
 ## Migrated from Create React App
 
-This project previously used CRA (`react-scripts`) and `react-router-dom`. It now uses Next.js App Router. Old CRA entrypoints under `src/index.js` / `src/layouts/Admin.js` are unused and can be removed safely after you confirm the Next app.
+This project previously used CRA (`react-scripts`) and published static files to `build/`. It now uses **Next.js App Router**. Netlify must use `@netlify/plugin-nextjs` and `NEXT_PUBLIC_API_URL` instead of the old CRA publish directory and `REACT_APP_*` env vars.
