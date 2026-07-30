@@ -76,12 +76,8 @@ export function AuthProvider({ children }) {
     setReady(true);
   }, []);
 
-  if (!ready) {
-    return null;
-  }
-
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
+    <AuthContext.Provider value={{ state: { ...state, ready }, dispatch }}>
       {children}
     </AuthContext.Provider>
   );

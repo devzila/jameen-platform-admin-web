@@ -12,12 +12,14 @@ export default function AdminShell({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const mainPanel = React.useRef(null);
+  const ready = state?.ready !== false;
 
   useEffect(() => {
+    if (!ready) return;
     if (!state?.isAutheticated) {
       router.replace("/login");
     }
-  }, [state?.isAutheticated, router]);
+  }, [ready, state?.isAutheticated, router]);
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -29,8 +31,20 @@ export default function AdminShell({ children }) {
     }
   }, [pathname]);
 
+  if (!ready) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+        Loading...
+      </div>
+    );
+  }
+
   if (!state?.isAutheticated) {
-    return null;
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+        Redirecting to sign in...
+      </div>
+    );
   }
 
   return (
