@@ -28,28 +28,53 @@ function Edit() {
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
 
   useEffect(() => {
-    loadComapny();
-    async function loadSubscriptionPlans() {
-      const api = await get(`/v1/platform_admin/options`);
-      if (response.ok) {
-        setSubscriptionPlans(
-          api.subscription_plans.map((element) => ({
-            value: element.id,
-            label: element.name,
-          })) || []
-        );
+    let cancelled = false;
+
+    async function loadFormData() {
+      try {
+        const [companyRes, optionsData, countriesData] = await Promise.all([
+          get(`/v1/platform_admin/companies/${companyId}`),
+          get(`/v1/platform_admin/options`),
+          get(`/v1/platform_admin/countries`),
+        ]);
+
+        if (cancelled) return;
+
+        if (companyRes?.data || companyRes?.name) {
+          const company = companyRes.data || companyRes;
+          setCompanyData(company || {});
+          setValue("name", company.name);
+          setValue("slug", company.slug);
+          setValue("subscription_id", company?.subscription?.id);
+          setValue("country_id", company?.country?.id);
+        }
+
+        if (optionsData?.subscription_plans) {
+          setSubscriptionPlans(
+            optionsData.subscription_plans.map((element) => ({
+              value: element.id,
+              label: element.name,
+            }))
+          );
+        }
+
+        if (Array.isArray(countriesData)) {
+          formatcountrydata(countriesData);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error(err);
+          toast.error("Failed to load company");
+        }
       }
     }
-    loadCountry();
-    loadSubscriptionPlans();
-  }, [get, response]);
 
-  async function loadCountry() {
-    const endpoint = await get(`/v1/platform_admin/countries`);
-    if (response.ok) {
-      formatcountrydata(endpoint);
-    }
-  }
+    loadFormData();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId]);
 
   function formatcountrydata(data) {
     const temp_array = data.map((element) => ({
@@ -57,17 +82,6 @@ function Edit() {
       value: element.id,
     }));
     setCountry_array(temp_array);
-  }
-
-  async function loadComapny() {
-    const api = await get(`/v1/platform_admin/companies/${companyId}`);
-    if (response.ok) {
-      setCompanyData(api.data || {});
-      setValue("name", api.data.name);
-      setValue("slug", api.data.slug);
-      setValue("subscription_id", api.data?.subscription?.id);
-      setValue("country_id", api.data?.country?.id);
-    }
   }
 
   async function onSubmit(data) {

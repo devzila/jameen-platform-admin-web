@@ -24,27 +24,44 @@ function Add() {
   const router = useRouter();
 
   useEffect(() => {
-    async function loadSubscriptionPlans() {
-      const api = await get(`/v1/platform_admin/options`);
-      if (response.ok) {
-        setSubscriptionPlans(
-          api.subscription_plans.map((element) => ({
-            value: element.id,
-            label: element.name,
-          })) || []
-        );
+    let cancelled = false;
+
+    async function loadOptions() {
+      try {
+        const [optionsData, countriesData] = await Promise.all([
+          get(`/v1/platform_admin/options`),
+          get(`/v1/platform_admin/countries`),
+        ]);
+
+        if (cancelled) return;
+
+        if (optionsData?.subscription_plans) {
+          setSubscriptionPlans(
+            optionsData.subscription_plans.map((element) => ({
+              value: element.id,
+              label: element.name,
+            }))
+          );
+        }
+
+        if (Array.isArray(countriesData)) {
+          formatcountrydata(countriesData);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error(err);
+          toast.error("Failed to load form options");
+        }
       }
     }
-    loadCountry();
-    loadSubscriptionPlans();
-  }, [get, response]);
 
-  async function loadCountry() {
-    const endpoint = await get(`/v1/platform_admin/countries`);
-    if (response.ok) {
-      formatcountrydata(endpoint);
-    }
-  }
+    loadOptions();
+    return () => {
+      cancelled = true;
+    };
+    // Load once on mount; get is stable from useApi
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function formatcountrydata(data) {
     const temp_array = data.map((element) => ({

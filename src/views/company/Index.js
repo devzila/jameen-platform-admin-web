@@ -53,7 +53,11 @@ function Index() {
       setCompanies(data?.data || []);
       setPagination(data?.pagination || {});
 
-      if (data?.pagination && currentPage > data.pagination.total_pages) {
+      if (
+        data?.pagination &&
+        data.pagination.total_pages > 0 &&
+        currentPage > data.pagination.total_pages
+      ) {
         setCurrentPage(1);
       }
     } catch (err) {
