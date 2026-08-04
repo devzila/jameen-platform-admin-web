@@ -530,7 +530,7 @@ export default function InvoiceRunResultsModal({ run, resultsEndpoint, onClose }
               </thead>
               <tbody>
                 {results.length > 0 ? (
-                  results.map((result) => (
+                  results.map((result, index) => (
                     <tr key={result.id || `${result.invoice_id || "result"}-${index}`}>
                       <td style={bodyCellStyle}>
                         <span style={successBadgeStyle(resolveSuccess(result))}>{resolveSuccess(result) ? "Yes" : "No"}</span>
