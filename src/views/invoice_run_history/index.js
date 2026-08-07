@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useApi from "hooks/useApi";
-import InvoiceRunResultsModal from "./show";
+import { useRouter } from "next/navigation";
 import {
   Container,
   Card,
@@ -24,12 +24,11 @@ import "./invoiceRunHistory.css";
 
 function InvoiceRunHistory() {
   const { get, loading } = useApi();
-
+  const router = useRouter();
   const [runs, setRuns] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] =
     useState("");
-  const [selectedRun, setSelectedRun] = useState(null);
 
   useEffect(() => {
     fetchCompanies();
@@ -187,11 +186,11 @@ function InvoiceRunHistory() {
                               <span
                                 role="button"
                                 tabIndex={0}
-                                onClick={() => setSelectedRun(item)}
+                                onClick={() => router.push(`/invoice-run-history/show?id=${item.id}`)}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter" || event.key === " ") {
                                     event.preventDefault();
-                                    setSelectedRun(item);
+                                    router.push(`/invoice-run-history/show?id=${item.id}`);
                                   }
                                 }}
                                 style={{
@@ -293,14 +292,6 @@ function InvoiceRunHistory() {
           </Card>
         </Col>
       </Row>
-
-      {selectedRun && (
-        <InvoiceRunResultsModal
-          run={selectedRun}
-          resultsEndpoint="/v1/platform_admin/invoice_generation_runs"
-          onClose={() => setSelectedRun(null)}
-        />
-      )}
     </Container>
   );
 }
