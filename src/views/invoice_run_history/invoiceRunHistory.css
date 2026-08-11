@@ -113,3 +113,17 @@
   font-size: 11px;
 }
 
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 768px) {
+  .text-right {
+    text-align: left !important;
+    margin-top: 15px;
+  }
+
+  .company-filter {
+    width: 100%;
+  }
+}
