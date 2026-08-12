@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useApi from "hooks/useApi";
+import InvoiceRunResultsModal from "./show";
 import {
   Container,
   Card,
@@ -28,6 +29,7 @@ function CustomInvoiceRunHistory() {
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] =
     useState("");
+  const [selectedRun, setSelectedRun] = useState(null);
 
   useEffect(() => {
     fetchCompanies();
@@ -194,7 +196,33 @@ function CustomInvoiceRunHistory() {
                         runs.map((item) => (
                           <tr key={item.id}>
                             <td>
-                              {item?.property?.name}
+                              <span
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => setSelectedRun(item)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    setSelectedRun(item);
+                                  }
+                                }}
+                                style={{
+                                  color: "#00bfcc",
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  display: "inline-block",
+                                  lineHeight: 1.4,
+                                  transition: "text-decoration 0.15s ease",
+                                }}
+                                onMouseEnter={(event) => {
+                                  event.currentTarget.style.textDecoration = "underline";
+                                }}
+                                onMouseLeave={(event) => {
+                                  event.currentTarget.style.textDecoration = "none";
+                                }}
+                              >
+                                {item?.property?.name}
+                              </span>
                             </td>
 
                             <td>
@@ -271,6 +299,14 @@ function CustomInvoiceRunHistory() {
           </Card>
         </Col>
       </Row>
+
+      {selectedRun && (
+        <InvoiceRunResultsModal
+          run={selectedRun}
+          resultsEndpoint="/v1/platform_admin/invoice_generation_runs"
+          onClose={() => setSelectedRun(null)}
+        />
+      )}
     </Container>
   );
 }
