@@ -206,7 +206,20 @@ function Index() {
             </CNavbar>
 
             <Card.Body className="table-responsive">
-              <table className="table table-striped align-middle">
+              <div
+                style={{
+                  width: '100%',
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                }}
+              >
+              <table
+                className="table table-striped align-middle mb-0"
+                style={{
+                  minWidth: '900px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -376,6 +389,7 @@ function Index() {
                   </tbody>
                 )}
               </table>
+              </div>
             </Card.Body>
           </Card>
         </Col>
