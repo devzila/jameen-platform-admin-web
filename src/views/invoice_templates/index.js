@@ -213,182 +213,182 @@ function Index() {
                   overflowY: 'hidden',
                 }}
               >
-                <table
-                  className="table table-striped align-middle mb-0"
-                  style={{
-                    minWidth: '900px',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>
-                        Processor Class
-                      </th>
-                      <th>
-                        Category Id
-                      </th>
-                      <th>
-                        Default
-                      </th>
-                      <th>
-                        Created
-                      </th>
-                      <th width="60">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
+              <table
+                className="table table-striped align-middle mb-0"
+                style={{
+                  minWidth: '900px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>
+                      Processor Class
+                    </th>
+                    <th>
+                      Category Id
+                    </th>
+                    <th>
+                      Default
+                    </th>
+                    <th>
+                      Created
+                    </th>
+                    <th width="60">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
 
-                  {loading ? (
-                    <tbody>
+                {loading ? (
+                  <tbody>
+                    <tr>
+                      <td
+                        colSpan="9"
+                        className="text-center py-5"
+                      >
+                        <Loader />
+                      </td>
+                    </tr>
+                  </tbody>
+                ) : (
+                  <tbody>
+                    {invoiceTemplates.length >
+                    0 ? (
+                      invoiceTemplates.map(
+                        (
+                          template,
+                        ) => (
+                          <tr
+                            key={
+                              template.id
+                            }
+                          >
+                            <td className="fw-semibold">
+                              {
+                                template.name
+                              }
+                            </td>
+
+                            <td>
+                              {template.description ||
+                                '-'}
+                            </td>
+
+                            <td>
+                              <small className="text-muted">
+                                {
+                                  template.processor_class
+                                }
+                              </small>
+                            </td>
+                            <td>
+                              {template.category_name || "-"}
+                            </td>
+                            <td>
+                              {template.is_default ? (
+                                <Badge bg="success">
+                                  Yes
+                                </Badge>
+                              ) : (
+                                <Badge bg="secondary">
+                                  No
+                                </Badge>
+                              )}
+                            </td>
+
+                            <td>
+                              {template.created_at
+                                ? dateFormat(
+                                    template.created_at.substring(
+                                      0,
+                                      10,
+                                    ),
+                                  )
+                                : '-'}
+                            </td>
+
+                            <td className="text-center">
+                              <Dropdown align="end">
+                                <Dropdown.Toggle
+                                  variant="light"
+                                  size="sm"
+                                  className="border-0 shadow-none"
+                                >
+                                  <BsThreeDots
+                                    size={
+                                      18
+                                    }
+                                  />
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                  <Dropdown.Item
+                                    as={
+                                      Link
+                                    }
+                                    href={`/invoice-templates/${template.id}`}
+                                  >
+                                    👁
+                                    View
+                                  </Dropdown.Item>
+
+                                  <Dropdown.Item
+                                    as={
+                                      Link
+                                    }
+                                    href={`/invoice-templates/${template.id}/edit`}
+                                  >
+                                    ✏
+                                    Edit
+                                  </Dropdown.Item>
+
+                                  <Dropdown.Divider />
+
+                                  <Dropdown.Item
+                                    className="text-danger"
+                                    onClick={() =>
+                                      handleDelete(
+                                        template.id,
+                                      )
+                                    }
+                                  >
+                                    🗑
+                                    Delete
+                                  </Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </td>
+                          </tr>
+                        ),
+                      )
+                    ) : (
                       <tr>
                         <td
                           colSpan="9"
                           className="text-center py-5"
                         >
-                          <Loader />
+                          <h6 className="mb-1">
+                            No Invoice
+                            Templates
+                            Found
+                          </h6>
+
+                          <small className="text-muted">
+                            Click "Add
+                            Template" to
+                            create your
+                            first invoice
+                            template.
+                          </small>
                         </td>
                       </tr>
-                    </tbody>
-                  ) : (
-                    <tbody>
-                      {invoiceTemplates.length >
-                      0 ? (
-                        invoiceTemplates.map(
-                          (
-                            template,
-                          ) => (
-                            <tr
-                              key={
-                                template.id
-                              }
-                            >
-                              <td className="fw-semibold">
-                                {
-                                  template.name
-                                }
-                              </td>
-
-                              <td>
-                                {template.description ||
-                                  '-'}
-                              </td>
-
-                              <td>
-                                <small className="text-muted">
-                                  {
-                                    template.processor_class
-                                  }
-                                </small>
-                              </td>
-                              <td>
-                                {template.category_name || "-"}
-                              </td>
-                              <td>
-                                {template.is_default ? (
-                                  <Badge bg="success">
-                                    Yes
-                                  </Badge>
-                                ) : (
-                                  <Badge bg="secondary">
-                                    No
-                                  </Badge>
-                                )}
-                              </td>
-
-                              <td>
-                                {template.created_at
-                                  ? dateFormat(
-                                      template.created_at.substring(
-                                        0,
-                                        10,
-                                      ),
-                                    )
-                                  : '-'}
-                              </td>
-
-                              <td className="text-center">
-                                <Dropdown align="end">
-                                  <Dropdown.Toggle
-                                    variant="light"
-                                    size="sm"
-                                    className="border-0 shadow-none"
-                                  >
-                                    <BsThreeDots
-                                      size={
-                                        18
-                                      }
-                                    />
-                                  </Dropdown.Toggle>
-
-                                  <Dropdown.Menu>
-                                    <Dropdown.Item
-                                      as={
-                                        Link
-                                      }
-                                      href={`/invoice-templates/${template.id}`}
-                                    >
-                                      👁
-                                      View
-                                    </Dropdown.Item>
-
-                                    <Dropdown.Item
-                                      as={
-                                        Link
-                                      }
-                                      href={`/invoice-templates/${template.id}/edit`}
-                                    >
-                                      ✏
-                                      Edit
-                                    </Dropdown.Item>
-
-                                    <Dropdown.Divider />
-
-                                    <Dropdown.Item
-                                      className="text-danger"
-                                      onClick={() =>
-                                        handleDelete(
-                                          template.id,
-                                        )
-                                      }
-                                    >
-                                      🗑
-                                      Delete
-                                    </Dropdown.Item>
-                                  </Dropdown.Menu>
-                                </Dropdown>
-                              </td>
-                            </tr>
-                          ),
-                        )
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan="9"
-                            className="text-center py-5"
-                          >
-                            <h6 className="mb-1">
-                              No Invoice
-                              Templates
-                              Found
-                            </h6>
-
-                            <small className="text-muted">
-                              Click "Add
-                              Template" to
-                              create your
-                              first invoice
-                              template.
-                            </small>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  )}
-                </table>
+                    )}
+                  </tbody>
+                )}
+              </table>
               </div>
             </Card.Body>
           </Card>
