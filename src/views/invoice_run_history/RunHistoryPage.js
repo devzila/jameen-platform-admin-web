@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import useApi from "hooks/useApi";
 import { Form } from "react-bootstrap";
@@ -67,6 +68,7 @@ function RunHistoryPage({
   emptyTitle = "No invoice run history found",
   emptyText = "Try a different company filter.",
 }) {
+  const router = useRouter();
   const { get, loading } = useApi();
   const [runs, setRuns] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -106,6 +108,11 @@ function RunHistoryPage({
       console.error(err);
       setRuns([]);
     }
+  };
+
+  const openRun = (item) => {
+    if (!item?.id) return;
+    router.push(`/invoice-run-history/show?id=${item.id}`);
   };
 
   return (
@@ -170,9 +177,13 @@ function RunHistoryPage({
             ? runs.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <div className="cell-title">
+                    <button
+                      type="button"
+                      className="admin-link-button cell-title"
+                      onClick={() => openRun(item)}
+                    >
                       {item?.property?.name || "-"}
-                    </div>
+                    </button>
                   </td>
                   <td className="cell-muted">{item.started_at || "-"}</td>
                   <td className="cell-muted">{item.finished_at || "-"}</td>
