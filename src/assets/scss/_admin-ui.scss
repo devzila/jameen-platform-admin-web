@@ -88,6 +88,62 @@ body {
   margin: 0 auto;
 }
 
+.admin-page--wide {
+  max-width: 1480px;
+}
+
+/* In-card tabs */
+.admin-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: linear-gradient(180deg, #fbfcfd 0%, #f5f9fa 100%);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admin-tabs::-webkit-scrollbar-thumb {
+  background: var(--admin-border-strong);
+  border-radius: 999px;
+}
+
+.admin-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-radius: var(--admin-radius-sm);
+  border: 1px solid transparent;
+  color: var(--admin-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background var(--admin-transition), color var(--admin-transition),
+    border-color var(--admin-transition);
+}
+
+.admin-tabs__link:hover {
+  color: var(--admin-text);
+  background: rgba(13, 158, 170, 0.08);
+}
+
+.admin-tabs__link.is-active {
+  color: var(--admin-primary-strong);
+  background: var(--admin-primary-soft);
+  border-color: rgba(13, 158, 170, 0.22);
+}
+
+.admin-tabs__icon {
+  font-size: 12px;
+}
+
 .admin-page-header {
   display: flex;
   align-items: flex-start;
@@ -189,8 +245,39 @@ body {
   text-transform: uppercase;
 }
 
-.admin-field .form-control,
-.admin-form .form-control,
+.admin-form .form-check-label {
+  display: inline;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: normal;
+  color: var(--admin-text);
+  text-transform: none;
+  cursor: pointer;
+}
+
+.admin-form .form-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  min-height: 42px;
+}
+
+.admin-form .form-check input[type="checkbox"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: static !important;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--admin-primary);
+  cursor: pointer;
+}
+
+.admin-field .form-control:not(textarea),
+.admin-form .form-control:not(textarea),
 .admin-search input,
 .admin-form select.form-control {
   height: 42px;
@@ -199,6 +286,21 @@ body {
   background: #fff;
   color: var(--admin-text);
   padding: 8px 12px;
+  font-size: 14px;
+  transition: border-color var(--admin-transition), box-shadow var(--admin-transition);
+}
+
+.admin-field textarea.form-control,
+.admin-form textarea.form-control {
+  height: auto;
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.5;
+  border-radius: var(--admin-radius-sm) !important;
+  border: 1px solid var(--admin-border) !important;
+  background: #fff;
+  color: var(--admin-text);
+  padding: 10px 12px;
   font-size: 14px;
   transition: border-color var(--admin-transition), box-shadow var(--admin-transition);
 }
@@ -713,11 +815,17 @@ body {
 }
 
 .custom_input,
-.card .form-control,
-.content .form-control {
+.card .form-control:not(textarea),
+.content .form-control:not(textarea) {
   border-radius: var(--admin-radius-sm) !important;
   border: 1px solid var(--admin-border) !important;
   height: 42px;
+}
+
+.card textarea.form-control,
+.content textarea.form-control {
+  height: auto;
+  min-height: 140px;
 }
 
 .card {
